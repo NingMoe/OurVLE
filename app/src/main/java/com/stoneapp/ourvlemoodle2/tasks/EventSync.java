@@ -46,6 +46,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleEvents;
 import com.stoneapp.ourvlemoodle2.rest.MoodleRestEvent;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
+import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 public class EventSync {
     private final boolean first_update;
@@ -102,9 +103,11 @@ public class EventSync {
             }
 
             if (count == 0 && !first_update) { //if event is a new event
-                if(!isEventInCal(context,event.getEventid()+""))
+                if (SettingsUtils.shouldSyncCalendar(context) && !isEventInCal(context,event.getEventid()+""))
                     addCalendarEvent(event); //add event to user calendar
-                addNotification(event); // notify user about event
+
+                if (SettingsUtils.shouldShowNotifications(context))
+                    addNotification(event); // notify user about event
             }
 
             event.save();
@@ -114,7 +117,6 @@ public class EventSync {
     }
 
     public boolean isEventInCal(Context context, String cal_meeting_id) {
-
         Cursor cursor = context.getContentResolver().query(
                 Uri.parse("content://com.android.calendar/events"),
                 new String[] { "_id" }, " _id = ? ",
