@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:orientation="horizontal"
+    android:background="?android:attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_marginLeft="16dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textview_course_shortname"
+            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:paddingTop="5dp"
+            tools:text="COMP1220" />
+
+        <TextView
+            android:id="@+id/textview_course_fullname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:paddingTop="12dp"
+            tools:text="Electromagnetism and optics"/>
+
+    </LinearLayout>
+
+</LinearLayout>

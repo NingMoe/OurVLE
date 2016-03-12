@@ -1,0 +1,159 @@
+package com.stoneapp.ourvlemoodle2.sync;
+
+import android.accounts.Account;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SyncResult;
+import android.os.Bundle;
+
+import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
+import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
+import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
+import com.stoneapp.ourvlemoodle2.models.MoodleForum;
+import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
+import com.stoneapp.ourvlemoodle2.tasks.ContentSync;
+import com.stoneapp.ourvlemoodle2.tasks.DiscussionSync;
+import com.stoneapp.ourvlemoodle2.tasks.EventSync;
+import com.stoneapp.ourvlemoodle2.tasks.MemberSync;
+import com.stoneapp.ourvlemoodle2.tasks.PostSync;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SyncAdapter extends AbstractThreadedSyncAdapter {
+    int first_update;
+    private String token;
+    private List<MoodleCourse> courses;
+    private SharedPreferences sharedPrefs;
+
+    /**
+     * Set up the sync adapter
+     */
+    public SyncAdapter(Context context, boolean autoInitialize) {
+        super(context, autoInitialize);
+    }
+
+    /**
+     * Set up the sync adapter. This form of the
+     * constructor maintains compatibility with Android 3.0
+     * and later platform versions
+     */
+    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+        super(context, autoInitialize, allowParallelSyncs);
+    }
+
+    /**
+     * Perform a sync for this account. SyncAdapter-specific parameters may
+     * be specified in extras, which is guaranteed to not be null. Invocations
+     * of this method are guaranteed to be serialized.
+     *
+     * @param account    the account that should be synced
+     * @param extras     SyncAdapter-specific parameters
+     * @param authority  the authority of this sync request
+     * @param provider   a ContentProviderClient that points to the ContentProvider for this
+     *                   authority
+     * @param syncResult SyncAdapter-specific parameters
+     */
+    @Override
+    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        sharedPrefs = super.getContext().getSharedPreferences(MoodleConstants.PREFS_STRING, Context.MODE_PRIVATE);
+
+        first_update = sharedPrefs.getInt(MoodleConstants.FIRST_UPDATE, 404); // flag to check whether this is the first update
+
+        token = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getToken(); // gets the url token
+
+        courses = MoodleCourse.listAll(MoodleCourse.class); // gets all the courses
+
+        updateLatestEvents();
+        updateLatestForumPosts();
+        updateLatestDiscussionPots();
+        updateLatestCourseContent();
+        updateMembers();
+    }
+
+    private void updateLatestEvents() {
+        if(courses.size() > 0 && courses != null) { // checks if there are no courses
+            ArrayList<String> courseids = new ArrayList<>();
+            for (int i = 0; i < courses.size(); i++)
+                courseids.add(courses.get(i).getCourseid() + ""); // appends course ids to list
+
+            // refresh events
+            EventSync evsync = new EventSync(token, super.getContext());
+            evsync.syncEvents(courseids); // syncs events
+        }
+    }
+
+    private void updateLatestForumPosts() {
+        ArrayList<String>forumids;
+        List<MoodleForum> forums  = MoodleForum.listAll(MoodleForum.class); // gets a list of all the forums
+        ArrayList<MoodleForum>news_forums = new ArrayList<>();
+
+        if(forums != null && forums.size() > 0) { // checks if there are no forums
+            for(int i = 0; i < forums.size(); i++) {
+                if (forums.get(i).getName().toUpperCase().contains("NEWS FORUM")) // checks if it is a news forum
+                    news_forums.add(forums.get(i));
+            }
+
+            forumids = new ArrayList<>();
+
+            if(news_forums.size() > 0) {
+                for (int i = 0; i < news_forums.size(); i++)
+                    forumids.add(news_forums.get(i).getForumid() + ""); // adds all the forums ids of the news forums to list
+            }
+
+            DiscussionSync dsync = new DiscussionSync(token, super.getContext());
+
+            boolean sync = dsync.syncDiscussions(forumids); // syncs all forum discussions
+
+            if(sync && first_update == 404)
+                sharedPrefs.edit().putInt(MoodleConstants.FIRST_UPDATE, 200); // update first update flag
+        }
+    }
+
+    private void updateLatestDiscussionPots() {
+        ArrayList<String> discussionids = new ArrayList<>();
+        List<MoodleDiscussion> discussions = MoodleDiscussion.listAll(MoodleDiscussion.class); // gets a list of all the forum discussions
+
+        if(discussions != null && discussions.size() > 0) { // checks if there are no discussions
+            for(int i = 0; i < discussions.size(); i++)
+                discussionids.add(discussions.get(i).getDiscussionid() + ""); // adds a discussion id to list
+
+            for(int i = 0; i < discussionids.size(); i++)
+                new PostSync(token).syncPosts(discussionids.get(i)); // syncs posts
+        }
+    }
+
+    private void updateMembers() {
+        ArrayList<String>courseids = new ArrayList<>();
+        if(courses != null && courses.size() == 0) { // checks if there are no courses
+            for(int i = 0; i <courses.size(); i++)
+                courseids.add(courses.get(i).getCourseid() + ""); // adds course ids to a list
+
+            for(int i = 0;i < courseids.size();i++)
+                new MemberSync(token).syncMembers(courseids.get(i)); // syncs members
+        }
+    }
+
+    private void updateLatestCourseContent() {
+        ArrayList<Integer>courseids;
+        ArrayList<Long>coursepids;
+
+        long siteid = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getId();
+
+        courseids = new ArrayList<>();
+        coursepids = new ArrayList<>();
+
+        if(courses.size() > 0 && courses != null) { // checks if there are no courses
+            for(int i = 0; i < courses.size(); i++) {
+                courseids.add(courses.get(i).getCourseid()); // adds course ids to a list
+                coursepids.add(courses.get(i).getId()); // adds course parent ids to list
+            }
+
+            for(int i = 0; i < courseids.size(); i++)
+                new ContentSync(courseids.get(i), coursepids.get(i), siteid, token, super.getContext())
+                .syncContent(); // syncs course content
+        }
+    }
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/forum_img"
+        android:layout_marginLeft="16dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/forum_name"
+            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:paddingTop="5dp"
+            tools:text="News Forum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/forum_desc"
+            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:paddingTop="12dp"
+            tools:text="The purpose of this forum is to discuss important notifications and so forth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center_horizontal"
+    android:id="@+id/specialView"
+    android:clickable="true"
+    android:layout_margin="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:selectableItemBackground">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:paddingTop="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/calImg"
+                android:src="@mipmap/ic_event"
+                android:layout_marginLeft="5dp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
+
+            <TextView
+                android:id="@+id/eventname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                tools:text="Quiz Closes"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:alpha="0.7" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:paddingTop="10dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/eventcourse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingLeft="5dp"
+                android:layout_alignParentLeft="true"
+                tools:text="COMP1161" />
+
+            <TextView
+                android:id="@+id/eventdate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                tools:text="Jan 03,2014"
+                android:paddingTop="10dp"
+                android:paddingRight="5dp"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/eventdesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:alpha="0.57"
+            tools:text="This quiz is worth 10% of your grade"
+            android:textColor="#000000"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Sync" >
+
+        <CheckBoxPreference
+            android:key="pref_key_sync"
+            android:title="Sync with OurVLE"
+            android:summary="Automatically sync your device to OurVLE"
+            android:defaultValue="true" />
+
+        <CheckBoxPreference
+            android:key="pref_key_sync_calendar"
+            android:title="Sync with Google Calendar"
+            android:summary="Automatically sync your events to Google Calendar"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Notifications" >
+
+        <CheckBoxPreference
+            android:key="pref_key_notifications"
+            android:title="Notifications"
+            android:summary="Notify you when new content is synced"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:key="pref_key_notifications_sound"
+            android:title="Notifications Sound"
+            android:summary="Play sound on new notifications"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:key="pref_key_notifications_vibrate"
+            android:title="Notifications Vibrate"
+            android:summary="Vibrate on new notifications"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Storage" >
+
+        <CheckBoxPreference
+            android:key="pref_key_storage"
+            android:title="Store to SD card"
+            android:summary="Save course resources to an SD card"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="About">
+
+        <Preference
+            android:title="Open-source licences"
+            android:summary="Licence details for open source software"/>
+
+        <Preference
+            android:key="build_version"
+            android:title="Build Version" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

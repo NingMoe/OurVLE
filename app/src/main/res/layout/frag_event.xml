@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swiperefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/eventList"
+            android:scrollbars="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <ProgressBar
+        android:id="@+id/progressEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+       />
+    <ImageView
+
+        android:id="@+id/no_events"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/notpresent"
+        android:layout_centerInParent="true"/>
+    <TextView
+
+        android:id="@+id/txt_notpresent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_events_present"
+        android:textSize="20sp"
+        android:paddingTop="10dp"
+        android:layout_below="@+id/no_events"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
