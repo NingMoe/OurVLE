@@ -60,37 +60,5 @@ public class MoodleLogin {
 
         return token;
     }
-
-//    public MoodleToken getToken() {
-//        String urlParams = "";
-//
-//        String URL = MoodleConstants.URL + "/login/token.php";
-//
-//        try {
-//            urlParams = "username=" + URLEncoder.encode(usrname ,"UTF-8")+
-//                    "&password=" + URLEncoder.encode(passwd,"UTF-8");
-//        } catch(UnsupportedEncodingException e) {
-//            Log.d("MoodleToken", "Error");
-//            e.printStackTrace();
-//        }
-//
-//        GsonObjectRequest<MoodleToken> gsObjRequest =
-//                new GsonObjectRequest<>(URL+ "?" + urlParams + "&service=" + SERVICE, MoodleToken.class, null, new Response.Listener<MoodleToken>() {
-//                    @Override
-//                    public void onResponse(MoodleToken token) {
-//                        MoodleLogin.this.token = token;
-//                    }
-//                }, new Response.ErrorListener() {
-//
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        token.appenedError("\n" + SERVICE + " : " + error.getMessage());
-//                    }
-//                });
-//
-//        VolleySingleton.getInstance().addToRequestQueue(gsObjRequest);
-//
-//        return token;
-//    }
 }
 
