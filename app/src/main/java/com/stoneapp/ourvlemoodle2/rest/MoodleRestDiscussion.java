@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Matthew Stone and Romario Maxwell.
+ *
+ * This file is part of OurVLE.
+ *
+ * OurVLE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OurVLE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.stoneapp.ourvlemoodle2.rest;
 
 import java.io.IOException;
@@ -20,14 +39,14 @@ import com.google.gson.reflect.TypeToken;
 
 public class MoodleRestDiscussion {
 
-	String token;
+    String token;
     String url = MoodleConstants.URL;
     String format = MoodleConstants.format;
     String function = MoodleConstants.DISCUSSION_FUNCTION;
 
     public MoodleRestDiscussion(String token){
-		this.token =token;
-	}
+        this.token =token;
+    }
 
     public ArrayList<MoodleDiscussion> getDiscussions(List<String> forumids){
 
@@ -88,11 +107,11 @@ public class MoodleRestDiscussion {
 
         return discussions;
     }
-	
-	/*public ArrayList<MoodleDiscussion> getDiscussions(List<String> forumids){
-		
 
-		ArrayList<MoodleDiscussion> discussions = null;
+    /*public ArrayList<MoodleDiscussion> getDiscussions(List<String> forumids){
+
+
+        ArrayList<MoodleDiscussion> discussions = null;
         try {
             String url_params="";
 
@@ -128,13 +147,13 @@ public class MoodleRestDiscussion {
             e.printStackTrace();
             return null;
         } catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            // TODO Auto-generated catch block
+            e.printStackTrace();
             return null; //to prevent app from crashing
         }
-		
-		return discussions;
-	}*/
-		
-	
+
+        return discussions;
+    }*/
+
+
 }

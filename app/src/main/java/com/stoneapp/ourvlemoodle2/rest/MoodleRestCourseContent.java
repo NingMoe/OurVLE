@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Matthew Stone and Romario Maxwell.
+ *
+ * This file is part of OurVLE.
+ *
+ * OurVLE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OurVLE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.stoneapp.ourvlemoodle2.rest;
 
 import java.io.IOException;
@@ -19,14 +38,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class MoodleRestCourseContent {
-	
 
-	private final String format = MoodleConstants.format;
-	private final String function = MoodleConstants.CONTENT_FUNCTION;
-	private String URL = MoodleConstants.URL;
-	private String token;
-	
-	public MoodleRestCourseContent(String token){
+
+    private final String format = MoodleConstants.format;
+    private final String function = MoodleConstants.CONTENT_FUNCTION;
+    private String URL = MoodleConstants.URL;
+    private String token;
+
+    public MoodleRestCourseContent(String token){
         this.token = token;
     }
 
@@ -78,15 +97,15 @@ public class MoodleRestCourseContent {
     }
 
    /* public ArrayList<MoodleSection> getSections(String courseid){
-		
-		ArrayList<MoodleSection> sections = null;
-		
-		try {
-			
-			String params = "&courseid=" + URLEncoder.encode(courseid, "UTF-8"); //appends courseid param to url
-			String url_rest = URL + "/webservice/rest/server.php" + "?wstoken="
-					+ token + "&wsfunction=" + function
-					+ "&moodlewsrestformat=" + format; //constructs rest api url
+
+        ArrayList<MoodleSection> sections = null;
+
+        try {
+
+            String params = "&courseid=" + URLEncoder.encode(courseid, "UTF-8"); //appends courseid param to url
+            String url_rest = URL + "/webservice/rest/server.php" + "?wstoken="
+                    + token + "&wsfunction=" + function
+                    + "&moodlewsrestformat=" + format; //constructs rest api url
 
             BasicRestCall basicRestCall = new BasicRestCall(url_rest + params);
             //InputStreamReader inputStreamReader = basicRestCall.getInputStream(); //get input stream
@@ -96,10 +115,10 @@ public class MoodleRestCourseContent {
 
             Reader reader = basicRestCall.getInputStream();
             GsonExclude exclude = new GsonExclude();
-				
+
             Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                     .addSerializationExclusionStrategy(exclude).create();
-				
+
             sections = gson.fromJson(reader, new TypeToken<List<MoodleSection>>(){}.getType()); //converts json to java objects
             reader.close();
         } catch (MalformedURLException e) {
@@ -107,15 +126,15 @@ public class MoodleRestCourseContent {
             e.printStackTrace();
             return null;
         } catch (IOException e) {
-				// TODO Auto-generated catch block
+                // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         } catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            // TODO Auto-generated catch block
+            e.printStackTrace();
             return null;
-		}
-		
-		return sections;
-	}*/
+        }
+
+        return sections;
+    }*/
 }

@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Matthew Stone and Romario Maxwell.
+ *
+ * This file is part of OurVLE.
+ *
+ * OurVLE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OurVLE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.stoneapp.ourvlemoodle2.models;
 
 import java.util.ArrayList;
@@ -7,245 +26,245 @@ import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
-public class MoodleModule  extends SugarRecord<MoodleModule>{
-	
-	@SerializedName("id")
-	int moduleid;
+public class MoodleModule  extends SugarRecord<MoodleModule> {
 
-	@SerializedName("url")
-	String url;
+    @SerializedName("id")
+    int moduleid;
 
-	@SerializedName("name")
-	String name;
+    @SerializedName("url")
+    String url;
 
-	@SerializedName("description")
-	String description;
+    @SerializedName("name")
+    String name;
 
-	@SerializedName("visible")
-	int visible;
+    @SerializedName("description")
+    String description;
 
-	@SerializedName("modicon")
-	String modicon;
+    @SerializedName("visible")
+    int visible;
 
-	@SerializedName("modname")
-	String modname;
+    @SerializedName("modicon")
+    String modicon;
 
-	@SerializedName("modplural")
-	String modplural;
+    @SerializedName("modname")
+    String modname;
 
-	@SerializedName("availablefrom")
-	int availablefrom;
+    @SerializedName("modplural")
+    String modplural;
 
-	@SerializedName("availableuntil")
-	int availableuntil;
+    @SerializedName("availablefrom")
+    int availablefrom;
 
-	@SerializedName("indent")
-	int indent;
+    @SerializedName("availableuntil")
+    int availableuntil;
 
-	@Ignore
-	@SerializedName("contents")
-	ArrayList<MoodleModuleContent> contents;
+    @SerializedName("indent")
+    int indent;
 
-	// Relational parameters
-	Long parentid;
-	int sectionid;
-	int courseid;
-	Long siteid;
+    @Ignore
+    @SerializedName("contents")
+    ArrayList<MoodleModuleContent> contents;
 
-	/**
-	 * module or activity id
-	 * 
-	 * @return
-	 */
-	public int getModuleid() {
-		return moduleid;
-	}
+    // Relational parameters
+    Long parentid;
+    int sectionid;
+    int courseid;
+    Long siteid;
 
-	/**
-	 * module or activity url
-	 * 
-	 * @return
-	 */
-	public String getUrl() {
-		return url;
-	}
+    /**
+     * module or activity id
+     *
+     * @return
+     */
+    public int getModuleid() {
+        return moduleid;
+    }
 
-	/**
-	 * activity module name
-	 * 
-	 * @return
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * module or activity url
+     *
+     * @return
+     */
+    public String getUrl() {
+        return url;
+    }
 
-	/**
-	 * activity description
-	 * 
-	 * @return
-	 */
-	public String getDescription() {
-		return description;
-	}
+    /**
+     * activity module name
+     *
+     * @return
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * is the module visible
-	 * 
-	 * @return
-	 */
-	public int getVisible() {
-		return visible;
-	}
+    /**
+     * activity description
+     *
+     * @return
+     */
+    public String getDescription() {
+        return description;
+    }
 
-	/**
-	 * activity icon url
-	 * 
-	 * @return
-	 */
-	public String getModicon() {
-		return modicon;
-	}
+    /**
+     * is the module visible
+     *
+     * @return
+     */
+    public int getVisible() {
+        return visible;
+    }
 
-	/**
-	 * activity module type
-	 * 
-	 * @return
-	 */
-	public String getModname() {
-		return modname;
-	}
+    /**
+     * activity icon url
+     *
+     * @return
+     */
+    public String getModicon() {
+        return modicon;
+    }
 
-	/**
-	 * activity module plural name
-	 * 
-	 * @return
-	 */
-	public String getModplural() {
-		return modplural;
-	}
+    /**
+     * activity module type
+     *
+     * @return
+     */
+    public String getModname() {
+        return modname;
+    }
 
-	/**
-	 * module availability start date
-	 * 
-	 * @return
-	 */
-	public int getAvailablefrom() {
-		return availablefrom;
-	}
+    /**
+     * activity module plural name
+     *
+     * @return
+     */
+    public String getModplural() {
+        return modplural;
+    }
 
-	/**
-	 * module availability end date
-	 * 
-	 * @return
-	 */
-	public int getAvailableuntil() {
-		return availableuntil;
-	}
+    /**
+     * module availability start date
+     *
+     * @return
+     */
+    public int getAvailablefrom() {
+        return availablefrom;
+    }
 
-	/**
-	 * number of identation in the site
-	 * 
-	 * @return
-	 */
-	public int getIndent() {
-		return indent;
-	}
+    /**
+     * module availability end date
+     *
+     * @return
+     */
+    public int getAvailableuntil() {
+        return availableuntil;
+    }
 
-	/**
-	 * List of contents
-	 * 
-	 * @return
-	 */
-	public ArrayList<MoodleModuleContent> getContents() {
-		return contents;
-	}
+    /**
+     * number of identation in the site
+     *
+     * @return
+     */
+    public int getIndent() {
+        return indent;
+    }
 
-	/**
-	 * Set list of contents <br/>
-	 * Used when getting course contents from database
-	 * 
-	 * @return
-	 */
-	public void setContents(List<MoodleModuleContent> contents) {
-		this.contents = new ArrayList<MoodleModuleContent>(contents);
-	}
+    /**
+     * List of contents
+     *
+     * @return
+     */
+    public ArrayList<MoodleModuleContent> getContents() {
+        return contents;
+    }
 
-	/**
-	 * Get the database id of the parent section. Not to be confused with actual
-	 * sectionid given to a section from Moodle site. This id is given by Sugar
-	 * db while saving the parent section
-	 * 
-	 * @return
-	 */
-	public Long getParentid() {
-		return parentid;
-	}
+    /**
+     * Set list of contents <br/>
+     * Used when getting course contents from database
+     *
+     * @return
+     */
+    public void setContents(List<MoodleModuleContent> contents) {
+        this.contents = new ArrayList<MoodleModuleContent>(contents);
+    }
 
-	/**
-	 * sectionid of the section to which this Module belongs to. This id is
-	 * given to a section by Moodle site.
-	 * 
-	 * @return
-	 */
-	public int getSectionid() {
-		return sectionid;
-	}
+    /**
+     * Get the database id of the parent section. Not to be confused with actual
+     * sectionid given to a section from Moodle site. This id is given by Sugar
+     * db while saving the parent section
+     *
+     * @return
+     */
+    public Long getParentid() {
+        return parentid;
+    }
 
-	/**
-	 * courseid of the course to which this section belongs to. This id is given
-	 * to a course by Moodle site
-	 * 
-	 * @return
-	 */
-	public int getCourseid() {
-		return courseid;
-	}
+    /**
+     * sectionid of the section to which this Module belongs to. This id is
+     * given to a section by Moodle site.
+     *
+     * @return
+     */
+    public int getSectionid() {
+        return sectionid;
+    }
 
-	/**
-	 * Get the siteid of the Moodle site to which this section belong to. siteid
-	 * is given to an user account by sugar db on successful login
-	 * 
-	 * @return
-	 */
-	public Long getSiteid() {
-		return siteid;
-	}
+    /**
+     * courseid of the course to which this section belongs to. This id is given
+     * to a course by Moodle site
+     *
+     * @return
+     */
+    public int getCourseid() {
+        return courseid;
+    }
 
-	/**
-	 * Set the module parent section db id
-	 * 
-	 * @param parentid
-	 */
-	public void setParentid(Long parentid) {
-		this.parentid = parentid;
-	}
+    /**
+     * Get the siteid of the Moodle site to which this section belong to. siteid
+     * is given to an user account by sugar db on successful login
+     *
+     * @return
+     */
+    public Long getSiteid() {
+        return siteid;
+    }
 
-	/**
-	 * Set the module course Moodle id
-	 * 
-	 * @param courseid
-	 */
-	public void setCourseid(int courseid) {
-		this.courseid = courseid;
-	}
+    /**
+     * Set the module parent section db id
+     *
+     * @param parentid
+     */
+    public void setParentid(Long parentid) {
+        this.parentid = parentid;
+    }
 
-	/**
-	 * Set the module parent section Moodle id
-	 * 
-	 * @param section
-	 *            .id
-	 */
-	public void setSectionid(int sectionid) {
-		this.sectionid = sectionid;
-	}
+    /**
+     * Set the module course Moodle id
+     *
+     * @param courseid
+     */
+    public void setCourseid(int courseid) {
+        this.courseid = courseid;
+    }
 
-	/**
-	 * Set the siteid to which this module belong to.
-	 * 
-	 * @param siteid
-	 */
-	public void setSiteid(Long siteid) {
-		this.siteid = siteid;
-	}
-	
+    /**
+     * Set the module parent section Moodle id
+     *
+     * @param section
+     *            .id
+     */
+    public void setSectionid(int sectionid) {
+        this.sectionid = sectionid;
+    }
+
+    /**
+     * Set the siteid to which this module belong to.
+     *
+     * @param siteid
+     */
+    public void setSiteid(Long siteid) {
+        this.siteid = siteid;
+    }
+
 }

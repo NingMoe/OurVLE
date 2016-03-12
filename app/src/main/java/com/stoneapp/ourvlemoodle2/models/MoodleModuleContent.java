@@ -1,229 +1,248 @@
+/*
+ * Copyright 2016 Matthew Stone and Romario Maxwell.
+ *
+ * This file is part of OurVLE.
+ *
+ * OurVLE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OurVLE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.stoneapp.ourvlemoodle2.models;
 
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 
 public class MoodleModuleContent extends SugarRecord<MoodleModuleContent> {
-	
-	@SerializedName("type")
-	String type;
 
-	@SerializedName("filename")
-	String filename;
+    @SerializedName("type")
+    String type;
 
-	@SerializedName("filepath")
-	String filepath;
+    @SerializedName("filename")
+    String filename;
 
-	@SerializedName("filesize")
-	int filesize;
+    @SerializedName("filepath")
+    String filepath;
 
-	@SerializedName("fileurl")
-	String fileurl;
+    @SerializedName("filesize")
+    int filesize;
 
-	@SerializedName("content")
-	String content;
+    @SerializedName("fileurl")
+    String fileurl;
 
-	@SerializedName("timecreated")
-	int timecreated;
+    @SerializedName("content")
+    String content;
 
-	@SerializedName("timemodified")
-	int timemodified;
+    @SerializedName("timecreated")
+    int timecreated;
 
-	@SerializedName("sortorder")
-	int sortorder;
+    @SerializedName("timemodified")
+    int timemodified;
 
-	@SerializedName("userid")
-	int userid;
+    @SerializedName("sortorder")
+    int sortorder;
 
-	@SerializedName("author")
-	String author;
+    @SerializedName("userid")
+    int userid;
 
-	@SerializedName("license")
-	String license;
+    @SerializedName("author")
+    String author;
 
-	// Relational parameters
-	Long parentid;
-	int moduleid;
-	int sectionid;
-	int courseid;
-	Long siteid;
+    @SerializedName("license")
+    String license;
 
-	/**
-	 * Get content type
-	 * 
-	 * @return
-	 */
-	public String getType() {
-		return type;
-	}
+    // Relational parameters
+    Long parentid;
+    int moduleid;
+    int sectionid;
+    int courseid;
+    Long siteid;
 
-	/**
-	 * Get filename as saved in Moodle
-	 * 
-	 * @return
-	 */
-	public String getFilename() {
-		return filename;
-	}
+    /**
+     * Get content type
+     *
+     * @return
+     */
+    public String getType() {
+        return type;
+    }
 
-	/**
-	 * Get filepath
-	 * 
-	 * @return
-	 */
-	public String getFilepath() {
-		return filepath;
-	}
+    /**
+     * Get filename as saved in Moodle
+     *
+     * @return
+     */
+    public String getFilename() {
+        return filename;
+    }
 
-	/**
-	 * Get filesize
-	 * 
-	 * @return
-	 */
-	public int getFilesize() {
-		return filesize;
-	}
+    /**
+     * Get filepath
+     *
+     * @return
+     */
+    public String getFilepath() {
+        return filepath;
+    }
 
-	/**
-	 * Get file download url. <br/>
-	 * <b>Note:</b> token must be appended as a param to download
-	 * 
-	 * @return
-	 */
-	public String getFileurl() {
-		return fileurl;
-	}
+    /**
+     * Get filesize
+     *
+     * @return
+     */
+    public int getFilesize() {
+        return filesize;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    /**
+     * Get file download url. <br/>
+     * <b>Note:</b> token must be appended as a param to download
+     *
+     * @return
+     */
+    public String getFileurl() {
+        return fileurl;
+    }
 
-	public int getTimecreated() {
-		return timecreated;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public int getTimemodified() {
-		return timemodified;
-	}
+    public int getTimecreated() {
+        return timecreated;
+    }
 
-	public int getSortorder() {
-		return sortorder;
-	}
+    public int getTimemodified() {
+        return timemodified;
+    }
 
-	/**
-	 * Get author userid
-	 * @return
-	 */
-	public int getUserid() {
-		return userid;
-	}
+    public int getSortorder() {
+        return sortorder;
+    }
 
-	/**
-	 * Get author name
-	 * @return
-	 */
-	public String getAuthor() {
-		return author;
-	}
+    /**
+     * Get author userid
+     * @return
+     */
+    public int getUserid() {
+        return userid;
+    }
 
-	public String getLicense() {
-		return license;
-	}
+    /**
+     * Get author name
+     * @return
+     */
+    public String getAuthor() {
+        return author;
+    }
 
-	/**
-	 * Get the database id of the parent module. Not to be confused with actual
-	 * moduleid given to a module by Moodle site. This id is given by Sugar db
-	 * while saving the parent module
-	 * 
-	 * @return
-	 */
-	public Long getParentid() {
-		return parentid;
-	}
+    public String getLicense() {
+        return license;
+    }
 
-	/**
-	 * moduleid of the module to which this module content belongs to. This id
-	 * is given to a module by Moodle site.
-	 * 
-	 * @return
-	 */
-	public int getModuleid() {
-		return moduleid;
-	}
+    /**
+     * Get the database id of the parent module. Not to be confused with actual
+     * moduleid given to a module by Moodle site. This id is given by Sugar db
+     * while saving the parent module
+     *
+     * @return
+     */
+    public Long getParentid() {
+        return parentid;
+    }
 
-	/**
-	 * sectionid of the section to which this module content content belongs to.
-	 * This id is given to a section by Moodle site.
-	 * 
-	 * @return
-	 */
-	public int getSectionid() {
-		return sectionid;
-	}
+    /**
+     * moduleid of the module to which this module content belongs to. This id
+     * is given to a module by Moodle site.
+     *
+     * @return
+     */
+    public int getModuleid() {
+        return moduleid;
+    }
 
-	/**
-	 * courseid of the course to which this section belongs to. This id is given
-	 * to a course by Moodle site
-	 * 
-	 * @return
-	 */
-	public int getCourseid() {
-		return courseid;
-	}
+    /**
+     * sectionid of the section to which this module content content belongs to.
+     * This id is given to a section by Moodle site.
+     *
+     * @return
+     */
+    public int getSectionid() {
+        return sectionid;
+    }
 
-	/**
-	 * Get the siteid of the Moodle site to which this section belong to. siteid
-	 * is given to an user account by sugar db on successful login
-	 * 
-	 * @return
-	 */
-	public Long getSiteid() {
-		return siteid;
-	}
+    /**
+     * courseid of the course to which this section belongs to. This id is given
+     * to a course by Moodle site
+     *
+     * @return
+     */
+    public int getCourseid() {
+        return courseid;
+    }
 
-	/**
-	 * Set the content parent module db id
-	 * 
-	 * @param parentid
-	 */
-	public void setParentid(Long parentid) {
-		this.parentid = parentid;
-	}
+    /**
+     * Get the siteid of the Moodle site to which this section belong to. siteid
+     * is given to an user account by sugar db on successful login
+     *
+     * @return
+     */
+    public Long getSiteid() {
+        return siteid;
+    }
 
-	/**
-	 * Set the content course Moodle id
-	 * 
-	 * @param courseid
-	 */
-	public void setCourseid(int courseid) {
-		this.courseid = courseid;
-	}
+    /**
+     * Set the content parent module db id
+     *
+     * @param parentid
+     */
+    public void setParentid(Long parentid) {
+        this.parentid = parentid;
+    }
 
-	/**
-	 * Set the content parent module section Moodle id
-	 * 
-	 * @param sectionid
-	 */
-	public void setSectionid(int sectionid) {
-		this.sectionid = sectionid;
-	}
+    /**
+     * Set the content course Moodle id
+     *
+     * @param courseid
+     */
+    public void setCourseid(int courseid) {
+        this.courseid = courseid;
+    }
 
-	/**
-	 * Set the content parent module Moodle id
-	 * 
-	 * @param moduleid
-	 */
-	public void setModuleid(int moduleid) {
-		this.moduleid = moduleid;
-	}
+    /**
+     * Set the content parent module section Moodle id
+     *
+     * @param sectionid
+     */
+    public void setSectionid(int sectionid) {
+        this.sectionid = sectionid;
+    }
 
-	/**
-	 * Set the siteid to which this modulecontent belong to.
-	 * 
-	 * @param siteid
-	 */
-	public void setSiteid(Long siteid) {
-		this.siteid = siteid;
-	}
-	
+    /**
+     * Set the content parent module Moodle id
+     *
+     * @param moduleid
+     */
+    public void setModuleid(int moduleid) {
+        this.moduleid = moduleid;
+    }
+
+    /**
+     * Set the siteid to which this modulecontent belong to.
+     *
+     * @param siteid
+     */
+    public void setSiteid(Long siteid) {
+        this.siteid = siteid;
+    }
+
 }

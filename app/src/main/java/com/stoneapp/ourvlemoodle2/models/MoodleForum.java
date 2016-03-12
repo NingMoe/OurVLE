@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Matthew Stone and Romario Maxwell.
+ *
+ * This file is part of OurVLE.
+ *
+ * OurVLE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OurVLE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.stoneapp.ourvlemoodle2.models;
 
 import com.google.gson.annotations.SerializedName;
@@ -5,76 +24,76 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 public class MoodleForum extends SugarRecord<MoodleForum>{
-	
-	// since id is a reserved field in SugarRecord
-		@SerializedName("id")
-		int forumid;
 
-		@SerializedName("course")
-		String courseid;
+    // since id is a reserved field in SugarRecord
+        @SerializedName("id")
+        int forumid;
 
-		@SerializedName("name")
-		String name;
+        @SerializedName("course")
+        String courseid;
 
-		@SerializedName("intro")
-		String intro;
+        @SerializedName("name")
+        String name;
 
-		@SerializedName("introformat")
-		String introformat;
+        @SerializedName("intro")
+        String intro;
 
-		@SerializedName("assessed")
-		int assessed;
+        @SerializedName("introformat")
+        String introformat;
 
-		@SerializedName("assesstimestart")
-		int assesstimestart;
+        @SerializedName("assessed")
+        int assessed;
 
-		@SerializedName("assesstimefinish")
-		int assesstimefinish;
+        @SerializedName("assesstimestart")
+        int assesstimestart;
 
-		@SerializedName("scale")
-		int scale;
+        @SerializedName("assesstimefinish")
+        int assesstimefinish;
 
-		@SerializedName("maxbytes")
-		int maxbytes;
+        @SerializedName("scale")
+        int scale;
 
-		@SerializedName("maxattachments")
-		int maxattachments;
+        @SerializedName("maxbytes")
+        int maxbytes;
 
-		@SerializedName("forcesubscribe")
-		int forcesubscribe;
+        @SerializedName("maxattachments")
+        int maxattachments;
 
-		@SerializedName("trackingtype")
-		int trackingtype;
+        @SerializedName("forcesubscribe")
+        int forcesubscribe;
 
-		@SerializedName("rsstype")
-		int rsstype;
+        @SerializedName("trackingtype")
+        int trackingtype;
 
-		@SerializedName("rssarticles")
-		int rssarticles;
+        @SerializedName("rsstype")
+        int rsstype;
 
-		@SerializedName("timemodified")
-		int timemodified;
+        @SerializedName("rssarticles")
+        int rssarticles;
 
-		@SerializedName("warnafter")
-		int warnafter;
+        @SerializedName("timemodified")
+        int timemodified;
 
-		@SerializedName("blockafter")
-		int blockafter;
+        @SerializedName("warnafter")
+        int warnafter;
 
-		@SerializedName("blockperiod")
-		int blockperiod;
+        @SerializedName("blockafter")
+        int blockafter;
 
-		@SerializedName("completiondiscussions")
-		int completiondiscussions;
+        @SerializedName("blockperiod")
+        int blockperiod;
 
-		@SerializedName("completionreplies")
-		int completionreplies;
+        @SerializedName("completiondiscussions")
+        int completiondiscussions;
 
-		@SerializedName("completionposts")
-		int completionposts;
+        @SerializedName("completionreplies")
+        int completionreplies;
 
-		@SerializedName("cmid")
-		int cmid;
+        @SerializedName("completionposts")
+        int completionposts;
+
+        @SerializedName("cmid")
+        int cmid;
 
         @Ignore
         @SerializedName("exception")
@@ -94,132 +113,132 @@ public class MoodleForum extends SugarRecord<MoodleForum>{
         @SerializedName("debuginfo")
         String debuginfo;
 
-	
-		long siteid;
-		String coursename;
-		
-		public String getCoursename() {
-			return coursename;
-		}
 
-		public void setCoursename(String coursename) {
-			this.coursename = coursename;
-		}
+        long siteid;
+        String coursename;
 
-		public int getForumid() {
-			return forumid;
-		}
+        public String getCoursename() {
+            return coursename;
+        }
 
-		public String getCourseid() {
-			return courseid;
-		}
+        public void setCoursename(String coursename) {
+            this.coursename = coursename;
+        }
 
-		public String getName() {
-			return name;
-		}
+        public int getForumid() {
+            return forumid;
+        }
 
-		public String getIntro() {
-			return intro;
-		}
+        public String getCourseid() {
+            return courseid;
+        }
 
-		public String getIntroformat() {
-			return introformat;
-		}
+        public String getName() {
+            return name;
+        }
 
-		
-		public int getAssessed() {
-			return assessed;
-		}
+        public String getIntro() {
+            return intro;
+        }
 
-		public int getAssesstimestart() {
-			return assesstimestart;
-		}
-
-		public int getAssesstimefinish() {
-			return assesstimefinish;
-		}
-
-		public int getScale() {
-			return scale;
-		}
-
-		public int getMaxbytes() {
-			return maxbytes;
-		}
-
-		public int getMaxattachments() {
-			return maxattachments;
-		}
-
-		
-		public int getForcesubscribe() {
-			return forcesubscribe;
-		}
-
-	
-		public int getTrackingtype() {
-			return trackingtype;
-		}
-
-		
-		public int getRsstype() {
-			return rsstype;
-		}
-
-		
-		public int getRssarticles() {
-			return rssarticles;
-		}
-
-	
-		public int getTimemodified() {
-			return timemodified;
-		}
-
-	
-		public int getWarnafter() {
-			return warnafter;
-		}
-
-		
-		public int getBlockafter() {
-			return blockafter;
-		}
-
-	
-		public int getBlockperiod() {
-			return blockperiod;
-		}
-
-	
-		public int getCompletiondiscussions() {
-			return completiondiscussions;
-		}
-
-		
-		public int getCompletionreplies() {
-			return completionreplies;
-		}
-
-		
-		public int getCompletionposts() {
-			return completionposts;
-		}
+        public String getIntroformat() {
+            return introformat;
+        }
 
 
-		public int getCmid() {
-			return cmid;
-		}
+        public int getAssessed() {
+            return assessed;
+        }
 
-		
-		public long getSiteid() {
-			return siteid;
-		}
+        public int getAssesstimestart() {
+            return assesstimestart;
+        }
 
-	
-		public void setSiteid(long siteid) {
-			this.siteid = siteid;
-		}
+        public int getAssesstimefinish() {
+            return assesstimefinish;
+        }
+
+        public int getScale() {
+            return scale;
+        }
+
+        public int getMaxbytes() {
+            return maxbytes;
+        }
+
+        public int getMaxattachments() {
+            return maxattachments;
+        }
+
+
+        public int getForcesubscribe() {
+            return forcesubscribe;
+        }
+
+
+        public int getTrackingtype() {
+            return trackingtype;
+        }
+
+
+        public int getRsstype() {
+            return rsstype;
+        }
+
+
+        public int getRssarticles() {
+            return rssarticles;
+        }
+
+
+        public int getTimemodified() {
+            return timemodified;
+        }
+
+
+        public int getWarnafter() {
+            return warnafter;
+        }
+
+
+        public int getBlockafter() {
+            return blockafter;
+        }
+
+
+        public int getBlockperiod() {
+            return blockperiod;
+        }
+
+
+        public int getCompletiondiscussions() {
+            return completiondiscussions;
+        }
+
+
+        public int getCompletionreplies() {
+            return completionreplies;
+        }
+
+
+        public int getCompletionposts() {
+            return completionposts;
+        }
+
+
+        public int getCmid() {
+            return cmid;
+        }
+
+
+        public long getSiteid() {
+            return siteid;
+        }
+
+
+        public void setSiteid(long siteid) {
+            this.siteid = siteid;
+        }
 
         public String getDebuginfo() {
             return debuginfo;

@@ -1,3 +1,22 @@
+/*
+ * Copyright 2016 Matthew Stone and Romario Maxwell.
+ *
+ * This file is part of OurVLE.
+ *
+ * OurVLE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OurVLE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.stoneapp.ourvlemoodle2.rest;
 
 import java.io.IOException;
@@ -16,15 +35,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class MoodleRestPost {
-	
-	private String token;
+
+    private String token;
     private String url = MoodleConstants.URL;
     private String function = MoodleConstants.POSTS_FUNCTION;
     private String format = MoodleConstants.format;
 
     public MoodleRestPost(String token){
-		this.token = token;
-	}
+        this.token = token;
+    }
 
     public MoodleDiscussionPosts getDiscussionPosts(String discussionid){
         String url = MoodleConstants.URL;
@@ -73,14 +92,14 @@ public class MoodleRestPost {
         return dposts;
 
     }
-	
-	
-	/*public MoodleDiscussionPosts getDiscussionPosts(String discussionid){
 
 
-		MoodleDiscussionPosts dposts = null;
-		
-		try {
+    /*public MoodleDiscussionPosts getDiscussionPosts(String discussionid){
+
+
+        MoodleDiscussionPosts dposts = null;
+
+        try {
                 String url_params = "&discussionid=" +URLEncoder.encode(discussionid,"UTF-8"); //appends params to url
                 String rest_url = url +"/webservice/rest/server.php" + "?wstoken="
                         + token + "&wsfunction=" + function
@@ -113,8 +132,8 @@ public class MoodleRestPost {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
-		}
-		return dposts;
-		
-	}*/
+        }
+        return dposts;
+
+    }*/
 }
