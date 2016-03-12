@@ -38,6 +38,7 @@ import com.stoneapp.ourvlemoodle2.rest.MoodleRestDiscussion;
 import com.stoneapp.ourvlemoodle2.activities.PostActivity;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 public class DiscussionSync {
     String token;
@@ -85,12 +86,12 @@ public class DiscussionSync {
                     discussion.getForumid() + "").get(0).getName().toUpperCase().contains("NEWS FORUM");
 
             // if discussion is already present in database
-            if(saved_discussions.size() > 0) {
+            if (saved_discussions.size() > 0) {
                 discussion.setId(saved_discussions.get(0).getId()); // overwrite previous discussion record
             } else {
 
                 //if discussion is a new discussion and its not the first tie syncing then notify the user
-                if(allsaved_discussions != null && allsaved_discussions.size() > 0 && isNewsDiscussion
+                if (SettingsUtils.shouldShowNotifications(context) && allsaved_discussions != null && allsaved_discussions.size() > 0 && isNewsDiscussion
                         && !first_update) {
                     // addNotification(discussion);
                 }
