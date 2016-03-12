@@ -30,8 +30,6 @@ import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
 
 import com.stoneapp.ourvlemoodle2.tasks.LogoutTask;
 
-import com.stoneapp.ourvlemoodle2.view.SlidingTabLayout;
-
 import com.stoneapp.ourvlemoodle2.R;
 
 import android.content.Intent;
