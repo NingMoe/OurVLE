@@ -27,7 +27,6 @@ import com.stoneapp.ourvlemoodle2.models.MoodleModuleContent;
 import com.stoneapp.ourvlemoodle2.R;
 
 public class ImageChooser {
-
     /**
      * Used to image icon of module
      * @param module
@@ -87,12 +86,7 @@ public class ImageChooser {
                     return R.drawable.ic_insert_drive_file_24dp;
 
                 if (ext.contentEquals("pdf"))
-//<<<<<<< HEAD:app/src/main/java/com/stoneapp/ourvlemoodle2/helper/ImageChooser.java
-                   // return R.drawable.pdflarge;
                     return R.mipmap.ic_pdf;
-//=======
-                    //return R.drawable.ic_insert_drive_file_24dp;
-//>>>>>>> be536e7ab4571a744eece0c90a8934faab01b78a:app/src/main/java/com/stoneapp/ourvlemoodle2/util/ImageChooser.java
 
                 if (ext.contentEquals("zip") || ext.contentEquals("rar") || ext.contentEquals("jar"))
                     return R.drawable.ic_insert_drive_file_24dp;
