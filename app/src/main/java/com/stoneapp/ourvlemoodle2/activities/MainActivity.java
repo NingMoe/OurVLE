@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         mAccount = CreateSyncAccount(this);
 
         mResolver = getContentResolver();
+        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
         ContentResolver.addPeriodicSync(mAccount, AUTHORITY, Bundle.EMPTY, SYNC_INTERVAL);
     }
 
