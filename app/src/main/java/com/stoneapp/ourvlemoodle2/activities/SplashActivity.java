@@ -20,6 +20,7 @@
 package com.stoneapp.ourvlemoodle2.activities;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -38,6 +39,8 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         setContentView(R.layout.activity_splash);
 
