@@ -40,6 +40,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.rest.MoodleRestCourseContent;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 public class ContentSync {
     private int courseid;
@@ -136,7 +137,7 @@ public class ContentSync {
             }
 
             // only notify if it isn't the first time loading course modules in the database and if the module is of type resource and it is a new module
-            if (coursemodules.size() > 0
+            if (SettingsUtils.shouldShowNotifications(context) && coursemodules.size() > 0
                     && coursemodules != null && module.getModname().contentEquals("resource")
                     && count == 0 && !first_update)
                  addNotification(module);
