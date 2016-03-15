@@ -80,29 +80,16 @@
 
     </PreferenceCategory>
 
-    <!--<PreferenceCategory android:title="Storage" >-->
+    <PreferenceCategory android:title="Other" >
 
-        <!--<CheckBoxPreference-->
-            <!--android:key="pref_storage"-->
-            <!--android:title="Store to SD card"-->
-            <!--android:summary="Save course resources to an SD card"-->
-            <!--android:defaultValue="false" />-->
+        <Preference
+            android:key="clear_data"
+            android:title="Clear data" />
 
-    <!--</PreferenceCategory>-->
+        <Preference
+            android:key="log_out"
+            android:title="Log out" />
 
-    <!--<Preference-->
-    <!--android:title="Clear data" />-->
-
-    <!--<PreferenceCategory android:title="About">-->
-
-        <!--&lt;!&ndash;<Preference&ndash;&gt;-->
-            <!--&lt;!&ndash;android:title="Open-source licences"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:summary="Licence details for open source software"/>&ndash;&gt;-->
-
-        <!--<Preference-->
-            <!--android:key="build_version"-->
-            <!--android:title="Build Version" />-->
-
-    <!--</PreferenceCategory>-->
+    </PreferenceCategory>
 
 </PreferenceScreen>
