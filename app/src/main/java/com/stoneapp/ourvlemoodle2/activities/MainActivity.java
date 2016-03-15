@@ -23,6 +23,7 @@ import com.stoneapp.ourvlemoodle2.BuildConfig;
 import com.stoneapp.ourvlemoodle2.fragments.CalendarFragment;
 import com.stoneapp.ourvlemoodle2.fragments.CourseListFragment;
 import com.stoneapp.ourvlemoodle2.fragments.NewsFragment;
+import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
 import com.stoneapp.ourvlemoodle2.tasks.LogoutTask;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
@@ -45,14 +46,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
     public static final String ACCOUNT_TYPE = BuildConfig.APPLICATION_ID;
-    public static final String ACCOUNT = "OurVLE User";
 
     public static final long SECONDS_PER_MINUTE = 60L;
     public static final long SYNC_INTERVAL_IN_MINUTES = 60L;
@@ -119,7 +122,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static Account CreateSyncAccount(Context context) {
-        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        List<MoodleSiteInfo> sites = MoodleSiteInfo.listAll(MoodleSiteInfo.class);
+        String account = sites.get(0).getUsername();
+
+        if (TextUtils.isEmpty(account))
+            account = "OurVLE User";
+
+        Account newAccount = new Account(account, ACCOUNT_TYPE);
 
         AccountManager accountManager =
                 (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
