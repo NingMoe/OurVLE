@@ -66,4 +66,20 @@
     <string name="tab_title_news">News</string>
     <string name="label_desc">Description</string>
     <string name="label_email">Email</string>
+
+    <string-array name="pref_sync_frequency_entries">
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>4 hours</item>
+        <item>12 hours</item>
+        <item>Daily</item>
+    </string-array>
+
+    <string-array name="pref_sync_frequency_values">
+        <item>1</item>
+        <item>2</item>
+        <item>4</item>
+        <item>12</item>
+        <item>24</item>
+    </string-array>
 </resources>

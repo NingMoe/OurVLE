@@ -26,6 +26,7 @@ import com.stoneapp.ourvlemoodle2.fragments.NewsFragment;
 import com.stoneapp.ourvlemoodle2.tasks.LogoutTask;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
+import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final long SECONDS_PER_MINUTE = 60L;
     public static final long SYNC_INTERVAL_IN_MINUTES = 60L;
-    public static final long SYNC_INTERVAL = 4 * SYNC_INTERVAL_IN_MINUTES * SECONDS_PER_MINUTE;
+    public static long SYNC_INTERVAL = 4 * SYNC_INTERVAL_IN_MINUTES * SECONDS_PER_MINUTE;
 
     Account mAccount;
     ContentResolver mResolver;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
         mResolver = getContentResolver();
         ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+        SYNC_INTERVAL *= SettingsUtils.getSyncInterval(this);
         ContentResolver.addPeriodicSync(mAccount, AUTHORITY, Bundle.EMPTY, SYNC_INTERVAL);
     }
 

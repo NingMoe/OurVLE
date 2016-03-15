@@ -18,20 +18,32 @@
     along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
     -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <PreferenceCategory android:title="Sync" >
 
         <CheckBoxPreference
             android:key="pref_sync"
-            android:title="Sync with OurVLE"
-            android:summary="Automatically sync your device to OurVLE"
+            android:title="Sync"
+            android:summary="Sync device with OurVLE"
             android:defaultValue="true" />
 
+        <ListPreference
+            android:dependency="pref_sync"
+            android:key="pref_sync_interval"
+            android:title="Sync interval"
+            android:dialogTitle="Sync interval"
+            android:entries="@array/pref_sync_frequency_entries"
+            android:entryValues="@array/pref_sync_frequency_values"
+            android:summary="%s"
+            android:defaultValue="4"/>
+
         <CheckBoxPreference
+            android:dependency="pref_sync"
             android:key="pref_sync_calendar"
             android:title="Sync with Google Calendar"
-            android:summary="Automatically sync your events to Google Calendar"
+            android:summary="Sync course events with Google Calendar"
             android:defaultValue="false" />
 
     </PreferenceCategory>
@@ -44,40 +56,53 @@
             android:summary="Notify you when new content is synced"
             android:defaultValue="true" />
 
-        <SwitchPreference
-            android:key="pref_play_notification_sound"
-            android:title="Notifications Sound"
-            android:summary="Play sound on new notifications"
-            android:defaultValue="true" />
+        <RingtonePreference
+            android:dependency="pref_show_notifications"
+            android:key="pref_notification_ringtone"
+            android:title="Notification tone"
+            android:ringtoneType="notification"
+            android:showDefault="true"
+            android:showSilent="true"
+            tools:summary="Default ringtone (Tethys)"
+            android:defaultValue="content://settings/system/notification_sound"/>
 
         <SwitchPreference
+            android:dependency="pref_show_notifications"
             android:key="pref_notification_vibrate"
-            android:title="Notifications Vibrate"
-            android:summary="Vibrate on new notifications"
+            android:title="Vibrate"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:dependency="pref_show_notifications"
+            android:key="pref_notification_vibrate"
+            android:title="Notification light"
             android:defaultValue="true" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Storage" >
+    <!--<PreferenceCategory android:title="Storage" >-->
 
-        <CheckBoxPreference
-            android:key="pref_storage"
-            android:title="Store to SD card"
-            android:summary="Save course resources to an SD card"
-            android:defaultValue="false" />
+        <!--<CheckBoxPreference-->
+            <!--android:key="pref_storage"-->
+            <!--android:title="Store to SD card"-->
+            <!--android:summary="Save course resources to an SD card"-->
+            <!--android:defaultValue="false" />-->
 
-    </PreferenceCategory>
+    <!--</PreferenceCategory>-->
 
-    <PreferenceCategory android:title="About">
+    <!--<Preference-->
+    <!--android:title="Clear data" />-->
 
-        <Preference
-            android:title="Open-source licences"
-            android:summary="Licence details for open source software"/>
+    <!--<PreferenceCategory android:title="About">-->
 
-        <Preference
-            android:key="build_version"
-            android:title="Build Version" />
+        <!--&lt;!&ndash;<Preference&ndash;&gt;-->
+            <!--&lt;!&ndash;android:title="Open-source licences"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:summary="Licence details for open source software"/>&ndash;&gt;-->
 
-    </PreferenceCategory>
+        <!--<Preference-->
+            <!--android:key="build_version"-->
+            <!--android:title="Build Version" />-->
+
+    <!--</PreferenceCategory>-->
 
 </PreferenceScreen>

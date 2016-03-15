@@ -20,9 +20,13 @@
 package com.stoneapp.ourvlemoodle2.activities;
 
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.provider.Settings;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -71,9 +75,11 @@ public class SettingsActivity extends AppCompatActivity {
 
             SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
 
-            Preference mPref = findPreference("build_version");
+            Preference mPref = findPreference("pref_notification_ringtone");
 
-            mPref.setSummary(sp.getString("build_version", "Version: " + BuildConfig.VERSION_NAME));
+            Uri ringtoneUri = Uri.parse(sp.getString("pref_notification_ringtone", Settings.System.DEFAULT_NOTIFICATION_URI.toString()));
+            Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), ringtoneUri);
+            mPref.setSummary(ringtone.getTitle(getActivity()));
         }
     }
 }

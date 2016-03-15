@@ -26,7 +26,7 @@ import android.preference.PreferenceManager;
 public class SettingsUtils {
     public static final String PREF_SYNC = "pref_sync";
     public static final String PREF_SYNC_CALENDAR = "pref_sync_calendar";
-    public static final String PREF_CUR_SYNC_INTERVAL = "pref_cur_sync_interval";
+    public static final String PREF_SYNC_INTERVAL = "pref_sync_interval";
     public static final String PREF_SHOW_NOTIFICATIONS = "pref_show_notifications";
     public static final String PREF_PLAY_NOTIFICATION_SOUNDS = "pref_play_notification_sound";
     public static final String PREF_NOTIFICATION_VIBRATE = "pref_notification_vibrate";
@@ -36,14 +36,9 @@ public class SettingsUtils {
         return sp.getBoolean(PREF_SYNC, false);
     }
 
-    public static long getCurSyncInterval(final Context context) {
+    public static long getSyncInterval(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getLong(PREF_CUR_SYNC_INTERVAL, 0L);
-    }
-
-    public static void setCurSyncInterval(final Context context, long newValue) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putLong(PREF_CUR_SYNC_INTERVAL, newValue).apply();
+        return Integer.parseInt(sp.getString(PREF_SYNC_INTERVAL, "4"));
     }
 
     public static boolean shouldSyncCalendar(final Context context) {
