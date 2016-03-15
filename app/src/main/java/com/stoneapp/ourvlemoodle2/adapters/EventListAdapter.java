@@ -20,11 +20,7 @@
 package com.stoneapp.ourvlemoodle2.adapters;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -32,9 +28,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.stoneapp.ourvlemoodle2.util.TimeDate;
+import com.stoneapp.ourvlemoodle2.util.TimeUtils;
 import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
 import com.stoneapp.ourvlemoodle2.R;
 
@@ -129,7 +124,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         else
             eventViewHolder.event_date.setTextColor(Color.BLACK);
 
-        eventViewHolder.event_date.setText(TimeDate.getTime(eventdate));
+        eventViewHolder.event_date.setText(TimeUtils.getTime(eventdate));
     }
 
     @Override

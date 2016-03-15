@@ -23,38 +23,27 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Html.ImageGetter;
 
 
 import com.stoneapp.ourvlemoodle2.adapters.PostListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodlePost;
 import com.stoneapp.ourvlemoodle2.tasks.PostSync;
-import com.stoneapp.ourvlemoodle2.util.TimeDate;
 import com.stoneapp.ourvlemoodle2.R;
 
 import android.content.Context;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
-import android.text.Html;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;

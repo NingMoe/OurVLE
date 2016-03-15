@@ -36,7 +36,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.models.MoodlePost;
-import com.stoneapp.ourvlemoodle2.util.TimeDate;
+import com.stoneapp.ourvlemoodle2.util.TimeUtils;
 
 import java.util.List;
 
@@ -129,7 +129,7 @@ public class PostListAdapter  extends RecyclerView.Adapter<PostListAdapter.PostL
             holder.message.setText(format_message);
 
         int time = post.getModified();
-        holder.posttime.setText(TimeDate.getTime(time));
+        holder.posttime.setText(TimeUtils.getTime(time));
 
         char firstLetter = username.toUpperCase().charAt(0);
         ColorGenerator generator = ColorGenerator.MATERIAL;

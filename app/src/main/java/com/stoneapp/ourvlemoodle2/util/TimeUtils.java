@@ -21,7 +21,7 @@ package com.stoneapp.ourvlemoodle2.util;
 
 import java.util.Calendar;
 
-public class TimeDate {
+public class TimeUtils {
     public static String getTime(int time) {
         Calendar cal = Calendar.getInstance(); //create a new calendar instance
         Calendar cal_current = Calendar.getInstance();

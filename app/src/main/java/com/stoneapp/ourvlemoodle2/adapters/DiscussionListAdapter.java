@@ -22,12 +22,9 @@ package com.stoneapp.ourvlemoodle2.adapters;
 import android.content.Context;
 import android.content.Intent;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -39,7 +36,7 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.stoneapp.ourvlemoodle2.activities.PostActivity;
-import com.stoneapp.ourvlemoodle2.util.TimeDate;
+import com.stoneapp.ourvlemoodle2.util.TimeUtils;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.R;
@@ -148,7 +145,7 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
 
         int lastposttime = discussion.getTimemodified();
 
-        holder.lastposttime.setText(TimeDate.getTime(lastposttime));
+        holder.lastposttime.setText(TimeUtils.getTime(lastposttime));
     }
 
     @Override
