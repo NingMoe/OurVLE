@@ -35,12 +35,6 @@
         yourapp:actionViewClass="android.support.v7.widget.SearchView"/>
 
     <item
-        android:id="@+id/action_logout"
-        android:title="@string/action_logout"
-        android:orderInCategory="100"
-        yourapp:showAsAction="never" />
-
-    <item
         android:id="@+id/action_settings"
         android:title="Settings"
         android:orderInCategory="200"

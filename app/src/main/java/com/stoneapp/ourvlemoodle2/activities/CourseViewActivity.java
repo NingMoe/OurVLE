@@ -132,10 +132,6 @@ public class CourseViewActivity extends AppCompatActivity
                 onSearchRequested();
                 return true;
 
-            case R.id.action_logout:
-                new LogoutTask(this).LogOut();
-                return true;
-
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;

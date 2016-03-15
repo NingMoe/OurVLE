@@ -23,12 +23,6 @@
     tools:context="com.stoneapp.ourvlemoodle2.activities.SplashActivity">
 
     <item
-        android:id="@+id/action_logout"
-        android:title="@string/action_logout"
-        app:showAsAction="never"
-        android:orderInCategory="100" />
-
-    <item
         android:id="@+id/action_settings"
         android:title="Settings"
         android:orderInCategory="200"

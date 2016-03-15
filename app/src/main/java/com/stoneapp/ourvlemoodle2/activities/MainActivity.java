@@ -103,10 +103,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_logout:
-                logOut();
-                return true;
-
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
@@ -114,11 +110,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void logOut() {
-        LogoutTask logout = new LogoutTask(this);
-        logout.LogOut();
     }
 
     public static Account CreateSyncAccount(Context context) {

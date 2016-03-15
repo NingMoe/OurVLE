@@ -117,16 +117,8 @@ public class BrowserActivity extends AppCompatActivity {
                 this.finish();
                 return true;
 
-            case R.id.action_logout:
-                logout();
-
             default:
-            return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
-    }
-
-    public void logout(){
-        LogoutTask logout = new LogoutTask(this);
-        logout.LogOut();
     }
 }
