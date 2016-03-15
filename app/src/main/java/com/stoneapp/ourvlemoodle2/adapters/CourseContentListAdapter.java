@@ -40,11 +40,9 @@ import com.stoneapp.ourvlemoodle2.activities.BrowserActivity;
 import com.stoneapp.ourvlemoodle2.fragments.CourseContentFragment;
 import com.stoneapp.ourvlemoodle2.models.ContentListItem;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleMember;
 import com.stoneapp.ourvlemoodle2.models.MoodleModule;
 import com.stoneapp.ourvlemoodle2.models.MoodleModuleContent;
-import com.stoneapp.ourvlemoodle2.util.FileDownloader;
-import com.stoneapp.ourvlemoodle2.util.FileOpener;
+import com.stoneapp.ourvlemoodle2.util.FileUtils;
 import com.stoneapp.ourvlemoodle2.util.ImageChooser;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 
@@ -156,13 +154,10 @@ public class CourseContentListAdapter
                         String file_url = content.getFileurl();
                         file_url = file_url + "&token=" + token;
 
-                        FileDownloader fdown = new FileDownloader(ctxt);
                         Toast.makeText(ctxt, "Opening File", Toast.LENGTH_SHORT).show();
-                        fdown.download(file_url, file_path, content.getFilename());   //Downloads file if file is not present
-
-                      //  Toast.makeText(ctxt, filename, Toast.LENGTH_SHORT).show();
+                        FileUtils.download(ctxt, file_url, file_path, content.getFilename());   //Downloads file if file is not present
                     } else
-                        FileOpener.openFile(file, ctxt);   //opens file if file is found
+                        FileUtils.openFile(ctxt, file);   //opens file if file is found
                 }
 
                 //if (module.getContents()!=null || module.getContents().size()>0){

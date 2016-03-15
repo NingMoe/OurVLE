@@ -19,18 +19,49 @@
 
 package com.stoneapp.ourvlemoodle2.util;
 
+import android.annotation.TargetApi;
+import android.app.DownloadManager;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.webkit.MimeTypeMap;
+import android.widget.Toast;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.webkit.MimeTypeMap;
-import android.widget.Toast;
+public class FileUtils {
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static long download(Context context, String file_url, String file_path, String filename) {
+        File file;
 
-public  class FileOpener {
-    public static void openFile(File file,Context context) {
+        file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE") + file_path);
+
+        if (!file.exists())
+            file.mkdirs();
+
+        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Request req = new DownloadManager.Request(Uri.parse(file_url));
+        try {
+            req.setDestinationInExternalPublicDir("/OURVLE", file_path + filename);
+        } catch(Exception exec) {
+            Toast.makeText(context, "No Storage Found", Toast.LENGTH_SHORT).show();
+            return 0;
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+        req.setTitle(filename);
+        req.setDescription("File Download");
+
+        return manager.enqueue(req);
+    }
+
+    public static void openFile(Context context, File file) {
         MimeTypeMap mMime = MimeTypeMap.getSingleton(); // create a new mime type instance
         int pos_dot;
 
@@ -82,13 +113,13 @@ public  class FileOpener {
         intent.setDataAndType(Uri.fromFile(file), mtype);
         try {
             context.startActivity(intent);
-                //context.start
+            //context.start
         } catch(android.content.ActivityNotFoundException e) {
-                Toast.makeText(context, "Could not open file", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Could not open file", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static List<Integer> getPoints(String string, String substr) {
+    private static List<Integer> getPoints(String string, String substr) {
         int lastIndex = 0;
         int count = 0;
         List<Integer> pointslist = new ArrayList<>();
@@ -106,5 +137,3 @@ public  class FileOpener {
         return pointslist;
     }
 }
-
-

@@ -23,16 +23,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import com.stoneapp.ourvlemoodle2.adapters.CourseContentListAdapter;
 import com.stoneapp.ourvlemoodle2.models.ContentListItem;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleMember;
 import com.stoneapp.ourvlemoodle2.models.MoodleModule;
 import com.stoneapp.ourvlemoodle2.models.MoodleSection;
 import com.stoneapp.ourvlemoodle2.tasks.ContentSync;
-import com.stoneapp.ourvlemoodle2.util.FileOpener;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.FileUtils;
 
 import android.Manifest;
 import android.app.DownloadManager;
@@ -221,7 +219,7 @@ public class CourseContentFragment extends Fragment
                 if (ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     if (file.exists())
-                        FileOpener.openFile(file, getActivity()); // opens file just downloaded
+                        FileUtils.openFile(getActivity(), file); // opens file just downloaded
                 }
             }
     };
