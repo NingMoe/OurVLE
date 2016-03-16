@@ -28,8 +28,6 @@ import com.stoneapp.ourvlemoodle2.fragments.MembersFragment;
 
 import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
 
-import com.stoneapp.ourvlemoodle2.tasks.LogoutTask;
-
 import com.stoneapp.ourvlemoodle2.R;
 
 import android.content.Intent;

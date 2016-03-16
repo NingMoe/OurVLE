@@ -24,16 +24,14 @@ import com.stoneapp.ourvlemoodle2.fragments.CalendarFragment;
 import com.stoneapp.ourvlemoodle2.fragments.CourseListFragment;
 import com.stoneapp.ourvlemoodle2.fragments.NewsFragment;
 import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
-import com.stoneapp.ourvlemoodle2.tasks.LogoutTask;
 import com.stoneapp.ourvlemoodle2.R;
-import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
+
 import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -49,7 +47,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.util.List;
 
