@@ -19,7 +19,6 @@
 
 package com.stoneapp.ourvlemoodle2.activities;
 
-import com.stoneapp.ourvlemoodle2.tasks.LogoutTask;
 import com.stoneapp.ourvlemoodle2.R;
 
 import android.annotation.SuppressLint;
