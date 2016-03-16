@@ -54,16 +54,6 @@ import android.widget.Toast;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
-    public static final String ACCOUNT_TYPE = BuildConfig.APPLICATION_ID;
-
-    public static final long SECONDS_PER_MINUTE = 60L;
-    public static final long SYNC_INTERVAL_IN_MINUTES = 60L;
-    public static long SYNC_INTERVAL = 4 * SYNC_INTERVAL_IN_MINUTES * SECONDS_PER_MINUTE;
-
-    Account mAccount;
-    ContentResolver mResolver;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,12 +75,8 @@ public class MainActivity extends AppCompatActivity {
         if (action != null && action.equals(BuildConfig.APPLICATION_ID + ".ACTION_OPEN_EVENTS"))
             viewPager.setCurrentItem(1);
 
-        mAccount = CreateSyncAccount(this);
-
-        mResolver = getContentResolver();
-        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
-        SYNC_INTERVAL *= SettingsUtils.getSyncInterval(this);
-        ContentResolver.addPeriodicSync(mAccount, AUTHORITY, Bundle.EMPTY, SYNC_INTERVAL);
+        // Create account, if needed
+        CreateSyncAccount(this);
     }
 
     @Override
@@ -112,35 +98,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static Account CreateSyncAccount(Context context) {
+    /**
+     * Create an entry for this application in the system account list, if it isn't already there.
+     *
+     * @param context Context
+     */
+    public static void CreateSyncAccount(Context context) {
+        final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
+        // Value below must match the account type specified in res/xml/syncadapter.xml
+        final String ACCOUNT_TYPE = BuildConfig.APPLICATION_ID;
+        // hours in seconds
+        final long SYNC_INTERVAL = SettingsUtils.getSyncInterval(context) * 60L * 60L;
+
         List<MoodleSiteInfo> sites = MoodleSiteInfo.listAll(MoodleSiteInfo.class);
-        String account = sites.get(0).getUsername();
+        String accountName = sites.get(0).getUsername();
 
-        if (TextUtils.isEmpty(account))
-            account = "OurVLE User";
+        if (TextUtils.isEmpty(accountName))
+            accountName = "OurVLE User";
 
-        Account newAccount = new Account(account, ACCOUNT_TYPE);
+        // Create account, if it's missing. (Either first run, or user has deleted account.)
+        Account account = new Account(accountName, ACCOUNT_TYPE);
 
         AccountManager accountManager =
                 (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+
         /*
          * Add the account and account type, no password or user data
          * If successful, return the Account object, otherwise report an error.
          */
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-            return newAccount;
-        } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-            return newAccount;
+        if (accountManager.addAccountExplicitly(account, null, null)) {
+            // Inform the system that this account is eligible for auto sync when the network is up
+            ContentResolver.setSyncAutomatically(account, AUTHORITY, true);
+            // Recommend a schedule for automatic synchronization. The system may modify this based
+            // on other scheduled syncs and network utilization.
+            ContentResolver.addPeriodicSync(account, AUTHORITY, Bundle.EMPTY, SYNC_INTERVAL);
         }
     }
 
