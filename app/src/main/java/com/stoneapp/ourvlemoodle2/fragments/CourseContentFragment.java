@@ -45,6 +45,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -66,7 +67,10 @@ import android.widget.Toast;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class CourseContentFragment extends Fragment
-        implements OnRefreshListener, SearchView.OnQueryTextListener {
+        implements
+        OnRefreshListener,
+        SearchView.OnQueryTextListener,
+        ActivityCompat.OnRequestPermissionsResultCallback {
     private String coursename;
     private String coursefname;
     private int courseid;
@@ -84,7 +88,8 @@ public class CourseContentFragment extends Fragment
 
     private static int TYPE_HEADER = 1;
     private static int TYPE_MODULE = 0;
-    MoodleCourse course;
+    private MoodleCourse course;
+    private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0x1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -135,9 +140,9 @@ public class CourseContentFragment extends Fragment
         sectionsToListItems(sections); // adds content to list items
 
         contentList.setHasFixedSize(true);
-        contentList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        contentList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        cadapter = new CourseContentListAdapter(this.getActivity(), items, token, course, CourseContentFragment.this);
+        cadapter = new CourseContentListAdapter(getActivity(), items, token, course, this);
         contentList.setAdapter(cadapter);
 
         //checks if any content is present
@@ -366,6 +371,31 @@ public class CourseContentFragment extends Fragment
         }
 
         return filteredModelList;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     private View rootView;

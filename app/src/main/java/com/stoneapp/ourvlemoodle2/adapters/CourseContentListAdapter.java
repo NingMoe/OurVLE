@@ -25,7 +25,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -63,6 +63,7 @@ public class CourseContentListAdapter
     private File file;
     private CourseContentFragment cfrag;
     private String filter = "";
+    private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0x1;
 
     public static class CourseContentViewHolder extends RecyclerView.ViewHolder {
         TextView section_name;
@@ -79,10 +80,10 @@ public class CourseContentListAdapter
         }
     }
 
-    public CourseContentListAdapter(Context ctxt, List<ContentListItem> list_items, String token,
+    public CourseContentListAdapter(Context context, List<ContentListItem> list_items, String token,
                                     MoodleCourse course, CourseContentFragment cfrag) {
         this.list_items = list_items;
-        this.ctxt = ctxt;
+        this.ctxt = context;
         this.course = course;
         this.token = token;
         this.coursename = course.getShortname();
@@ -136,7 +137,7 @@ public class CourseContentListAdapter
                     return;
                 }
 
-                if (ActivityCompat.checkSelfPermission(ctxt.getApplicationContext(),
+                if (ContextCompat.checkSelfPermission(ctxt,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             == PackageManager.PERMISSION_GRANTED) {
                     MoodleModuleContent content = module.getContents().get(0); // gets the content/file
@@ -158,6 +159,9 @@ public class CourseContentListAdapter
                         FileUtils.download(ctxt, file_url, file_path, content.getFilename());   //Downloads file if file is not present
                     } else
                         FileUtils.openFile(ctxt, file);   //opens file if file is found
+                } else {
+                    cfrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
                 }
 
                 //if (module.getContents()!=null || module.getContents().size()>0){
