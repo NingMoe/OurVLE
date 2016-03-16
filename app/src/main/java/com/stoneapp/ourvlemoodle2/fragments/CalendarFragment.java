@@ -20,6 +20,8 @@
 package com.stoneapp.ourvlemoodle2.fragments;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -90,7 +92,11 @@ public class CalendarFragment extends Fragment
         eventList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         eventList.setAdapter(eventListAdapter);
 
-        new LoadAllEventsTask(courseids, token, this.getActivity()).execute(""); // refresh events
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadAllEventsTask(courseids, token, this.getActivity()).execute(""); // refresh events
 
         return view;
     }
@@ -149,7 +155,11 @@ public class CalendarFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        new LoadAllEventsTask(courseids, token, this.getActivity()).execute(""); // refresh events
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadAllEventsTask(courseids, token, this.getActivity()).execute(""); // refresh events
     }
 
     private RecyclerView eventList;

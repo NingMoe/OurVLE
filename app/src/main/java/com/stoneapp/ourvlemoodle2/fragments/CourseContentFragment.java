@@ -40,6 +40,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -148,8 +150,12 @@ public class CourseContentFragment extends Fragment
         getActivity().registerReceiver(onComplete,
                 new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-        //refreshes content
-        new LoadContentTask(courseid, coursepid, siteid, context).execute("");
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            //refreshes content
+            new LoadContentTask(courseid, coursepid, siteid, context).execute("");
 
         return rootView;
     }
@@ -313,7 +319,11 @@ public class CourseContentFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        new LoadContentTask(courseid, coursepid, siteid, getActivity()).execute(""); // refresh content
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadContentTask(courseid, coursepid, siteid, getActivity()).execute(""); // refresh content
     }
 
     public void setFile(File file) {
@@ -354,10 +364,6 @@ public class CourseContentFragment extends Fragment
                 }
             }
         }
-
-
-
-
 
         return filteredModelList;
     }

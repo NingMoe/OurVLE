@@ -29,6 +29,8 @@ import com.stoneapp.ourvlemoodle2.tasks.EventSync;
 import com.stoneapp.ourvlemoodle2.R;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -106,8 +108,12 @@ public class EventFragment extends Fragment
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        //refreshes events
-        new LoadEventTask(courseid, token, context).execute("");
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            //refreshes events
+            new LoadEventTask(courseid, token, context).execute("");
 
         return rootView;
     }
@@ -183,7 +189,11 @@ public class EventFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        new LoadEventTask(courseid, token, context).execute(""); // refresh content
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadEventTask(courseid, token, context).execute(""); // refresh content
     }
 
     private View rootView;

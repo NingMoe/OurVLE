@@ -20,6 +20,8 @@
 package com.stoneapp.ourvlemoodle2.fragments;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -77,15 +79,23 @@ public class CourseListFragment extends Fragment
         courseList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         courseList.setAdapter(courseListAdapter);
 
-        // refreshes courses list
-        new LoadCoursesTask(userid, token, this.getActivity()).execute("");
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            // refreshes courses list
+            new LoadCoursesTask(userid, token, this.getActivity()).execute("");
 
         return view;
     }
 
     @Override
     public void onRefresh() {
-        new LoadCoursesTask(userid, token, this.getActivity()).execute("");
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadCoursesTask(userid, token, this.getActivity()).execute("");
     }
 
     private class LoadCoursesTask extends AsyncTask<String, Integer, Boolean> {

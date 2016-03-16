@@ -20,6 +20,8 @@
 package com.stoneapp.ourvlemoodle2.fragments;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -120,7 +122,11 @@ public class NewsFragment extends Fragment
         news_list.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         news_list.setAdapter(list_adapter);
 
-        new LoadLatestDiscussionTask(this.getActivity(),forumids).execute(""); //refresh discussions
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadLatestDiscussionTask(this.getActivity(),forumids).execute(""); //refresh discussions
 
         return view;
     }
@@ -135,7 +141,11 @@ public class NewsFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        new LoadLatestDiscussionTask(this.getActivity(), forumids).execute("");
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadLatestDiscussionTask(this.getActivity(), forumids).execute("");
     }
 
     private class LoadLatestDiscussionTask extends AsyncTask<String, Integer, Boolean>{

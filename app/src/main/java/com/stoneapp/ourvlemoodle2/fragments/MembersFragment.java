@@ -24,6 +24,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -120,7 +122,12 @@ public class MembersFragment extends Fragment
 
         madapter = new MemberListAdapter(context,members,token);
         memberList.setAdapter(madapter);
-        new LoadMembersTask(context, courseid, token).execute(""); // refresh member list
+
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadMembersTask(context, courseid, token).execute(""); // refresh member list
 
         return rootView;
     }

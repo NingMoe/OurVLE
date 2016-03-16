@@ -28,6 +28,8 @@ import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
 import com.stoneapp.ourvlemoodle2.R;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -90,7 +92,11 @@ public class ForumFragment extends Fragment
         forumRecView.setLayoutManager(new LinearLayoutManager(getActivity()));
         forumRecView.setAdapter(forumListAdapter);
 
-        new LoadForumTask(token, courseids, getActivity()).execute(""); // refresh forums
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadForumTask(token, courseids, getActivity()).execute(""); // refresh forums
 
         return rootView;
     }
@@ -145,7 +151,11 @@ public class ForumFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        new LoadForumTask(token, courseids, getActivity()).execute(""); // refresh content
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeInfo != null && activeInfo.isConnected())
+            new LoadForumTask(token, courseids, getActivity()).execute(""); // refresh content
     }
 
     private View rootView;
