@@ -34,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.tasks.LogoutTask;
 
 public class SettingsActivity extends AppCompatActivity {
     @Override
@@ -79,6 +80,21 @@ public class SettingsActivity extends AppCompatActivity {
             Uri ringtoneUri = Uri.parse(sp.getString("pref_notification_ringtone", Settings.System.DEFAULT_NOTIFICATION_URI.toString()));
             Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), ringtoneUri);
             mPref.setSummary(ringtone.getTitle(getActivity()));
+
+            findPreference("clear_data").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    return true;
+                }
+            });
+
+            findPreference("log_out").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new LogoutTask(getActivity()).LogOut();
+                    return true;
+                }
+            });
         }
     }
 }
