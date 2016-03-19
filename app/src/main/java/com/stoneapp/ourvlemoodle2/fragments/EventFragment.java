@@ -113,7 +113,7 @@ public class EventFragment extends Fragment
         NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
         if (activeInfo != null && activeInfo.isConnected())
             //refreshes events
-            new LoadEventTask(courseid, token, context).execute("");
+            new LoadEventTask(context, courseid, token).execute("");
 
         return rootView;
     }
@@ -128,7 +128,7 @@ public class EventFragment extends Fragment
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 mSwipeRefreshLayout.setRefreshing(true);
-                new LoadEventTask(courseid, token, getActivity()).execute(""); // refresh content
+                new LoadEventTask(getActivity(), courseid, token).execute(""); // refresh content
                 return true;
 
             default:
@@ -142,7 +142,7 @@ public class EventFragment extends Fragment
         String courseid;
         Context context;
 
-        public LoadEventTask(String courseid, String token, Context context){
+        public LoadEventTask(Context context, String courseid, String token) {
             this.context = context;
             this.courseid = courseid;
             evsync = new EventSync(token,context);
@@ -178,7 +178,7 @@ public class EventFragment extends Fragment
             mSwipeRefreshLayout.setRefreshing(false);
 
             if (!result)
-                Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
 
             if (mevents.size() == 0) { // if any events are present
                 img_notpresent.setVisibility(View.VISIBLE);
@@ -193,7 +193,7 @@ public class EventFragment extends Fragment
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
         if (activeInfo != null && activeInfo.isConnected())
-            new LoadEventTask(courseid, token, context).execute(""); // refresh content
+            new LoadEventTask(context, courseid, token).execute(""); // refresh content
     }
 
     private View rootView;
