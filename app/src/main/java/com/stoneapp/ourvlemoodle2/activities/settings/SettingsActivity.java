@@ -17,16 +17,12 @@
  * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.stoneapp.ourvlemoodle2.activities;
+package com.stoneapp.ourvlemoodle2.activities.settings;
 
-import android.content.SharedPreferences;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.provider.Settings;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -73,17 +69,20 @@ public class SettingsActivity extends AppCompatActivity {
 
             addPreferencesFromResource(R.xml.preferences);
 
-            SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
-
-            Preference mPref = findPreference("pref_notification_ringtone");
-
-            Uri ringtoneUri = Uri.parse(sp.getString("pref_notification_ringtone", Settings.System.DEFAULT_NOTIFICATION_URI.toString()));
-            Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), ringtoneUri);
-            mPref.setSummary(ringtone.getTitle(getActivity()));
-
-            findPreference("clear_data").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            findPreference("sync").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(getActivity(), SettingsSync.class);
+                    getActivity().startActivity(intent);
+                    return true;
+                }
+            });
+
+            findPreference("notifications").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(getActivity(), SettingsNotifications.class);
+                    getActivity().startActivity(intent);
                     return true;
                 }
             });
@@ -92,6 +91,13 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     new LogoutTask(getActivity()).LogOut();
+                    return true;
+                }
+            });
+
+            findPreference("clear_data").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
                     return true;
                 }
             });

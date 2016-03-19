@@ -20,6 +20,7 @@
 package com.stoneapp.ourvlemoodle2.activities;
 
 import com.stoneapp.ourvlemoodle2.BuildConfig;
+import com.stoneapp.ourvlemoodle2.activities.settings.SettingsActivity;
 import com.stoneapp.ourvlemoodle2.fragments.CalendarFragment;
 import com.stoneapp.ourvlemoodle2.fragments.CourseListFragment;
 import com.stoneapp.ourvlemoodle2.fragments.NewsFragment;

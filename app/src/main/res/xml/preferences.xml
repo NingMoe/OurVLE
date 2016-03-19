@@ -18,83 +18,31 @@
     along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
     -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <PreferenceCategory android:title="Sync" >
-
-        <CheckBoxPreference
-            android:key="pref_sync"
-            android:title="Sync"
-            android:summary="Sync device with OurVLE"
-            android:defaultValue="true" />
-
-        <ListPreference
-            android:dependency="pref_sync"
-            android:key="pref_sync_interval"
-            android:title="Sync interval"
-            android:dialogTitle="Sync interval"
-            android:entries="@array/pref_sync_frequency_entries"
-            android:entryValues="@array/pref_sync_frequency_values"
-            android:summary="%s"
-            android:defaultValue="4"/>
-
-        <CheckBoxPreference
-            android:dependency="pref_sync"
-            android:key="pref_sync_calendar"
-            android:title="Sync with Google Calendar"
-            android:summary="Sync course events with Google Calendar"
-            android:defaultValue="false" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Notifications" >
-
-        <CheckBoxPreference
-            android:key="pref_show_notifications"
-            android:title="Notifications"
-            android:summary="Notify you when new content is synced"
-            android:defaultValue="true" />
-
-        <RingtonePreference
-            android:dependency="pref_show_notifications"
-            android:key="pref_notification_ringtone"
-            android:title="Notification tone"
-            android:ringtoneType="notification"
-            android:showDefault="true"
-            android:showSilent="true"
-            tools:summary="Default ringtone (Tethys)"
-            android:defaultValue="content://settings/system/notification_sound"/>
-
-        <SwitchPreference
-            android:dependency="pref_show_notifications"
-            android:key="pref_notification_vibrate"
-            android:title="Vibrate"
-            android:defaultValue="true" />
-
-        <SwitchPreference
-            android:dependency="pref_show_notifications"
-            android:key="pref_notification_vibrate"
-            android:title="Notification light"
-            android:defaultValue="true" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Other" >
-
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General">
+        <Preference
+            android:key="sync"
+            android:title="Sync" />
+        <Preference
+            android:key="notifications"
+            android:title="Notifications" />
+        <Preference
+            android:key="storage"
+            android:title="Storage" />
         <SwitchPreference
             android:key="link_open_extern"
             android:title="Links open externally"
             android:defaultValue="false" />
-
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Other">
         <Preference
             android:key="clear_data"
             android:title="Clear data" />
-
         <Preference
             android:key="log_out"
             android:title="Log out" />
-
+        <Preference
+            android:key="about"
+            android:title="About" />
     </PreferenceCategory>
-
 </PreferenceScreen>

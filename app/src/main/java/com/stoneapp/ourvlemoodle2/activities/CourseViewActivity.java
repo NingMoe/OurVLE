@@ -21,6 +21,7 @@ package com.stoneapp.ourvlemoodle2.activities;
 
 import java.util.List;
 
+import com.stoneapp.ourvlemoodle2.activities.settings.SettingsActivity;
 import com.stoneapp.ourvlemoodle2.fragments.CourseContentFragment;
 import com.stoneapp.ourvlemoodle2.fragments.EventFragment;
 import com.stoneapp.ourvlemoodle2.fragments.ForumFragment;

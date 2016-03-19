@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2016 Matthew Stone and Romario Maxwell.
+
+    This file is part of OurVLE.
+
+    OurVLE is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OurVLE is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
+    -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <PreferenceCategory android:title="General">
+        <CheckBoxPreference
+            android:key="pref_show_notifications"
+            android:title="Show notifications"
+            android:defaultValue="true" />
+
+        <RingtonePreference
+            android:dependency="pref_show_notifications"
+            android:key="pref_notification_ringtone"
+            android:title="Notification tone"
+            android:ringtoneType="notification"
+            android:showDefault="true"
+            android:showSilent="true"
+            tools:summary="Default ringtone (Tethys)"
+            android:defaultValue="content://settings/system/notification_sound"/>
+
+        <SwitchPreference
+            android:dependency="pref_show_notifications"
+            android:key="pref_notification_vibrate"
+            android:title="Vibrate"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:dependency="pref_show_notifications"
+            android:key="pref_notification_vibrate"
+            android:title="Notification light"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Notifcation types">
+        <CheckBoxPreference
+            android:key="pref_notif_events"
+            android:title="Events"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_notif_content"
+            android:title="Course content"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_notif_discussions"
+            android:title="Forum discussions and posts"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_notif_messages"
+            android:title="Private messages"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

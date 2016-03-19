@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2016 Matthew Stone and Romario Maxwell.
+
+    This file is part of OurVLE.
+
+    OurVLE is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OurVLE is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
+    -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General">
+        <CheckBoxPreference
+            android:key="pref_sync"
+            android:title="Sync"
+            android:summary="Sync device with OurVLE"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:dependency="pref_sync"
+            android:key="pref_sync_interval"
+            android:title="Sync interval"
+            android:dialogTitle="Sync interval"
+            android:entries="@array/pref_sync_frequency_entries"
+            android:entryValues="@array/pref_sync_frequency_values"
+            android:summary="%s"
+            android:defaultValue="4"/>
+
+        <CheckBoxPreference
+            android:dependency="pref_sync"
+            android:key="pref_sync_calendar"
+            android:title="Sync with Google Calendar"
+            android:summary="Sync course events with Google Calendar"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:dependency="pref_sync"
+            android:key="pref_sync_conn_type"
+            android:title="Sync over Wi-Fi only"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Sync items">
+        <CheckBoxPreference
+            android:key="pref_sync_events"
+            android:title="Events"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_sync_content"
+            android:title="Course content"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_sync_discussions"
+            android:title="Forum discussions and posts"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_sync_messages"
+            android:title="Private messages"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_sync_participants"
+            android:title="Course participants"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

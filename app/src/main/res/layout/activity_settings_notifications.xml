@@ -23,7 +23,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.settings.SettingsActivity">
+    tools:context=".activities.settings.SettingsNotifications">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/tool_bar"
@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/settings_fragment"
-        android:name="com.stoneapp.ourvlemoodle2.activities.settings.SettingsActivity$SettingsFragment"
+        android:name="com.stoneapp.ourvlemoodle2.activities.settings.SettingsNotifications$SettingsNotificationsFragment"
         android:layout_below="@+id/tool_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
