@@ -30,6 +30,8 @@ import com.stoneapp.ourvlemoodle2.rest.MoodleRestSiteInfo;
 import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -63,7 +65,6 @@ import java.util.List;
 
 public class SignInActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_MULTIPLE = 0x1;
-    private static final String MITS_HELPDESK = "https://support.mona.uwi.edu/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +107,13 @@ public class SignInActivity extends AppCompatActivity {
                     handled = true;
                 }
                 return handled;
+            }
+        });
+
+        login_help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showHelpDialog(SignInActivity.this);
             }
         });
     }
@@ -162,6 +170,30 @@ public class SignInActivity extends AppCompatActivity {
         user_pass.setText("");
 
         new LoginTask(id, password).execute("");
+    }
+
+    private void showHelpDialog(Context context) {
+        final String MITS_HELPDESK = "https://support.mona.uwi.edu/";
+        final String message = "Student users should note that your password is now the same as" +
+                " your OURVLE/DOMAIN password. If your OURVLE/DOMAIN password is your date of" +
+                " birth, please use the format YYYYMMDD. e.g. John Brown is a student with id" +
+                " number 89876543. John was born on January 3, 1989. In this case John would" +
+                " enter: 89876543 in the slot for User ID and, 19890103 in the slot for Password." +
+                "If you do not remember your OURVLE/DOMAIN password or it has expired, please" +
+                " contact the MITS Helpdesk at extension 2992 or (876) 927-2148. You may also" +
+                " email the helpdesk or visit the UWI Mona Live Support page (link below) to" +
+                " request a password reset";
+
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle("Login Help").setMessage(message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) { return; } })
+                .create();
+        dialog.show();
     }
 
     public class LoginTask extends AsyncTask<String, Integer, Boolean> {
