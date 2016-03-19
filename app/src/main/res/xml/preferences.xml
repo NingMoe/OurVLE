@@ -82,6 +82,11 @@
 
     <PreferenceCategory android:title="Other" >
 
+        <SwitchPreference
+            android:key="link_open_extern"
+            android:title="Links open externally"
+            android:defaultValue="false" />
+
         <Preference
             android:key="clear_data"
             android:title="Clear data" />
