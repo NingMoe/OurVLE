@@ -31,7 +31,7 @@
             android:title="Storage"
             android:enabled="false"/>
         <SwitchPreference
-            android:key="link_open_extern"
+            android:key="pref_open_links_externally"
             android:title="Links open externally"
             android:defaultValue="false" />
     </PreferenceCategory>

@@ -24,10 +24,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +47,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleModuleContent;
 import com.stoneapp.ourvlemoodle2.util.FileUtils;
 import com.stoneapp.ourvlemoodle2.util.ImageChooser;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
+import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,168 +55,174 @@ import java.util.List;
 
 public class CourseContentListAdapter
         extends RecyclerView.Adapter<CourseContentListAdapter.CourseContentViewHolder> {
-    private List<ContentListItem> list_items;
-    private Context ctxt;
-    private int TYPE_HEADER = 1 ;
-    private int TYPE_ITEM = 0;
-    private long courseid;
-    private String token;
-    private MoodleCourse course;
-    private String coursename;
-    private File file;
-    private CourseContentFragment cfrag;
+    private static List<ContentListItem> list_items;
+    private static Context context;
+    private static final int TYPE_HEADER = 1 ;
+    private static long courseid;
+    private static String token;
+    private static String coursename;
+    private static File file;
+    private static CourseContentFragment cfrag;
     private String filter = "";
     private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0x1;
 
     public static class CourseContentViewHolder extends RecyclerView.ViewHolder {
-        TextView section_name;
-        TextView module_name;
-        TextView module_description;
-        ImageView modimage;
+        private final TextView section_name;
+        private final TextView module_name;
+        private final TextView module_description;
+        private final ImageView modimage;
 
-        public CourseContentViewHolder(View itemView) {
-            super(itemView);
-            section_name = (TextView) itemView.findViewById(R.id.section_heading);
-            module_name = (TextView) itemView.findViewById(R.id.module_name);
-            module_description = (TextView) itemView.findViewById(R.id.module_summary);
-            modimage = (ImageView) itemView.findViewById(R.id.module_img);
+        public CourseContentViewHolder(View v) {
+            super(v);
+
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = CourseContentViewHolder.this.getAdapterPosition();
+
+                    MoodleModule module = list_items.get(position).module;
+                    if (module == null)
+                        return;
+
+                    String modurl = module.getUrl();
+                    if (TextUtils.isEmpty(modurl))
+                        modurl = MoodleConstants.URL + "/course/view.php?id=" + courseid;
+
+                    Intent intent;
+
+                    if (SettingsUtils.shouldOpenLinksExternally(context)) {
+                        Uri webpage = Uri.parse(modurl);
+                        intent = new Intent(Intent.ACTION_VIEW, webpage);
+                        if (intent.resolveActivity(context.getPackageManager()) != null) {
+                            context.startActivity(intent);
+
+                            return;
+                        }
+                    }
+                    else {
+                        intent = new Intent(context, BrowserActivity.class);
+                        intent.putExtra("url", modurl);
+                    }
+
+                    if (module.getModname().contentEquals("label"))
+                        return;
+
+                    if (!module.getModname().contentEquals("resource")) {
+                        context.startActivity(intent);
+                        return;
+                    }
+
+                    if (module.getContents() == null) {
+                        context.startActivity(intent);
+                        return;
+                    }
+
+                    if (module.getContents().size() == 0) {
+                        context.startActivity(intent);
+                        return;
+                    }
+
+                    if (ContextCompat.checkSelfPermission(context,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        MoodleModuleContent content = module.getContents().get(0); // gets the content/file
+                        String file_path = "/" + coursename + "/"; // place file in course folder
+                        String filename = content.getFilename().replace("#", ""); // to fix file opening issues
+                        file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
+                                + file_path + filename); //creates a new file and store it in the directory
+                        cfrag.setFile(file);
+
+                        if (file.exists()) {
+                            FileUtils.openFile(context, file);
+                        } else {
+                            String file_url = content.getFileurl() + "&token=" + token;
+
+                            Toast.makeText(context, "Opening File", Toast.LENGTH_SHORT).show();
+                            FileUtils.download(context, file_url, file_path, content.getFilename());
+                        }
+                    } else
+                        cfrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                }
+            });
+
+            section_name = (TextView) v.findViewById(R.id.section_heading);
+            module_name = (TextView) v.findViewById(R.id.module_name);
+            module_description = (TextView) v.findViewById(R.id.module_summary);
+            modimage = (ImageView) v.findViewById(R.id.module_img);
+        }
+
+        public TextView getSectionNameView() {
+            return section_name;
+        }
+
+        public TextView getModuleNameView() {
+            return module_name;
+        }
+
+        public TextView getModuleDescriptionView() {
+            return module_description;
+        }
+
+        public ImageView getModImageView() {
+            return modimage;
         }
     }
 
     public CourseContentListAdapter(Context context, List<ContentListItem> list_items, String token,
-                                    MoodleCourse course, CourseContentFragment cfrag) {
-        this.list_items = list_items;
-        this.ctxt = context;
-        this.course = course;
-        this.token = token;
-        this.coursename = course.getShortname();
-        this.cfrag = cfrag;
-       // this.file = file;
-
+                                    String course, CourseContentFragment cfrag) {
+        CourseContentListAdapter.list_items = list_items;
+        CourseContentListAdapter.context = context;
+        CourseContentListAdapter.token = token;
+        CourseContentListAdapter.coursename = course;
+        CourseContentListAdapter.cfrag = cfrag;
     }
 
     @Override
     public CourseContentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final CourseContentViewHolder courseContentViewHolder;
         View view;
+        int layout;
 
-        if (viewType == TYPE_HEADER)
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_section_header, parent, false);
-        else
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_module_item, parent, false);
+        layout = viewType == TYPE_HEADER ? R.layout.list_section_header : R.layout.list_module_item;
 
-        courseContentViewHolder = new CourseContentViewHolder(view);
+        view = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = courseContentViewHolder.getAdapterPosition();
-                MoodleModule module = list_items.get(position).module;
-                if (module == null)
-                    return;
-
-                String modurl = module.getUrl();
-                if (modurl == null)
-                    modurl = MoodleConstants.URL+ "/course/view.php?id=" + courseid;
-
-                Intent intent = new Intent(ctxt, BrowserActivity.class);
-                intent.putExtra("url", modurl);
-
-                if (module.getModname().contentEquals("label"))
-                    return;
-
-                if (!module.getModname().contentEquals("resource")) {
-                    ctxt.startActivity(intent);
-                    return;
-                }
-
-                if (module.getContents() == null) {
-                    ctxt.startActivity(intent);
-                    return;
-                }
-
-                if (module.getContents().size() == 0) {
-                    ctxt.startActivity(intent);
-                    return;
-                }
-
-                if (ContextCompat.checkSelfPermission(ctxt,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            == PackageManager.PERMISSION_GRANTED) {
-                    MoodleModuleContent content = module.getContents().get(0); // gets the content/file
-                    String file_path = "/" + coursename + "/"; // place file in course folder
-                    String filename = content.getFilename().replace("#", ""); // to fix file opening issues
-                    // String filename = "file.ppt";
-                    file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
-                            + file_path + filename); //creates a new file and store it in the directory
-                    //cfrag.file = file;
-                    //((BrowserActivity)ctxt).setFile(file);
-                    cfrag.setFile(file);
-
-                    // checks if the file exists
-                    if (!file.exists()) {
-                        String file_url = content.getFileurl();
-                        file_url = file_url + "&token=" + token;
-
-                        Toast.makeText(ctxt, "Opening File", Toast.LENGTH_SHORT).show();
-                        FileUtils.download(ctxt, file_url, file_path, content.getFilename());   //Downloads file if file is not present
-                    } else
-                        FileUtils.openFile(ctxt, file);   //opens file if file is found
-                } else {
-                    cfrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-                }
-
-                //if (module.getContents()!=null || module.getContents().size()>0){
-                  //  Toast.makeText(ctxt,module.getContents().get(0).getFileurl()+"",Toast.LENGTH_SHORT).show();
-
-                //}
-            }
-
-
-        });
-
-        return courseContentViewHolder;
+        return new CourseContentViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(CourseContentViewHolder holder, int position) {
+    public void onBindViewHolder(CourseContentViewHolder viewHolder, int position) {
         int type = getItemViewType(position);
 
-        ContentListItem item = list_items.get(position); //gets the list item
+        ContentListItem item = list_items.get(position);
 
-        if (type == TYPE_HEADER) { // check if it is of type header
-            // checks if the section name is empty or contains a long line
-            if (item.section.getName() == null || item.section.getName().contains("____"))
-                holder.section_name.setText("");
-            else
-                holder.section_name.setText(Html.fromHtml(item.section.getName()).toString().trim()); // converts from html to normal string
+        if (type == TYPE_HEADER) {
+            // checks if the section name is not empty and doesn't contain a long line
+            if (!TextUtils.isEmpty(item.section.getName()) && !item.section.getName().contains("____"))
+                viewHolder.getSectionNameView().setText(Html.fromHtml(item.section.getName()).toString().trim()); // converts from html to normal string
         } else {
-            String modulename = item.module.getName(); // gets the name of the module
-            String moduledesc = item.module.getDescription(); // gets the description
-            holder.modimage.setImageResource(ImageChooser.getImage(item.module));
+            String modulename = item.module.getName();
+            String moduledesc = item.module.getDescription();
 
-            if (modulename == null)
-                holder.module_name.setText("");
-            else {
-                holder.module_name.setText(Html.fromHtml(modulename).toString().trim());
+            viewHolder.getModImageView().setImageResource(ImageChooser.getImage(item.module));
 
-                if (list_items.get(position).module.getModname().contentEquals("label")) { // if item is a label
-                    holder.module_name.setTextColor(Color.parseColor("#009900")); // change color to green
+            if (!TextUtils.isEmpty(modulename)) {
+                viewHolder.getModuleNameView().setText(Html.fromHtml(modulename).toString().trim());
+
+                if (item.module.getModname().contentEquals("label")) {
+                    viewHolder.getModuleNameView().setTextColor(Color.parseColor("#009900")); // change color to green
                     if (modulename.contains("_____"))
-                        holder.module_name.setText("");
+                        viewHolder.getModuleNameView().setText("");
                 } else
-                    holder.module_name.setTextColor(Color.parseColor("#000000")); // set font to black
+                    viewHolder.getModuleNameView().setTextColor(Color.BLACK);
             }
 
-            if (moduledesc == null)
-                holder.module_description.setText("");
-            else {
-                holder.module_description.setText(Html.fromHtml(moduledesc).toString().trim());
+            if (!TextUtils.isEmpty(moduledesc)) {
+                viewHolder.getModuleDescriptionView().setText(Html.fromHtml(moduledesc).toString().trim());
 
-                if (list_items.get(position).module.getModname().contentEquals("label")) {  // if item is a label
+                if (item.module.getModname().contentEquals("label")) {
                     if (moduledesc.contains("____"))
-                        holder.module_description.setText("");
+                        viewHolder.getModuleDescriptionView().setText("");
                 }
             }
         }
@@ -227,7 +236,7 @@ public class CourseContentListAdapter
 
     public void updateContentList(List<ContentListItem> newlist_items)
     {
-        this.list_items = new ArrayList<>(newlist_items);
+        list_items = new ArrayList<>(newlist_items);
         notifyDataSetChanged();
     }
 

@@ -30,6 +30,7 @@ public class SettingsUtils {
     public static final String PREF_SHOW_NOTIFICATIONS = "pref_show_notifications";
     public static final String PREF_PLAY_NOTIFICATION_SOUNDS = "pref_play_notification_sound";
     public static final String PREF_NOTIFICATION_VIBRATE = "pref_notification_vibrate";
+    public static final String PREF_OPEN_LINKS_EXTERNALLY = "pref_open_links_externally";
 
     public static boolean shouldSync(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -54,6 +55,11 @@ public class SettingsUtils {
     public static boolean shouldPlayNotificationSound(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getBoolean(PREF_PLAY_NOTIFICATION_SOUNDS, false);
+    }
+
+    public static boolean shouldOpenLinksExternally(final Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getBoolean(PREF_OPEN_LINKS_EXTERNALLY, false);
     }
 
     public static boolean shouldNotificationVibrate(final Context context) {
