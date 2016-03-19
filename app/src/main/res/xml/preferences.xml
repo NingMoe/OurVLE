@@ -28,7 +28,8 @@
             android:title="Notifications" />
         <Preference
             android:key="storage"
-            android:title="Storage" />
+            android:title="Storage"
+            android:enabled="false"/>
         <SwitchPreference
             android:key="link_open_extern"
             android:title="Links open externally"
@@ -37,12 +38,14 @@
     <PreferenceCategory android:title="Other">
         <Preference
             android:key="clear_data"
-            android:title="Clear data" />
+            android:title="Clear data"
+            android:enabled="false" />
         <Preference
             android:key="log_out"
             android:title="Log out" />
         <Preference
             android:key="about"
-            android:title="About" />
+            android:title="About &amp; help"
+            android:enabled="false" />
     </PreferenceCategory>
 </PreferenceScreen>

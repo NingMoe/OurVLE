@@ -41,7 +41,8 @@
             android:key="pref_sync_calendar"
             android:title="Sync with Google Calendar"
             android:summary="Sync course events with Google Calendar"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            android:enabled="false"/>
         <CheckBoxPreference
             android:dependency="pref_sync"
             android:key="pref_sync_conn_type"
