@@ -142,7 +142,7 @@ public class CourseContentFragment extends Fragment
         contentList.setHasFixedSize(true);
         contentList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        cadapter = new CourseContentListAdapter(getActivity(), items, token, course.getShortname(), this);
+        cadapter = new CourseContentListAdapter(getActivity(), items, token, courseid, course.getShortname(), this);
         contentList.setAdapter(cadapter);
 
         //checks if any content is present

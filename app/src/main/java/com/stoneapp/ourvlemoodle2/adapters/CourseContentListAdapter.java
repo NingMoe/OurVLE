@@ -182,11 +182,12 @@ public class CourseContentListAdapter
     }
 
     public CourseContentListAdapter(Context context, List<ContentListItem> list_items, String token,
-                                    String course, CourseContentFragment cfrag) {
+                                    long courseid, String coursename, CourseContentFragment cfrag) {
         CourseContentListAdapter.list_items = list_items;
         CourseContentListAdapter.context = context;
         CourseContentListAdapter.token = token;
-        CourseContentListAdapter.coursename = course;
+        CourseContentListAdapter.courseid = courseid;
+        CourseContentListAdapter.coursename = coursename;
         CourseContentListAdapter.cfrag = cfrag;
     }
 
