@@ -179,13 +179,11 @@ public class CourseContentListAdapter
     }
 
     @Override
-    public CourseContentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view;
-        int layout;
+    public CourseContentViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        int layout =
+                viewType == TYPE_HEADER ? R.layout.list_section_header : R.layout.list_module_item;
 
-        layout = viewType == TYPE_HEADER ? R.layout.list_section_header : R.layout.list_module_item;
-
-        view = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(layout, viewGroup, false);
 
         return new CourseContentViewHolder(view);
     }
@@ -234,8 +232,7 @@ public class CourseContentListAdapter
     @Override
     public int getItemViewType(int position) { return list_items.get(position).type; }
 
-    public void updateContentList(List<ContentListItem> newlist_items)
-    {
+    public void updateContentList(List<ContentListItem> newlist_items) {
         list_items = new ArrayList<>(newlist_items);
         notifyDataSetChanged();
     }
