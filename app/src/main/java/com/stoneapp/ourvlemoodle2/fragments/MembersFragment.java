@@ -120,7 +120,7 @@ public class MembersFragment extends Fragment
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.GONE);
 
-        madapter = new MemberListAdapter(context,members,token);
+        madapter = new MemberListAdapter(context, members, token);
         memberList.setAdapter(madapter);
 
         ConnectivityManager connectivityManager =

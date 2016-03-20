@@ -99,7 +99,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 courseids.add(courses.get(i).getCourseid() + ""); // appends course ids to list
 
             // refresh events
-            EventSync evsync = new EventSync(token, super.getContext());
+            EventSync evsync = new EventSync(super.getContext(), token);
             evsync.syncEvents(courseids); // syncs events
         }
     }

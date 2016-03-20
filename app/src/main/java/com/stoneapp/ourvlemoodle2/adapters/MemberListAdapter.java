@@ -42,30 +42,56 @@ import java.util.List;
 
 public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.MemberViewHolder> {
     private List<MoodleMember> memberList;
-    private Context ctxt;
+    private Context context;
     private String token;
     private String filter = "";
 
     public static class MemberViewHolder extends RecyclerView.ViewHolder {
-        public TextView name;
-        public ImageView memberpic;
+        private final TextView name;
+        private final ImageView memberpic;
 
-        public MemberViewHolder(View itemView) {
-            super(itemView);
-            name = (TextView)itemView.findViewById(R.id.member_name);
-            memberpic = (ImageView)itemView.findViewById(R.id.member_img);
+        public MemberViewHolder(View v, final Context context, final List<MoodleMember> mDataSet,
+                                final String token) {
+            super(v);
+
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MoodleMember member = mDataSet.get(MemberViewHolder.this.getAdapterPosition());
+
+                    Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+                    intent.putExtra("username", member.getFullname());
+                    intent.putExtra("email", member.getEmail());
+                    intent.putExtra("description", member.getDescription());
+                    intent.putExtra("memberid", member.getMemberid());
+                    intent.putExtra("token", token);
+
+                    v.getContext().startActivity(intent);
+                }
+            });
+
+            name = (TextView) v.findViewById(R.id.member_name);
+            memberpic = (ImageView) v.findViewById(R.id.member_img);
+        }
+
+        public TextView getTextView() {
+            return name;
+        }
+
+        public ImageView getImageView() {
+            return memberpic;
         }
     }
 
-    public MemberListAdapter(Context ctxt, List<MoodleMember> memberList, String token) {
+    public MemberListAdapter(Context context, List<MoodleMember> memberList, String token) {
         this.memberList = new ArrayList<>(memberList);
-        this.ctxt = ctxt;
+        this.context = context;
         this.token = token;
     }
 
     @Override
     public void onBindViewHolder(MemberViewHolder holder, int position) {
-        holder.name.setText(memberList.get(position).getFullname());
+        holder.getTextView().setText(memberList.get(position).getFullname());
 
         ColorGenerator generator = ColorGenerator.MATERIAL;
         int color2 = generator.getColor(memberList.get(position).getFullname());
@@ -83,31 +109,15 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
                 .endConfig()
                 .buildRound(firstLetter + "", color2);
 
-        holder.memberpic.setImageDrawable(drawable2);
+        holder.getImageView().setImageDrawable(drawable2);
     }
 
     @Override
-    public MemberViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
+    public MemberViewHolder onCreateViewHolder(final ViewGroup viewGroup, int viewType) {
+        View v = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.list_item_member, viewGroup, false);
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_member, parent, false);
-        final MemberViewHolder memberViewHolder = new MemberViewHolder(view);
-
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MoodleMember member = memberList.get(memberViewHolder.getAdapterPosition());
-                Intent intent = new Intent(parent.getContext(), ProfileActivity.class);
-                intent.putExtra("username", member.getFullname()) ;
-                intent.putExtra("email", member.getEmail());
-                intent.putExtra("description", member.getDescription());
-                intent.putExtra("memberid",member.getMemberid());
-                intent.putExtra("token", token);
-
-                parent.getContext().startActivity(intent);
-            }
-        });
-
-        return memberViewHolder;
+        return new MemberViewHolder(v, context, memberList, token);
     }
 
     @Override
@@ -115,12 +125,12 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
         return memberList.size();
     }
 
-    public void updateMemberList(List<MoodleMember>memberList){
+    public void updateMemberList(List<MoodleMember> memberList){
         this.memberList = new ArrayList<>(memberList);
         notifyDataSetChanged();
     }
 
-    public void animateTo(List<MoodleMember> models,String filter) {
+    public void animateTo(List<MoodleMember> models, String filter) {
         applyAndAnimateRemovals(models);
         applyAndAnimateAdditions(models);
         applyAndAnimateMovedItems(models);
@@ -161,14 +171,14 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
         return model;
     }
 
-    public void addItem(int position, MoodleMember model) {
-        memberList.add(position, model);
-        notifyItemInserted(position);
+    public void addItem(int pos, MoodleMember model) {
+        memberList.add(pos, model);
+        notifyItemInserted(pos);
     }
 
-    public void moveItem(int fromPosition, int toPosition) {
-        final MoodleMember model = memberList.remove(fromPosition);
-        memberList.add(toPosition, model);
-        notifyItemMoved(fromPosition, toPosition);
+    public void moveItem(int fromPos, int toPos) {
+        final MoodleMember model = memberList.remove(fromPos);
+        memberList.add(toPos, model);
+        notifyItemMoved(fromPos, toPos);
     }
 }

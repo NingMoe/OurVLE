@@ -53,7 +53,7 @@ public class EventSync {
     String token;
     Context context;
 
-    public EventSync(String token, Context context) {
+    public EventSync(Context context, String token) {
         this.token = token;
         this.context = context;
 

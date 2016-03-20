@@ -108,7 +108,7 @@ public class PostActivity  extends AppCompatActivity
         }
 
         postList.setLayoutManager(new LinearLayoutManager(this));
-        padapter = new PostListAdapter(posts, this);
+        padapter = new PostListAdapter(this, posts);
         postList.setAdapter(padapter);
 
         new LoadPostsTask(discussionid, token, this).execute(""); // refresh posts

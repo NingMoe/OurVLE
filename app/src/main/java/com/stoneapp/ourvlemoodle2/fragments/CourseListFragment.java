@@ -73,10 +73,10 @@ public class CourseListFragment extends Fragment
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        courseListAdapter = new CourseListAdapter(courses, this.getActivity(), token, siteid);
+        courseListAdapter = new CourseListAdapter(getActivity(), courses, token, siteid);
 
         courseList.setHasFixedSize(true);
-        courseList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        courseList.setLayoutManager(new LinearLayoutManager(getActivity()));
         courseList.setAdapter(courseListAdapter);
 
         ConnectivityManager connectivityManager =
@@ -84,7 +84,7 @@ public class CourseListFragment extends Fragment
         NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
         if (activeInfo != null && activeInfo.isConnected())
             // refreshes courses list
-            new LoadCoursesTask(userid, token, this.getActivity()).execute("");
+            new LoadCoursesTask(getActivity(), userid, token).execute("");
 
         return view;
     }
@@ -95,7 +95,7 @@ public class CourseListFragment extends Fragment
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
         if (activeInfo != null && activeInfo.isConnected())
-            new LoadCoursesTask(userid, token, this.getActivity()).execute("");
+            new LoadCoursesTask(getActivity(), userid, token).execute("");
     }
 
     private class LoadCoursesTask extends AsyncTask<String, Integer, Boolean> {
@@ -103,7 +103,7 @@ public class CourseListFragment extends Fragment
         CourseSync csync;
         Context context;
 
-        public LoadCoursesTask(int userid, String token, Context context) {
+        public LoadCoursesTask(Context context, int userid, String token) {
             this.userid = userid;
             csync = new CourseSync(token);
             this.context = context;

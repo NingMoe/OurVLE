@@ -89,7 +89,7 @@ public class EventFragment extends Fragment
         //Searches database for all events matching courseid
         mevents = MoodleEvent.find(MoodleEvent.class, "courseid = ?", courseid);
 
-        eventadapter = new EventListAdapter(mevents, context);
+        eventadapter = new EventListAdapter(context, mevents);
 
         eventcourse = MoodleCourse.find(MoodleCourse.class, "courseid = ?", courseid).get(0).getShortname(); // gets event course
 
@@ -145,7 +145,7 @@ public class EventFragment extends Fragment
         public LoadEventTask(Context context, String courseid, String token) {
             this.context = context;
             this.courseid = courseid;
-            evsync = new EventSync(token,context);
+            evsync = new EventSync(context, token);
             courseids = new ArrayList<>();
             courseids.add(courseid);
         }

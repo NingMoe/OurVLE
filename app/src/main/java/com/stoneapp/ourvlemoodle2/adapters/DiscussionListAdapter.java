@@ -27,6 +27,7 @@ import android.graphics.Typeface;
 
 import android.support.v7.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,62 +45,84 @@ import com.stoneapp.ourvlemoodle2.R;
 import java.util.List;
 
 public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAdapter.DiscussionViewHolder> {
-    public static class DiscussionViewHolder extends RecyclerView.ViewHolder {
-        TextView course_name;
-        TextView topic_name;
-        TextView lastposttime;
-        TextView startname;
-        TextView lastpostname;
-        ImageView numreplies;
-        ImageView icon;
-
-        public DiscussionViewHolder(View itemView) {
-            super(itemView);
-
-            course_name = (TextView)itemView.findViewById(R.id.coursename);
-            topic_name = (TextView)itemView.findViewById(R.id.discussion_topicname);
-            lastposttime = (TextView)itemView.findViewById(R.id.lastpostime);
-            startname = (TextView)itemView.findViewById(R.id.startname);
-            lastpostname = (TextView)itemView.findViewById(R.id.lastpostname);
-           // numreplies = (ImageView)itemView.findViewById(R.id.numreplies);
-            icon = (ImageView) itemView.findViewById(R.id.imageView1);
-        }
-    }
-
-    private Context ctxt;
+    private Context context;
     private List<MoodleDiscussion> discussionList;
     private String token;
 
-    public DiscussionListAdapter(Context ctxt, List<MoodleDiscussion> discussionList, String token){
-        this.ctxt = ctxt;
+    public static class DiscussionViewHolder extends RecyclerView.ViewHolder {
+        private final TextView course_name;
+        private final TextView topic_name;
+        private final TextView lastposttime;
+        private final TextView startname;
+        private final TextView lastpostname;
+        private final ImageView icon;
+
+        public DiscussionViewHolder(View v, final Context context,
+                                    final List<MoodleDiscussion> mDataSet, final String token) {
+            super(v);
+
+            v.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    int pos = DiscussionViewHolder.this.getAdapterPosition();
+
+                    Intent intent = new Intent(context, PostActivity.class);
+
+                    intent.putExtra("discussionid", mDataSet.get(pos).getDiscussionid() + "");
+                    intent.putExtra("discussionname", mDataSet.get(pos).getName());
+                    intent.putExtra("token", token);
+
+                    context.startActivity(intent);
+                }
+
+            });
+
+            course_name = (TextView) v.findViewById(R.id.coursename);
+            topic_name = (TextView) v.findViewById(R.id.discussion_topicname);
+            lastposttime = (TextView) v.findViewById(R.id.lastpostime);
+            startname = (TextView) v.findViewById(R.id.startname);
+            lastpostname = (TextView) v.findViewById(R.id.lastpostname);
+            icon = (ImageView) v.findViewById(R.id.imageView1);
+        }
+
+        public TextView getCourseNameView() {
+            return course_name;
+        }
+
+        public TextView getTopicNameView() {
+            return topic_name;
+        }
+
+        public TextView getLastPostTimeView() {
+            return lastposttime;
+        }
+
+        public TextView getStartNameView() {
+            return startname;
+        }
+
+        public TextView getLastPostNameView() {
+            return lastpostname;
+        }
+
+        public ImageView getIconView() {
+            return icon;
+        }
+    }
+
+    public DiscussionListAdapter(Context context, List<MoodleDiscussion> discussionList, String token){
+        this.context = context;
         this.discussionList = discussionList;
         this.token = token;
     }
 
     @Override
-    public DiscussionViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_discussion_item, viewGroup, false);
+    public DiscussionViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        View v = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.list_discussion_item, viewGroup, false);
 
-        final DiscussionViewHolder discussionViewHolder = new DiscussionViewHolder(view);
-
-        view.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                final int position = discussionViewHolder.getAdapterPosition();
-
-                Intent intent = new Intent(ctxt, PostActivity.class);
-
-                intent.putExtra("discussionid", discussionList.get(position).getDiscussionid() + "");
-                intent.putExtra("discussionname", discussionList.get(position).getName());
-                intent.putExtra("token", token);
-
-                ctxt.startActivity(intent);
-            }
-
-        });
-
-        return discussionViewHolder;
+        return new DiscussionViewHolder(v, context, discussionList, token);
     }
 
     @Override
@@ -107,45 +130,26 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
         final MoodleDiscussion discussion = discussionList.get(position);
 
         String topic_name = discussion.getName();
-        if (topic_name == null)
-            holder.topic_name.setText("");
-        else
-            holder.topic_name.setText(topic_name);
+        if (!TextUtils.isEmpty(topic_name))
+            holder.getTopicNameView().setText(topic_name);
 
         String coursename = MoodleCourse.find(MoodleCourse.class, "courseid = ?", discussion.getCourseid() + "").get(0).getShortname();
-        if (coursename == null)
-            holder.course_name.setText("N/A");
+        if (TextUtils.isEmpty(coursename))
+            holder.getCourseNameView().setText("N/A");
         else
-            holder.course_name.setText(coursename);
+            holder.getCourseNameView().setText(coursename);
 
         String startname = discussion.getFirstuserfullname();
-        if (startname == null)
-            holder.startname.setText("");
-        else
-            holder.startname.setText(startname);
-
-        String numreplies = discussion.getNumreplies().toString();
-
-        TextDrawable drawable2 = TextDrawable.builder().beginConfig()
-                .textColor(Color.WHITE)
-                .useFont(Typeface.DEFAULT)
-                .bold()
-                .toUpperCase()
-                .endConfig()
-                .buildRound(numreplies + "", Color.parseColor("#F44336"));
-     
-                //.buildRound(discussion.getNumreplies(),ContextCompat.getColor(ctxt, R.color.colorAccent));
-       // holder.numreplies.setImageDrawable(drawable2);
+        if (!TextUtils.isEmpty(startname))
+            holder.getStartNameView().setText(startname);
 
         String lastpostname = discussion.getLastuserfullname();
-        if (lastpostname == null)
-            holder.lastpostname.setText("");
-        else
-            holder.lastpostname.setText(lastpostname);
+        if (!TextUtils.isEmpty(lastpostname))
+            holder.getLastPostNameView().setText(lastpostname);
 
         int lastposttime = discussion.getTimemodified();
 
-        holder.lastposttime.setText(TimeUtils.getTime(lastposttime));
+        holder.getLastPostTimeView().setText(TimeUtils.getTime(lastposttime));
     }
 
     @Override

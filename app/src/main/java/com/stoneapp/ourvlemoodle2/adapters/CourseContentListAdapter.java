@@ -196,9 +196,9 @@ public class CourseContentListAdapter
         int layout =
                 viewType == TYPE_HEADER ? R.layout.list_section_header : R.layout.list_module_item;
 
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(layout, viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(layout, viewGroup, false);
 
-        return new CourseContentViewHolder(view);
+        return new CourseContentViewHolder(v);
     }
 
     @Override

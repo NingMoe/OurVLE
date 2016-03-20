@@ -23,6 +23,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,47 +38,58 @@ import java.util.Calendar;
 import java.util.List;
 
 public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.EventViewHolder> {
+    private List<MoodleEvent> events;
+    private Context context;
+
     public static class EventViewHolder extends RecyclerView.ViewHolder{
-        private TextView event_name;
-        private TextView event_desc;
-        private TextView event_course;
-        private TextView event_date;
-        private ImageView icon;
+        private final TextView event_name;
+        private final TextView event_desc;
+        private final TextView event_course;
+        private final TextView event_date;
+        private final ImageView icon;
 
-        public EventViewHolder(View itemView) {
-            super(itemView);
+        public EventViewHolder(View v) {
+            super(v);
 
-            event_name = (TextView) itemView.findViewById(R.id.eventname);
-            event_desc = (TextView) itemView.findViewById(R.id.eventdesc);
-            event_course = (TextView) itemView.findViewById(R.id.eventcourse);
-            event_date = (TextView) itemView.findViewById(R.id.eventdate);
-            icon = (ImageView) itemView.findViewById(R.id.calImg);
+            event_name = (TextView) v.findViewById(R.id.eventname);
+            event_desc = (TextView) v.findViewById(R.id.eventdesc);
+            event_course = (TextView) v.findViewById(R.id.eventcourse);
+            event_date = (TextView) v.findViewById(R.id.eventdate);
+            icon = (ImageView) v.findViewById(R.id.calImg);
+        }
+
+        public TextView getEventNameView() {
+            return event_name;
+        }
+
+        public TextView getEventDescView() {
+            return event_desc;
+        }
+
+        public TextView getEventCourseView() {
+            return event_course;
+        }
+
+        public TextView getEventDateView() {
+            return event_date;
+        }
+
+        public ImageView getIconView() {
+            return icon;
         }
     }
 
-    private List<MoodleEvent> events;
-    private Context ctxt;
-
-    public EventListAdapter(List<MoodleEvent>events, Context ctxt){
+    public EventListAdapter(Context context, List<MoodleEvent> events){
         this.events = events;
-        this.ctxt = ctxt;
+        this.context = context;
     }
 
     @Override
-    public EventViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public EventViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        View v = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.list_item_event, viewGroup, false);
 
-        View  view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item_event,viewGroup,false);
-
-        EventViewHolder eventViewHolder = new EventViewHolder(view);
-
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(v.getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        return eventViewHolder;
+        return new EventViewHolder(v);
     }
 
     @Override
@@ -86,22 +98,15 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
 
         String eventname = event.getName();
 
-        if (eventname == null)
-            eventViewHolder.event_name.setText("");
-        else
-            eventViewHolder.event_name.setText(eventname);
+        if (!TextUtils.isEmpty(eventname))
+            eventViewHolder.getEventNameView().setText(eventname);
 
         String eventdesc = event.getDescription();
-        if (eventdesc == null)
-            eventViewHolder.event_desc.setText("");
-        else
-            eventViewHolder.event_desc.setText(Html.fromHtml(eventdesc).toString().trim()); //convert html to string
+        if (!TextUtils.isEmpty(eventdesc))
+            eventViewHolder.getEventDescView().setText(Html.fromHtml(eventdesc).toString().trim()); //convert html to string
 
-        if(event.getCoursename()!=null)
-            eventViewHolder.event_course.setText(event.getCoursename());
-        else
-            eventViewHolder.event_course.setText("");
-
+        if(!TextUtils.isEmpty(event.getCoursename()))
+            eventViewHolder.getEventCourseView().setText(event.getCoursename());
 
         final int eventdate = event.getTimestart();
 
@@ -119,12 +124,12 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         int now_year = cal.get(Calendar.YEAR);
 
         final int month = cal.get(Calendar.MONTH);
-        if (day_now  == day_date && event_month== now_month && event_year == now_year) //if the event date is the current date
-            eventViewHolder.event_date.setTextColor(Color.RED);
+        if (day_now == day_date && event_month== now_month && event_year == now_year) //if the event date is the current date
+            eventViewHolder.getEventDateView().setTextColor(Color.RED);
         else
-            eventViewHolder.event_date.setTextColor(Color.BLACK);
+            eventViewHolder.getEventDateView().setTextColor(Color.BLACK);
 
-        eventViewHolder.event_date.setText(TimeUtils.getTime(eventdate));
+        eventViewHolder.getEventDateView().setText(TimeUtils.getTime(eventdate));
     }
 
     @Override

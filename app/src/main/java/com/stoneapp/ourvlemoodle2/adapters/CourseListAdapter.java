@@ -44,55 +44,67 @@ import java.util.List;
 
 public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.CourseViewHolder> {
     private List<MoodleCourse> courses;
-    private Context ctxt;
+    private Context context;
     private String token;
     private long siteid;
 
     public static class CourseViewHolder extends RecyclerView.ViewHolder {
-        TextView course_shortname;
-        TextView course_fullname;
-        ImageView courseIcon;
+        private final TextView course_shortname;
+        private final TextView course_fullname;
+        private final ImageView courseIcon;
 
-        public CourseViewHolder(View itemView) {
-            super(itemView);
+        public CourseViewHolder(View v, final List<MoodleCourse> courses, final String token, final long siteid) {
+            super(v);
 
-            course_fullname = (TextView)itemView.findViewById(R.id.textview_course_fullname);
-            course_shortname = (TextView)itemView.findViewById(R.id.textview_course_shortname);
-            courseIcon = (ImageView)itemView.findViewById(R.id.imageView1);
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = CourseViewHolder.this.getAdapterPosition();
+
+                    Intent intent = new Intent(v.getContext(), CourseViewActivity.class);
+
+                    intent.putExtra("coursename", courses.get(pos).getShortname());
+                    intent.putExtra("coursefname", courses.get(pos).getFullname());
+                    intent.putExtra("courseid", courses.get(pos).getCourseid());
+                    intent.putExtra("coursepid", courses.get(pos).getId());
+                    intent.putExtra("token", token);
+                    intent.putExtra("siteid", siteid);
+
+                    v.getContext().startActivity(intent);
+                }
+            });
+
+            course_fullname = (TextView) v.findViewById(R.id.textview_course_fullname);
+            course_shortname = (TextView) v.findViewById(R.id.textview_course_shortname);
+            courseIcon = (ImageView) v.findViewById(R.id.imageView1);
+        }
+
+        public TextView getCourseShortnameView() {
+            return course_shortname;
+        }
+
+        public TextView getCourseFullnameView() {
+            return course_fullname;
+        }
+
+        public ImageView getCourseIconView() {
+            return courseIcon;
         }
     }
 
-    public CourseListAdapter(List<MoodleCourse> courses, Context ctxt, String token, long siteid) {
+    public CourseListAdapter(Context context, List<MoodleCourse> courses, String token, long siteid) {
         this.courses = courses;
-        this.ctxt = ctxt;
+        this.context = context;
         this.token = token;
         this.siteid = siteid;
     }
 
     @Override
     public CourseViewHolder onCreateViewHolder(ViewGroup viewGroup, final int position) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.course_list_item, viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.course_list_item, viewGroup, false);
 
-        final CourseViewHolder courseViewHolder = new CourseViewHolder(view);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int pos = courseViewHolder.getAdapterPosition();
-
-                Intent intent = new Intent(v.getContext(), CourseViewActivity.class);
-
-                intent.putExtra("coursename", courses.get(pos).getShortname());
-                intent.putExtra("coursefname", courses.get(pos).getFullname());
-                intent.putExtra("courseid", courses.get(pos).getCourseid());
-                intent.putExtra("coursepid", courses.get(pos).getId());
-                intent.putExtra("token", token);
-                intent.putExtra("siteid", siteid);
-
-                v.getContext().startActivity(intent);
-            }
-        });
-
-        return courseViewHolder;
+        return new CourseViewHolder(v, courses, token, siteid);
     }
 
     @Override
@@ -102,13 +114,13 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
         String course_fullname = course.getFullname();
 
         if (course_fullname != null) {
-            courseViewHolder.course_fullname.setText(course_fullname.trim());
+            courseViewHolder.getCourseFullnameView().setText(course_fullname.trim());
         }
 
         String course_shortname = course.getShortname();
 
         if (course_shortname != null) {
-            courseViewHolder.course_shortname.setText(course_shortname);
+            courseViewHolder.getCourseShortnameView().setText(course_shortname);
         }
 
         char firstLetter = course_shortname.toUpperCase().charAt(0);
@@ -126,7 +138,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
                         .endConfig()
                         .buildRound(firstLetter + "", color2);
 
-        courseViewHolder.courseIcon.setImageDrawable(drawable2);
+        courseViewHolder.getCourseIconView().setImageDrawable(drawable2);
     }
 
     @Override

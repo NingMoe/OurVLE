@@ -86,31 +86,31 @@ public class CalendarFragment extends Fragment
 
         mevents = MoodleEvent.listAll(MoodleEvent.class); //get all events
 
-        eventListAdapter = new EventListAdapter(mevents, this.getActivity());
+        eventListAdapter = new EventListAdapter(getActivity(), mevents);
 
         eventList.setHasFixedSize(true);
-        eventList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
         eventList.setAdapter(eventListAdapter);
 
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
         if (activeInfo != null && activeInfo.isConnected())
-            new LoadAllEventsTask(courseids, token, this.getActivity()).execute(""); // refresh events
+            new LoadAllEventsTask(getActivity(), courseids, token).execute(""); // refresh events
 
         return view;
     }
 
-    private class LoadAllEventsTask extends AsyncTask<String,Integer,Boolean> {
+    private class LoadAllEventsTask extends AsyncTask<String, Integer, Boolean> {
         EventSync evsync;
         ArrayList<String> courseids;
         Context context;
 
-        public LoadAllEventsTask(ArrayList<String>courseids, String token, Context context) {
+        public LoadAllEventsTask(Context context, ArrayList<String>courseids, String token) {
             this.context = context;
             this.courseids = courseids;
 
-            evsync = new EventSync(token,context);
+            evsync = new EventSync(context, token);
         }
 
         @Override
@@ -159,7 +159,7 @@ public class CalendarFragment extends Fragment
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
         if (activeInfo != null && activeInfo.isConnected())
-            new LoadAllEventsTask(courseids, token, this.getActivity()).execute(""); // refresh events
+            new LoadAllEventsTask(getActivity(), courseids, token).execute(""); // refresh events
     }
 
     private RecyclerView eventList;
