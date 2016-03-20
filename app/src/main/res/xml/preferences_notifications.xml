@@ -19,17 +19,21 @@
     -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <PreferenceCategory android:title="General">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:title="@string/notifications_settings">
+
+    <PreferenceCategory
+        android:title="@string/notifications_general_title">
+
         <CheckBoxPreference
             android:key="pref_show_notifications"
-            android:title="Show notifications"
+            android:title="@string/notifications_show_title"
             android:defaultValue="true" />
 
         <RingtonePreference
             android:dependency="pref_show_notifications"
             android:key="pref_notification_ringtone"
-            android:title="Notification tone"
+            android:title="@string/notifications_tone_title"
             android:ringtoneType="notification"
             android:showDefault="true"
             android:showSilent="true"
@@ -39,15 +43,16 @@
         <SwitchPreference
             android:dependency="pref_show_notifications"
             android:key="pref_notification_vibrate"
-            android:title="Vibrate"
+            android:title="@string/notifications_vibrate_title"
             android:defaultValue="true" />
 
         <SwitchPreference
             android:dependency="pref_show_notifications"
             android:key="pref_notification_vibrate"
-            android:title="Notification light"
+            android:title="@string/notifications_light_title"
             android:defaultValue="true" />
     </PreferenceCategory>
+
     <PreferenceCategory android:title="Notifcation types">
         <CheckBoxPreference
             android:key="pref_notif_events"

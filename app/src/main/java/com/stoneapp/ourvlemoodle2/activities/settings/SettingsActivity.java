@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -68,39 +69,27 @@ public class SettingsActivity extends AppCompatActivity {
             super.onCreate(savedInstance);
 
             addPreferencesFromResource(R.xml.preferences);
+        }
 
-            findPreference("sync").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(getActivity(), SettingsSync.class);
-                    getActivity().startActivity(intent);
-                    return true;
-                }
-            });
-
-            findPreference("notifications").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(getActivity(), SettingsNotifications.class);
-                    getActivity().startActivity(intent);
-                    return true;
-                }
-            });
-
-            findPreference("log_out").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new LogoutTask(getActivity()).LogOut();
-                    return true;
-                }
-            });
-
-            findPreference("clear_data").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    return true;
-                }
-            });
+        @Override
+        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+            if (findPreference("sync") == preference) {
+                getActivity().startActivity(new Intent(getActivity(), SettingsSync.class));
+                super.onPreferenceTreeClick(preferenceScreen, preference);
+                return true;
+            } else if (findPreference("notifications") == preference) {
+                getActivity().startActivity(new Intent(getActivity(), SettingsNotifications.class));
+                super.onPreferenceTreeClick(preferenceScreen, preference);
+                return true;
+            } else if (findPreference("log_out") == preference) {
+                new LogoutTask(getActivity()).LogOut();
+                super.onPreferenceTreeClick(preferenceScreen, preference);
+                return true;
+            } else if (findPreference("clear_data") == preference) {
+                super.onPreferenceTreeClick(preferenceScreen, preference);
+                return true;
+            }
+            return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
     }
 }
