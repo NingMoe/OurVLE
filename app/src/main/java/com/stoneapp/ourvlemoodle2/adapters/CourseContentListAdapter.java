@@ -168,12 +168,13 @@ public class CourseContentListAdapter
                 cfrag.setFile(file);
 
                 if (file.exists()) {
+                    Toast.makeText(context, "Opening file", Toast.LENGTH_SHORT).show();
                     FileUtils.openFile(context, file);
                 } else {
                     String file_url = content.getFileurl() + "&token=" + token;
 
-                    Toast.makeText(context, "Opening file", Toast.LENGTH_SHORT).show();
-                    FileUtils.download(context, file_url, file_path, content.getFilename());
+                    Toast.makeText(context, "Downloading file", Toast.LENGTH_SHORT).show();
+                    FileUtils.downloadFile(context, file_url, file_path, content.getFilename());
                 }
             } else
                 cfrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},

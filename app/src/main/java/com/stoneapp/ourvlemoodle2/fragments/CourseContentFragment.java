@@ -229,8 +229,10 @@ public class CourseContentFragment extends Fragment
                 Toast.makeText(getActivity(), "Download completed", Toast.LENGTH_SHORT).show();
                 if (ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    if (file.exists())
-                        FileUtils.openFile(getActivity(), file); // opens file just downloaded
+                    if (file.exists()) {
+                        Toast.makeText(getActivity(), "Opening file", Toast.LENGTH_SHORT).show();
+                        FileUtils.openFile(getActivity(), file);
+                    }
                 }
             }
     };

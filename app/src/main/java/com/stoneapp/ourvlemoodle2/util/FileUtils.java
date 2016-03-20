@@ -35,7 +35,7 @@ import java.util.List;
 
 public class FileUtils {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static long download(Context context, String file_url, String file_path, String filename) {
+    public static long downloadFile(Context context, String file_url, String file_path, String filename) {
         File file;
 
         file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE") + file_path);
