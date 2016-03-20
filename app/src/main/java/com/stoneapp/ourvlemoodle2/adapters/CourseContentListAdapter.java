@@ -84,65 +84,18 @@ public class CourseContentListAdapter
                     if (module == null)
                         return;
 
-                    String modurl = module.getUrl();
-                    if (TextUtils.isEmpty(modurl))
-                        modurl = MoodleConstants.URL + "/course/view.php?id=" + courseid;
+                    switch (module.getModname()) {
+                        case "label": /* do nothing */
+                            break;
 
-                    Intent intent;
+                        case "resource":
+                            downloadResource(module);
+                            break;
 
-                    if (SettingsUtils.shouldOpenLinksExternally(context)) {
-                        Uri webpage = Uri.parse(modurl);
-                        intent = new Intent(Intent.ACTION_VIEW, webpage);
-                        if (intent.resolveActivity(context.getPackageManager()) != null) {
-                            context.startActivity(intent);
-
-                            return;
-                        }
+                        default:
+                            openWebpage(module);
+                            break;
                     }
-                    else {
-                        intent = new Intent(context, BrowserActivity.class);
-                        intent.putExtra("url", modurl);
-                    }
-
-                    if (module.getModname().contentEquals("label"))
-                        return;
-
-                    if (!module.getModname().contentEquals("resource")) {
-                        context.startActivity(intent);
-                        return;
-                    }
-
-                    if (module.getContents() == null) {
-                        context.startActivity(intent);
-                        return;
-                    }
-
-                    if (module.getContents().size() == 0) {
-                        context.startActivity(intent);
-                        return;
-                    }
-
-                    if (ContextCompat.checkSelfPermission(context,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        MoodleModuleContent content = module.getContents().get(0); // gets the content/file
-                        String file_path = "/" + coursename + "/"; // place file in course folder
-                        String filename = content.getFilename().replace("#", ""); // to fix file opening issues
-                        file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
-                                + file_path + filename); //creates a new file and store it in the directory
-                        cfrag.setFile(file);
-
-                        if (file.exists()) {
-                            FileUtils.openFile(context, file);
-                        } else {
-                            String file_url = content.getFileurl() + "&token=" + token;
-
-                            Toast.makeText(context, "Opening File", Toast.LENGTH_SHORT).show();
-                            FileUtils.download(context, file_url, file_path, content.getFilename());
-                        }
-                    } else
-                        cfrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
                 }
             });
 
@@ -166,6 +119,65 @@ public class CourseContentListAdapter
 
         public ImageView getModImageView() {
             return modimage;
+        }
+
+        private static void openWebpage(MoodleModule module) {
+            String url = module.getUrl();
+            if (TextUtils.isEmpty(url))
+                // course container webpage
+                url = MoodleConstants.URL + "/course/view.php?id=" + courseid;
+
+            Intent intent;
+
+            if (SettingsUtils.shouldOpenLinksExternally(context)) {
+                Uri webpage = Uri.parse(url);
+                intent = new Intent(Intent.ACTION_VIEW, webpage);
+                if (intent.resolveActivity(context.getPackageManager()) != null) {
+                    context.startActivity(intent);
+
+                    return;
+                }
+            }
+            else {
+                intent = new Intent(context, BrowserActivity.class);
+                intent.putExtra("url", url);
+            }
+
+            context.startActivity(intent);
+        }
+
+        private static void downloadResource(MoodleModule module) {
+            if (module.getContents() == null) {
+                openWebpage(module);
+                return;
+            }
+
+            if (module.getContents().size() == 0) {
+                openWebpage(module);
+                return;
+            }
+
+            if (ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                MoodleModuleContent content = module.getContents().get(0); // gets the content/file
+                String file_path = "/" + coursename + "/"; // place file in course folder
+                String filename = content.getFilename().replace("#", ""); // to fix file opening issues
+                file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
+                        + file_path + filename); //creates a new file and store it in the directory
+                cfrag.setFile(file);
+
+                if (file.exists()) {
+                    FileUtils.openFile(context, file);
+                } else {
+                    String file_url = content.getFileurl() + "&token=" + token;
+
+                    Toast.makeText(context, "Opening file", Toast.LENGTH_SHORT).show();
+                    FileUtils.download(context, file_url, file_path, content.getFilename());
+                }
+            } else
+                cfrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
         }
     }
 
