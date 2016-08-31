@@ -295,10 +295,18 @@ public class SignInActivity extends AppCompatActivity {
             courses  = mcourse.getCourses(siteInfo.getUserid()+  ""); // gets courses from api call
 
             if (courses == null) // if there are no courses
+            {
+                error = "No courses registered";
                 return false;
+            }
+
 
             if (courses.size() == 0)
+            {
+                error = "No courses registered";
                 return false;
+            }
+
 
             MoodleCourse course;
             for (int i = 0; i < courses.size(); i++) {
