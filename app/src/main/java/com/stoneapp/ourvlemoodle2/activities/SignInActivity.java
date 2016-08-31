@@ -38,6 +38,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -54,6 +55,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,6 +73,9 @@ public class SignInActivity extends AppCompatActivity {
     private Button mBtn;
     private ProgressBar mProgressBar;
     private TextView mTvLoginHelp;
+    private TextInputLayout mTvUserLabel;
+    private TextInputLayout mTvUserPassLabel;
+    private ImageView mImageIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +103,9 @@ public class SignInActivity extends AppCompatActivity {
         mUserPass = (EditText) findViewById(R.id.editPassword);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBarSignIn);
         mTvLoginHelp = (TextView) findViewById(R.id.login_help);
-
+        mTvUserLabel = (TextInputLayout) findViewById(R.id.idnum_float_label);
+        mTvUserPassLabel = (TextInputLayout) findViewById(R.id.password_float_label);
+        mImageIcon = (ImageView) findViewById(R.id.imgView);
         mProgressBar.setIndeterminate(true);
 
         mUserPass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -229,6 +236,9 @@ public class SignInActivity extends AppCompatActivity {
             mUserPass.setVisibility(View.GONE);
             mBtn.setVisibility(View.GONE);
             mTvLoginHelp.setVisibility(View.GONE);
+            mTvUserPassLabel.setVisibility(View.GONE);
+            mTvUserLabel.setVisibility(View.GONE);
+            mImageIcon.setVisibility(View.GONE);
         }
 
         @Override
@@ -239,12 +249,8 @@ public class SignInActivity extends AppCompatActivity {
             if (!getSiteInfo())
                 return false;
 
-          //  downloadUserImage();
-
             if (!getCourses())
                 return false;
-
-            getForums();
 
             return true;
         }
@@ -282,9 +288,7 @@ public class SignInActivity extends AppCompatActivity {
             return true;
         }
 
-        private void downloadUserImage() {
-            ImageDownloader.download(siteInfo.getUserpictureurl() + "", siteInfo.getUserid() + "");
-        }
+
 
         private boolean getCourses() {
             MoodleRestCourse mcourse= new MoodleRestCourse(token);
@@ -307,18 +311,6 @@ public class SignInActivity extends AppCompatActivity {
             return true;
         }
 
-        private boolean getForums() {
-            ForumSync fsync = new ForumSync(token);
-            ArrayList<String >courseids = new ArrayList<>();
-
-            for (int i = 0; i < courses.size(); i++)
-                courseids.add(courses.get(i).getCourseid() + "");
-
-            if (!fsync.syncForums(courseids)) // syncs all forums to database
-                return false;
-
-            return true;
-        }
 
         @Override
         protected void onPostExecute(Boolean status) {
@@ -340,9 +332,12 @@ public class SignInActivity extends AppCompatActivity {
                 mProgressBar.setVisibility(View.GONE);
 
                 mUserId.setVisibility(View.VISIBLE);
-                mUserId.setVisibility(View.VISIBLE);
+                mUserPass.setVisibility(View.VISIBLE);
                 mBtn.setVisibility(View.VISIBLE);
                 mTvLoginHelp.setVisibility(View.VISIBLE);
+                mTvUserLabel.setVisibility(View.VISIBLE);
+                mTvUserPassLabel.setVisibility(View.VISIBLE);
+                mImageIcon.setVisibility(View.VISIBLE);
             }
         }
     }
