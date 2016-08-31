@@ -18,7 +18,7 @@
     along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
     -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -40,5 +40,27 @@
         tools:listitem="@layout/list_forum_item" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
+    <ImageView
+        android:id="@+id/no_forums"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/notpresent"
+        android:layout_centerInParent="true"/>
+    <TextView
 
-</LinearLayout>
+        android:id="@+id/txt_notpresent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No Forums present"
+        android:textSize="20sp"
+        android:paddingTop="10dp"
+        android:layout_below="@+id/no_forums"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

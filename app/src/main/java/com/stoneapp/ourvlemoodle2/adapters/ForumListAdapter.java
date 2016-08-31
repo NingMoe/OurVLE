@@ -40,6 +40,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleForum;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.ForumViewHolder> {
@@ -63,7 +64,7 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
 
     public ForumListAdapter(Context ctxt, List<MoodleForum> forums, String token) {
         this.ctxt = ctxt;
-        this.forums = forums;
+        this.forums = new ArrayList<>(forums);
         this.token = token;
     }
 
@@ -118,7 +119,7 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
     }
 
     public void updateForumList(List<MoodleForum> newForums) {
-        this.forums = newForums;
+        this.forums = new ArrayList<>(newForums);
         notifyDataSetChanged();
     }
 

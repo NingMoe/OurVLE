@@ -26,6 +26,7 @@ import com.stoneapp.ourvlemoodle2.adapters.ForumListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleForum;
 import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -44,16 +45,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 @SuppressWarnings("FieldCanBeLocal")
-public class ForumFragment extends Fragment
-        implements OnRefreshListener {
-    private List<MoodleForum> forums;
-    int courseid = 0;
-    private ArrayList<String> courseids; // list of course ids
-    private String token; // url token
-    private ForumListAdapter forumListAdapter;
+public class ForumFragment extends Fragment implements OnRefreshListener {
+
+    private List<MoodleForum> mForums;
+    private int mCourseId = 0;
+    private ArrayList<String> mCourseids = new ArrayList<>(); // list of course ids
+    private String mToken; // url token
+    private ForumListAdapter mForumListAdapter;
+    private View mRootView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerView mForumRecView;
+    private TextView mTvPlaceHolder;
+    private ImageView mImgPlaceHolder;
+    private ProgressBar mProgressBar;
+
+
+    public ForumFragment() {/* required empty constructor */}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,9 +73,9 @@ public class ForumFragment extends Fragment
         Bundle args = getArguments();
 
         if (args != null) {
-            this.courseid  = args.getInt("courseid"); //get course id from previous activity
+            this.mCourseId  = args.getInt("courseid"); //get course id from previous activity
             // this.coursename  = getArguments().getString("coursename"); //get course name from previous activity
-            this.token = args.getString("token"); //gets the token stored in sqlite
+            this.mToken = args.getString("token"); //gets the token stored in sqlite
         }
 
         setHasOptionsMenu(true);
@@ -73,33 +84,83 @@ public class ForumFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.frag_forum, container, false);
+        mRootView = inflater.inflate(R.layout.frag_forum, container, false);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
-        forumRecView = (RecyclerView) rootView.findViewById(R.id.forumList);
+        initViews();
 
-       // List<MoodleSiteInfo> sites = MoodleSiteInfo.listAll(MoodleSiteInfo.class);
+        setUpSwipeRefresh();
 
-        //token = sites.get(0).getToken();
-        courseids = new ArrayList<>();
+        getForumsFromDatabase();
 
+        if(mForums.size()>0)
+        {
+            mTvPlaceHolder.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+        }
+
+        setUpRecyclerView();
+
+        setUpProgressBar();
+
+
+        new LoadForumTask(mToken, mCourseids, getActivity()).execute(); // refresh forums
+
+        return mRootView;
+    }
+
+
+    private void initViews()
+    {
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
+        mForumRecView = (RecyclerView) mRootView.findViewById(R.id.forumList);
+        mImgPlaceHolder = (ImageView) mRootView.findViewById(R.id.no_forums);
+        mTvPlaceHolder = (TextView)mRootView.findViewById(R.id.txt_notpresent);
+        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressBar);
+    }
+
+    private void setUpSwipeRefresh()
+    {
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-
-        forums = MoodleForum.find(MoodleForum.class, "courseid = ?", courseid + ""); // gets all forums related to the course
-
-        forumListAdapter = new ForumListAdapter(getActivity(), forums, token);
-        forumRecView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        forumRecView.setAdapter(forumListAdapter);
-
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            new LoadForumTask(token, courseids, getActivity()).execute(""); // refresh forums
-
-        return rootView;
     }
+
+    private void setUpRecyclerView()
+    {
+        mForumListAdapter = new ForumListAdapter(getActivity(), mForums, mToken);
+        mForumRecView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mForumRecView.setAdapter(mForumListAdapter);
+
+    }
+
+    private void getForumsFromDatabase()
+    {
+        mForums = MoodleForum.find(MoodleForum.class, "courseid = ?", mCourseId + ""); // gets all forums related to the course
+    }
+
+    private void setUpProgressBar()
+    {
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    private boolean isConnected() {
+        return ConnectUtils.isConnected(mRootView.getContext());
+    }
+
+    private static boolean hasInternet()
+    {
+        boolean hasInternet;
+
+        try {
+            hasInternet = ConnectUtils.haveInternetConnectivity();
+        } catch(Exception e) {
+            hasInternet = false;
+        }
+
+        return  hasInternet;
+    }
+
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -111,7 +172,7 @@ public class ForumFragment extends Fragment
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 mSwipeRefreshLayout.setRefreshing(true);
-                new LoadForumTask(token, courseids, getActivity()).execute(""); // refresh content
+                new LoadForumTask(mToken, mCourseids, getActivity()).execute(); // refresh content
                 return true;
 
             default:
@@ -119,48 +180,70 @@ public class ForumFragment extends Fragment
         }
     }
 
-    private class LoadForumTask extends AsyncTask<String, Integer, Boolean> {
-        ForumSync fsync;
+    private class LoadForumTask extends AsyncTask<Void,Void,Boolean> {
+
         ArrayList<String> courseids;
         Context context;
+        private String token;
 
         public LoadForumTask(String token, ArrayList<String>courseids, Context context) {
-            fsync = new ForumSync(token);
+            this.token = token;
             this.courseids = courseids;
             this.context =context;
         }
 
         @Override
-        protected Boolean doInBackground(String... params) {
+        protected void onPreExecute() {
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
+
+            if (mForums.size() == 0) { // check if any news are present
+                mProgressBar.setVisibility(View.VISIBLE);
+                if (mSwipeRefreshLayout.isRefreshing())
+                    mProgressBar.setVisibility(View.GONE);
+            }
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            final ForumSync fsync = new ForumSync(token);
+
+            if (!isConnected()) {  // if there is no internet connection
+                return false;
+            }
+
+            if (!hasInternet()) { // if there is no internet
+                return false;
+            }
+
             boolean sync = fsync.syncForums(courseids); // syncs forums
-            if (sync)
-                forums = MoodleForum.find(MoodleForum.class, "courseid = ?", courseid + ""); // update forums list
 
             return sync;
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
-            forumListAdapter.notifyDataSetChanged();
             mSwipeRefreshLayout.setRefreshing(false);
-
-            if (!result) {}
+            mProgressBar.setVisibility(View.GONE);
+            if (result) {
+                getForumsFromDatabase();
+                mForumListAdapter.updateForumList(mForums);
+            } else {
+                if (mForums.size() == 0) {
+                    mImgPlaceHolder.setVisibility(View.VISIBLE);
+                    mTvPlaceHolder.setVisibility(View.VISIBLE);
+                }
+            }
         }
 
     }
 
     @Override
     public void onRefresh() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            new LoadForumTask(token, courseids, getActivity()).execute(""); // refresh content
+        new LoadForumTask(mToken,mCourseids,getActivity()).execute();
     }
 
-    private View rootView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerView forumRecView;
 
-    public ForumFragment() {/* required empty constructor */}
+
+
 }
