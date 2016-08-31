@@ -66,11 +66,11 @@ import java.util.List;
 public class SignInActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_MULTIPLE = 0x1;
 
-    private EditText user_id;
-    private EditText user_pass;
-    private Button btn;
-    private ProgressBar progressBar;
-    private TextView login_help;
+    private EditText mUserId;
+    private EditText mUserPass;
+    private Button mBtn;
+    private ProgressBar mProgressBar;
+    private TextView mTvLoginHelp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,15 +93,15 @@ public class SignInActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_sign_in);
 
-        btn = (Button) findViewById(R.id.button);
-        user_id = (EditText) findViewById(R.id.editTextUser);
-        user_pass = (EditText) findViewById(R.id.editPassword);
-        progressBar = (ProgressBar) findViewById(R.id.progressBarSignIn);
-        login_help = (TextView) findViewById(R.id.login_help);
+        mBtn = (Button) findViewById(R.id.button);
+        mUserId = (EditText) findViewById(R.id.editTextUser);
+        mUserPass = (EditText) findViewById(R.id.editPassword);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBarSignIn);
+        mTvLoginHelp = (TextView) findViewById(R.id.login_help);
 
-        progressBar.setIndeterminate(true);
+        mProgressBar.setIndeterminate(true);
 
-        user_pass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mUserPass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
@@ -116,7 +116,7 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
-        login_help.setOnClickListener(new View.OnClickListener() {
+        mTvLoginHelp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showHelpDialog(SignInActivity.this);
@@ -153,27 +153,27 @@ public class SignInActivity extends AppCompatActivity {
         InputMethodManager inputManager = (InputMethodManager) SignInActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
-        user_id.setError(null);
-        user_pass.setError(null);
+        mUserId.setError(null);
+        mUserPass.setError(null);
 
-        String id = user_id.getText().toString();
-        String password = user_pass.getText().toString();
+        String id = mUserId.getText().toString();
+        String password = mUserPass.getText().toString();
 
         View focusView;
 
         if (TextUtils.isEmpty(id)) {
-            user_id.setError("This field is required");
-            focusView = user_id;
+            mUserId.setError("This field is required");
+            focusView = mUserId;
             focusView.requestFocus();
         }
 
         if (TextUtils.isEmpty(password)) {
-            user_pass.setError("Enter password");
-            focusView = user_pass;
+            mUserPass.setError("Enter password");
+            focusView = mUserPass;
             focusView.requestFocus();
         }
 
-        user_pass.setText("");
+        mUserPass.setText("");
 
         new LoginTask(id, password).execute("");
     }
@@ -223,12 +223,12 @@ public class SignInActivity extends AppCompatActivity {
             Toast toast = Toast.makeText(getApplicationContext(), login_status, Toast.LENGTH_SHORT);
             toast.show();
 
-            progressBar.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.VISIBLE);
 
-            user_id.setVisibility(View.GONE);
-            user_pass.setVisibility(View.GONE);
-            btn.setVisibility(View.GONE);
-            login_help.setVisibility(View.GONE);
+            mUserId.setVisibility(View.GONE);
+            mUserPass.setVisibility(View.GONE);
+            mBtn.setVisibility(View.GONE);
+            mTvLoginHelp.setVisibility(View.GONE);
         }
 
         @Override
@@ -239,7 +239,7 @@ public class SignInActivity extends AppCompatActivity {
             if (!getSiteInfo())
                 return false;
 
-            downloadUserImage();
+          //  downloadUserImage();
 
             if (!getCourses())
                 return false;
@@ -322,7 +322,7 @@ public class SignInActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean status) {
-            progressBar.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.GONE);
 
             if (status) { // if the user has successfully logged on
                 SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(MoodleConstants.PREFS_STRING, Context.MODE_PRIVATE);
@@ -337,12 +337,12 @@ public class SignInActivity extends AppCompatActivity {
                 Toast toast = Toast.makeText(getApplicationContext(),"Failed "+error, Toast.LENGTH_SHORT);
                 toast.show();
 
-                progressBar.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.GONE);
 
-                user_id.setVisibility(View.VISIBLE);
-                user_pass.setVisibility(View.VISIBLE);
-                btn.setVisibility(View.VISIBLE);
-                login_help.setVisibility(View.VISIBLE);
+                mUserId.setVisibility(View.VISIBLE);
+                mUserId.setVisibility(View.VISIBLE);
+                mBtn.setVisibility(View.VISIBLE);
+                mTvLoginHelp.setVisibility(View.VISIBLE);
             }
         }
     }
