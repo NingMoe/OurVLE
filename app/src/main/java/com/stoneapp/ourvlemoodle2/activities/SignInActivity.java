@@ -66,6 +66,12 @@ import java.util.List;
 public class SignInActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_MULTIPLE = 0x1;
 
+    private EditText user_id;
+    private EditText user_pass;
+    private Button btn;
+    private ProgressBar progressBar;
+    private TextView login_help;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -200,6 +206,7 @@ public class SignInActivity extends AppCompatActivity {
         private String user_name;
         private String user_passwd;
         private String token;
+        private String error = "";
         private String name = "";
         private MoodleSiteInfo siteInfo;
         private ArrayList<MoodleCourse> courses;
@@ -249,7 +256,11 @@ public class SignInActivity extends AppCompatActivity {
             // if there is no token
             // usually occurs if the user is not a valid user or lack of internet connectivity
             if (mtoken.getToken() == null)
+            {
+                this.error = mtoken.getError();
                 return false;
+            }
+
 
             this.token = mtoken.getToken(); // gets the string of characters that represent the token
 
@@ -323,7 +334,7 @@ public class SignInActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 getApplicationContext().startActivity(intent);
             } else {
-                Toast toast = Toast.makeText(getApplicationContext(), "Login Failed", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(),"Failed "+error, Toast.LENGTH_SHORT);
                 toast.show();
 
                 progressBar.setVisibility(View.GONE);
@@ -336,9 +347,5 @@ public class SignInActivity extends AppCompatActivity {
         }
     }
 
-    private EditText user_id;
-    private EditText user_pass;
-    private Button btn;
-    private ProgressBar progressBar;
-    private TextView login_help;
+
 }
