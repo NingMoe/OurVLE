@@ -21,16 +21,30 @@ package com.stoneapp.ourvlemoodle2.models;
 
 import java.util.ArrayList;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
-public class MoodleCourse extends SugarRecord<MoodleCourse> {
+
+@Table(name="MoodleCourse")
+public class MoodleCourse extends Model{
+
+
     @SerializedName("id")
+    @Column(name="courseid")
     int courseid;
 
+    @Column(name="shortname")
     @SerializedName("shortname")
     String shortname;
+
+    @Column(name="fullname")
+    @SerializedName("fullname")
+    String fullname;
 
     @SerializedName("categoryid")
     int categoryid;
@@ -38,8 +52,7 @@ public class MoodleCourse extends SugarRecord<MoodleCourse> {
     @SerializedName("categorysortorder")
     int categorysortorder;
 
-    @SerializedName("fullname")
-    String fullname;
+
 
     @SerializedName("idnumber")
     String idnumber;
@@ -131,6 +144,7 @@ public class MoodleCourse extends SugarRecord<MoodleCourse> {
     Boolean isFavCourse = false;
 
     public MoodleCourse() {
+        super();
 
     }
 
@@ -141,6 +155,7 @@ public class MoodleCourse extends SugarRecord<MoodleCourse> {
      *            siteid of the Moodle account to which this course belongs to.
      */
     public MoodleCourse(long siteid) {
+        super();
         this.siteid = siteid;
     }
 
@@ -447,5 +462,28 @@ public class MoodleCourse extends SugarRecord<MoodleCourse> {
      */
     public void setSiteid(long siteid) {
         this.siteid = siteid;
+    }
+
+    public static MoodleCourse findOrCreateFromJson(MoodleCourse new_course) {
+        int courseid = new_course.getCourseid();
+        MoodleCourse existingCourse =
+                new Select().from(MoodleCourse.class).where("courseid = ?", courseid).executeSingle();
+        if (existingCourse != null) {
+            // found and return existing
+            UpdateCourse(existingCourse,new_course);
+            return existingCourse;
+        } else {
+            // create and return new user
+            MoodleCourse course = new_course;
+            course.save();
+            return course;
+        }
+    }
+
+    private static void UpdateCourse(MoodleCourse old_course,MoodleCourse new_course)
+    {
+        old_course = new_course;
+        old_course.save();
+
     }
 }

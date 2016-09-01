@@ -22,6 +22,8 @@ package com.stoneapp.ourvlemoodle2.tasks;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.models.MoodleForum;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.rest.MoodleRestForum;
@@ -29,14 +31,16 @@ import com.stoneapp.ourvlemoodle2.rest.MoodleRestForum;
 public class ForumSync {
 
     private String token; //url token
+    List<MoodleForum> forums;
 
     public ForumSync(String token){
         this.token = token;
     }
 
     public boolean syncForums(ArrayList<String> courseids){
-        ArrayList<MoodleForum>forums;
+
         MoodleRestForum mrforum = new MoodleRestForum(token);
+
         forums = mrforum.getForums(courseids); // gets forums from api call
 
         if (forums  == null) // if there are no forums
@@ -45,27 +49,45 @@ public class ForumSync {
         if (forums.size() == 0 )
             return false;
 
-        List<MoodleForum> saved_forums;
-        List<MoodleCourse> saved_courses;
-        MoodleForum forum;
 
-        int len = forums.size();
 
-        for (int i = 0; i < len; i++){
-            forum = forums.get(i);
+        ActiveAndroid.beginTransaction();
+        try {
+            deleteStaleData();
+            for (int i = 0; i < forums.size(); i++) {
+                final MoodleForum forum = forums.get(i);
 
-            saved_forums = MoodleForum.find(MoodleForum.class, "forumid = ?", forum.getForumid() + ""); // get forums matching the current forum
-            saved_courses = MoodleCourse.find(MoodleCourse.class, "courseid = ?", forum.getCourseid() + ""); // gets courses from database
+                MoodleCourse forumCourse = new Select().from(MoodleCourse.class).where("courseid = ?",forum.getCourseid()).executeSingle();
+                if(forumCourse!=null)
+                {
+                    forum.setCoursename(forumCourse.getShortname());
+                }
 
-            if (saved_forums.size() > 0)  // if any forums match the current forum then just overwrite the previously sored one
-                forum.setId(saved_forums.get(0).getId());
-
-            if (saved_courses.size() > 0 )
-                forum.setCoursename(saved_courses.get(0).getShortname());
-
-            forum.save(); // save the forum
+                MoodleForum.findOrCreateFromJson(forum); // saves contact to database
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        }finally {
+            ActiveAndroid.endTransaction();
         }
 
         return true;
+    }
+
+    private void deleteStaleData()
+    {
+
+        List<MoodleForum> stale_forums = new Select().all().from(MoodleForum.class).execute();
+        for(int i=0;i<stale_forums.size();i++)
+        {
+            if(!doesForumExistInJson(stale_forums.get(i)))
+            {
+                MoodleForum.delete(MoodleForum.class,stale_forums.get(i).getId());
+            }
+        }
+    }
+
+    private boolean doesForumExistInJson(MoodleForum forum)
+    {
+        return forums.contains(forum);
     }
 }

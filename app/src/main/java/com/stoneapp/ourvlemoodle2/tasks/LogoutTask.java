@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.activeandroid.query.Delete;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
 import com.stoneapp.ourvlemoodle2.models.MoodleForum;
@@ -70,20 +71,18 @@ public class LogoutTask {
     }
 
     private void clearCache() {
-        //editor.putBoolean(MoodleConstants.ID_PRESENT, true); // resets logged in flag
-        //editor.commit();
         sharedPrefs.edit().clear().commit();
         PreferenceManager.getDefaultSharedPreferences(context).edit().clear().commit();
 
-        MoodleSection.deleteAll(MoodleSection.class);
-        MoodleModule.deleteAll(MoodleModule.class);
-        MoodleModuleContent.deleteAll(MoodleModuleContent.class);
-        MoodleSiteInfo.deleteAll(MoodleSiteInfo.class);
-        MoodleCourse.deleteAll(MoodleCourse.class);
-        MoodleEvent.deleteAll(MoodleEvent.class);
-        MoodleMember.deleteAll(MoodleMember.class);
-        MoodleForum.deleteAll(MoodleForum.class);
-        MoodlePost.deleteAll(MoodlePost.class);
-        MoodleDiscussion.deleteAll(MoodleDiscussion.class);
+        new Delete().from(MoodleSection.class).execute();
+        new Delete().from(MoodleModule.class).execute();
+        new Delete().from(MoodleModuleContent.class).execute();
+        new Delete().from(MoodleSiteInfo.class).execute();
+        new Delete().from(MoodleCourse.class).execute();
+        new Delete().from(MoodleEvent.class).execute();
+        new Delete().from(MoodleMember.class).execute();
+        new Delete().from(MoodleForum.class).execute();
+        new Delete().from(MoodlePost.class).execute();
+        new Delete().from(MoodleDiscussion.class).execute();
     }
 }

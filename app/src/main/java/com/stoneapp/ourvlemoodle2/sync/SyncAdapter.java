@@ -27,6 +27,7 @@ import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
@@ -46,6 +47,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private String token;
     private List<MoodleCourse> courses;
     private SharedPreferences sharedPrefs;
+    List<MoodleSiteInfo> mSites;
 
     /**
      * Set up the sync adapter
@@ -81,9 +83,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         first_update = sharedPrefs.getInt(MoodleConstants.FIRST_UPDATE, 404); // flag to check whether this is the first update
 
-        token = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getToken(); // gets the url token
+        mSites = new Select().all().from(MoodleSiteInfo.class).execute();
+        token = mSites.get(0).getToken(); // gets the url token
 
-        courses = MoodleCourse.listAll(MoodleCourse.class); // gets all the courses
+        courses = new Select().all().from(MoodleCourse.class).execute(); // gets all the courses
 
         updateLatestEvents();
         updateLatestForumPosts();
@@ -106,7 +109,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void updateLatestForumPosts() {
         ArrayList<String>forumids;
-        List<MoodleForum> forums  = MoodleForum.listAll(MoodleForum.class); // gets a list of all the forums
+        List<MoodleForum> forums  = new Select().all().from(MoodleForum.class).execute(); // gets a list of all the forums
         ArrayList<MoodleForum>news_forums = new ArrayList<>();
 
         if(forums != null && forums.size() > 0) { // checks if there are no forums
@@ -133,7 +136,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void updateLatestDiscussionPots() {
         ArrayList<String> discussionids = new ArrayList<>();
-        List<MoodleDiscussion> discussions = MoodleDiscussion.listAll(MoodleDiscussion.class); // gets a list of all the forum discussions
+        List<MoodleDiscussion> discussions = new Select().all().from(MoodleDiscussion.class).execute(); // gets a list of all the forum discussions
 
         if(discussions != null && discussions.size() > 0) { // checks if there are no discussions
             for(int i = 0; i < discussions.size(); i++)
@@ -159,7 +162,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         ArrayList<Integer>courseids;
         ArrayList<Long>coursepids;
 
-        long siteid = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getId();
+        long siteid = mSites.get(0).getId();
 
         courseids = new ArrayList<>();
         coursepids = new ArrayList<>();

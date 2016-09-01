@@ -30,6 +30,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.PostListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodlePost;
 import com.stoneapp.ourvlemoodle2.tasks.PostSync;
@@ -88,7 +89,7 @@ public class PostActivity  extends AppCompatActivity
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
         // get posts from database
-        posts = MoodlePost.find(MoodlePost.class, "discussionid = ?", discussionid);
+        getPostsFromDatabase();
 
         //Order posts by time created
         Collections.sort(posts, new Comparator<MoodlePost>() {
@@ -112,6 +113,11 @@ public class PostActivity  extends AppCompatActivity
         postList.setAdapter(padapter);
 
         new LoadPostsTask(discussionid, token, this).execute(""); // refresh posts
+    }
+
+    private void getPostsFromDatabase()
+    {
+        posts = new Select().from(MoodlePost.class).where("discussionid = ?",discussionid).execute();
     }
 
     @Override
@@ -158,7 +164,7 @@ public class PostActivity  extends AppCompatActivity
         protected Boolean doInBackground(String... params) {
             boolean sync = psync.syncPosts(discussionid); // syncs posts
             if (sync) {
-                posts = MoodlePost.find(MoodlePost.class, "discussionid = ?", discussionid); //gets the posts from database
+                getPostsFromDatabase(); //gets the posts from database
 
                 //Order posts by time created
                 Collections.sort(posts,new Comparator<MoodlePost>() {

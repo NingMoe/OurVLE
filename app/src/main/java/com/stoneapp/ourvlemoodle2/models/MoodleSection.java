@@ -22,21 +22,27 @@ package com.stoneapp.ourvlemoodle2.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
-public class MoodleSection extends SugarRecord<MoodleSection>{
+public class MoodleSection extends Model{
 
+    @Column(name="sectionid")
     @SerializedName("id")
     int sectionid;
 
+    @Column(name="name")
     @SerializedName("name")
     String name;
 
     @SerializedName("visible")
     int visible;
 
+    @Column(name="summary")
     @SerializedName("summary")
     String summary;
 
@@ -48,8 +54,13 @@ public class MoodleSection extends SugarRecord<MoodleSection>{
     ArrayList<MoodleModule> modules;
 
     // Relational parameters
+    @Column(name="parentid")
     Long parentid;
+
+    @Column(name="courseid")
     int courseid;
+
+    @Column(name="siteid")
     Long siteid;
 
     /**
@@ -172,6 +183,29 @@ public class MoodleSection extends SugarRecord<MoodleSection>{
      */
     public void setSiteid(Long siteid) {
         this.siteid = siteid;
+    }
+
+    public static MoodleSection findOrCreateFromJson(MoodleSection new_section) {
+        int sectionid = new_section.getSectionid();
+        MoodleSection existingSection =
+                new Select().from(MoodleSection.class).where("sectionid = ?", sectionid).executeSingle();
+        if (existingSection != null) {
+            // found and return existing
+            UpdateSection(existingSection,new_section);
+            return existingSection;
+        } else {
+            // create and return new user
+            MoodleSection section = new_section;
+            section.save();
+            return section;
+        }
+    }
+
+    private static void UpdateSection(MoodleSection old_section,MoodleSection new_section)
+    {
+        old_section = new_section;
+        old_section.save();
+
     }
 
 

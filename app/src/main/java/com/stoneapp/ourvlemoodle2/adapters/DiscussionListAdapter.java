@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.stoneapp.ourvlemoodle2.activities.PostActivity;
 import com.stoneapp.ourvlemoodle2.util.TimeUtils;
@@ -133,11 +134,18 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
         if (!TextUtils.isEmpty(topic_name))
             holder.getTopicNameView().setText(topic_name);
 
-        String coursename = MoodleCourse.find(MoodleCourse.class, "courseid = ?", discussion.getCourseid() + "").get(0).getShortname();
-        if (TextUtils.isEmpty(coursename))
+        MoodleCourse course = new Select().from(MoodleCourse.class).where("ccourseid = ?", discussion.getCourseid()).executeSingle();
+        if(course!=null)
+        {
+            String coursename = course.getShortname();
+            if (TextUtils.isEmpty(coursename))
+                holder.getCourseNameView().setText("N/A");
+            else
+                holder.getCourseNameView().setText(coursename);
+        }else{
             holder.getCourseNameView().setText("N/A");
-        else
-            holder.getCourseNameView().setText(coursename);
+        }
+
 
         String startname = discussion.getFirstuserfullname();
         if (!TextUtils.isEmpty(startname))

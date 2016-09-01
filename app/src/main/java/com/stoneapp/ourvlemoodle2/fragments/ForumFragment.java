@@ -22,15 +22,13 @@ package com.stoneapp.ourvlemoodle2.fragments;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.ForumListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleForum;
 import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
-
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -74,7 +72,6 @@ public class ForumFragment extends Fragment implements OnRefreshListener {
 
         if (args != null) {
             this.mCourseId  = args.getInt("courseid"); //get course id from previous activity
-            // this.coursename  = getArguments().getString("coursename"); //get course name from previous activity
             this.mToken = args.getString("token"); //gets the token stored in sqlite
         }
 
@@ -134,7 +131,7 @@ public class ForumFragment extends Fragment implements OnRefreshListener {
 
     private void getForumsFromDatabase()
     {
-        mForums = MoodleForum.find(MoodleForum.class, "courseid = ?", mCourseId + ""); // gets all forums related to the course
+        mForums = new Select().from(MoodleForum.class).where("courseid = ?", mCourseId).execute(); // gets all forums related to the course
     }
 
     private void setUpProgressBar()

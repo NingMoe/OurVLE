@@ -32,6 +32,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Select;
+import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.models.MoodleForum;
 import com.stoneapp.ourvlemoodle2.rest.MoodleRestDiscussion;
@@ -43,19 +46,15 @@ import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 public class DiscussionSync {
     String token;
     Context context;
-    private boolean first_update; // first sync flag
+    List<MoodleDiscussion> discussions;
 
     public DiscussionSync(String token, Context context) {
         this.token = token;
         this.context = context;
-        SharedPreferences sharedPref =
-                context.getSharedPreferences(MoodleConstants.PREFS_STRING, Context.MODE_PRIVATE);
 
-        first_update = sharedPref.getBoolean(MoodleConstants.FIRST_UPDATE, true);
     }
 
     public boolean syncDiscussions(ArrayList<String> forumids) {
-        ArrayList<MoodleDiscussion> discussions = null;
 
         MoodleRestDiscussion mrdiscuss = new MoodleRestDiscussion(token);
         discussions = mrdiscuss.getDiscussions(forumids); // get discussions from api call
@@ -67,76 +66,39 @@ public class DiscussionSync {
         if (discussions.size() == 0)
             return false;
 
-        MoodleDiscussion discussion;
-        List<MoodleDiscussion> saved_discussions;
-        List<MoodleDiscussion> allsaved_discussions = MoodleDiscussion.listAll(MoodleDiscussion.class); //get a list of previously stored discussions
+        ActiveAndroid.beginTransaction();
+        try {
+            deleteStaleData();
+            for (int i = 0; i < discussions.size(); i++) {
+                final MoodleDiscussion discussion = discussions.get(i);
 
-        for (int i = 0; i < discussions.size(); i++) {
-            discussion = discussions.get(i);
-
-            //String coursename = MoodleCourse.find(MoodleCourse.class,"courseid = ?",discussion.getCourseid()+"").get(0).getShortname();
-
-            //discussion.setCoursename(coursename);
-
-            saved_discussions = MoodleDiscussion.find(MoodleDiscussion.class, "discussionid = ?", discussion.getDiscussionid()+"");
-
-            //whether discussion is from news forum or not
-            boolean isNewsDiscussion
-                    = MoodleForum.find(MoodleForum.class,"forumid = ?",
-                    discussion.getForumid() + "").get(0).getName().toUpperCase().contains("NEWS FORUM");
-
-            // if discussion is already present in database
-            if (saved_discussions.size() > 0) {
-                discussion.setId(saved_discussions.get(0).getId()); // overwrite previous discussion record
-            } else {
-
-                //if discussion is a new discussion and its not the first tie syncing then notify the user
-                if (SettingsUtils.shouldShowNotifications(context) && allsaved_discussions != null && allsaved_discussions.size() > 0 && isNewsDiscussion
-                        && !first_update) {
-                    // addNotification(discussion);
-                }
+                MoodleDiscussion.findOrCreateFromJson(discussion); // saves contact to database
             }
-
-            discussion.save(); // save discussion
+            ActiveAndroid.setTransactionSuccessful();
+        }finally {
+            ActiveAndroid.endTransaction();
         }
 
         return true;
     }
 
-    public void addNotification (MoodleDiscussion discussion){
-        NotificationCompat.Builder mBuilder
-                =  new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ourvle_iconsmall)
-                        .setContentTitle("New Topic")
-                        .setContentText(Html.fromHtml(discussion.getName()).toString().trim());
+    private void deleteStaleData()
+    {
 
-        //creates an explicit intent for an activity in your app
-        Intent resultIntent = new Intent(context,PostActivity.class);
-        resultIntent.putExtra("discussionid",discussion.getDiscussionid()+"");
-        resultIntent.putExtra("discussionname",discussion.getName());
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder =  TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(PostActivity.class);
-
-        stackBuilder.addNextIntent(resultIntent);
-
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mBuilder.setContentIntent(resultPendingIntent);
-        Notification notification = mBuilder.build();
-
-        notification.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
-
-        notification.defaults |= Notification.DEFAULT_SOUND;
-        //notification.defaults |= Notification.DEFAULT_VIBRATE;
-
-        NotificationManager mNotificationManager
-                = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(discussion.getDiscussionid(), notification);
+        List<MoodleDiscussion> stale_discussions = new Select().all().from(MoodleDiscussion.class).execute();
+        for(int i=0;i<stale_discussions.size();i++)
+        {
+            if(!doesDiscussionExistInJson(stale_discussions.get(i)))
+            {
+                MoodleDiscussion.delete(MoodleDiscussion.class,stale_discussions.get(i).getId());
+            }
+        }
     }
+
+    private boolean doesDiscussionExistInJson(MoodleDiscussion discussion)
+    {
+        return discussions.contains(discussion);
+    }
+
 }
 

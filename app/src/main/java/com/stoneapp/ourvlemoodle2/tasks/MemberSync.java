@@ -19,6 +19,9 @@
 
 package com.stoneapp.ourvlemoodle2.tasks;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Select;
+import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleMember;
 import com.stoneapp.ourvlemoodle2.rest.MoodleRestMembers;
 
@@ -26,40 +29,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MemberSync {
+
     private String token;
+    private List<MoodleMember> members;
 
     public MemberSync(String token) {
         this.token = token;
     }
 
     public boolean syncMembers(String courseid) {
+
         MoodleRestMembers mrmembers = new MoodleRestMembers(token);
 
-        ArrayList<MoodleMember> members = mrmembers.getMembers(courseid); // gets a list of members from api call
+        members = mrmembers.getMembers(courseid); // gets a list of members from api call
 
-        if (members == null)
-            return false;
+        if (members == null) return false;
 
-        if (members.size() == 0)
-            return false;
+        if (members.size() == 0) return false;
 
-        List<MoodleMember> saved_members;
 
-        MoodleMember member;
+        ActiveAndroid.beginTransaction();
+        try {
+            deleteStaleData();
+            for (int i = 0; i < members.size(); i++) {
+                final MoodleMember member = members.get(i);
+                member.setCourseid(courseid);
 
-        int len = members.size();
-
-        for (int i = 0; i < len; i++) {
-            member = members.get(i);
-            member.setCourseid(courseid);
-
-            saved_members = MoodleMember.find(MoodleMember.class, "memberid = ? and courseid = ?", member.getMemberid() + "", courseid); // gets a list of members matching the current member
-            if (saved_members.size() > 0) //if a matching member is found
-                member.setId(saved_members.get(0).getId()); // overwrite previously stored member with matching member id
-
-            member.save();
+                MoodleMember.findOrCreateFromJson(member); // saves contact to database
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        }finally {
+            ActiveAndroid.endTransaction();
         }
 
         return true;
     }
+
+    private void deleteStaleData()
+    {
+
+        List<MoodleMember> stale_members = new Select().all().from(MoodleMember.class).execute();
+        for(int i=0;i<stale_members.size();i++)
+        {
+            if(!doesMemberExistInJson(stale_members.get(i)))
+            {
+                MoodleMember.delete(MoodleMember.class,stale_members.get(i).getId());
+            }
+        }
+    }
+
+    private boolean doesMemberExistInJson(MoodleMember member)
+    {
+        return members.contains(member);
+    }
+
 }

@@ -37,6 +37,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.EventListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
@@ -50,10 +51,10 @@ import java.util.List;
 @SuppressWarnings("FieldCanBeLocal")
 public class CalendarFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener {
-    private List<MoodleEvent> mevents;
+    private List<MoodleEvent> mevents = new ArrayList<>();
     private EventListAdapter eventListAdapter;
     private ArrayList<String> courseids;
-    private List<MoodleCourse> courses;
+    private List<MoodleCourse> courses = new ArrayList<>();
     private String token;
 
     @Nullable
@@ -76,15 +77,16 @@ public class CalendarFragment extends Fragment
         progressbar.setIndeterminate(true);
         progressbar.setVisibility(View.GONE);
 
-        courses = MoodleCourse.listAll(MoodleCourse.class);
-        token = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getToken(); // url token
+        courses = new Select().all().from(MoodleCourse.class).execute();
+        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        token = sites.get(0).getToken(); // url token
 
         courseids = new ArrayList<>();
 
         for (int i = 0; i < courses.size(); i++)
             courseids.add(courses.get(i).getCourseid() + "");
 
-        mevents = MoodleEvent.listAll(MoodleEvent.class); //get all events
+        getEventsFromDatabase();
 
         eventListAdapter = new EventListAdapter(getActivity(), mevents);
 
@@ -100,6 +102,13 @@ public class CalendarFragment extends Fragment
 
         return view;
     }
+
+
+    private void getEventsFromDatabase()
+    {
+        new Select().all().from(MoodleEvent.class).execute();
+    }
+
 
     private class LoadAllEventsTask extends AsyncTask<String, Integer, Boolean> {
         EventSync evsync;
@@ -117,7 +126,7 @@ public class CalendarFragment extends Fragment
         protected Boolean doInBackground(String... params) {
             boolean sync = evsync.syncEvents(courseids);
             if (sync)
-                mevents = MoodleEvent.listAll(MoodleEvent.class);
+                getEventsFromDatabase();
                 //Collections.reverse(mevents);
 
             return sync;
@@ -128,13 +137,13 @@ public class CalendarFragment extends Fragment
             txt_notpresent.setVisibility(View.GONE);
             img_notpresent.setVisibility(View.GONE);
 
-            if (mevents.size() == 0) {  //check if any events are present
-                progressbar.setVisibility(View.VISIBLE);
+//            if (mevents.size() == 0) {  //check if any events are present
+        //        progressbar.setVisibility(View.VISIBLE);
 
                 if (mSwipeRefreshLayout.isRefreshing())
                     progressbar.setVisibility(View.GONE);
             }
-        }
+        //}
         @Override
         protected void onPostExecute(Boolean result) {
             eventListAdapter.updateEventList(mevents);

@@ -22,12 +22,17 @@ package com.stoneapp.ourvlemoodle2.tasks;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussionPosts;
 import com.stoneapp.ourvlemoodle2.models.MoodlePost;
 import com.stoneapp.ourvlemoodle2.rest.MoodleRestPost;
 
 public class PostSync {
     private String token;
+    List<MoodlePost> posts;
+
+
 
     public PostSync(String token){
         this.token = token;
@@ -44,20 +49,49 @@ public class PostSync {
         if (dposts.getErrorcode() != null) // checks if there is an error with that discussion post
             return false;
 
-        MoodlePost post;
-        ArrayList<MoodlePost> posts = dposts.getPosts();
-        List<MoodlePost> saved_posts;
-        for (int i = 0; i < posts.size(); i++) {
-            post = posts.get(i);
+        posts = dposts.getPosts();
 
-            saved_posts = MoodlePost.find(MoodlePost.class, "postid = ?", post.getPostid() + ""); // gets list of post with matching post id
+        if(posts == null)
+        {
+            return false;
+        }
 
-            if (saved_posts.size() > 0) // if there exists a post with matching id
-                post.setId(saved_posts.get(0).getId()); // overwrite previously stored post with current one
+        if(posts.size()==0)
+        {
+            return false;
+        }
 
-            post.save(); //save post to database
+        ActiveAndroid.beginTransaction();
+        try {
+            deleteStaleData();
+            for (int i = 0; i < posts.size(); i++) {
+                final MoodlePost post = posts.get(i);
+
+                MoodlePost.findOrCreateFromJson(post); // saves contact to database
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        }finally {
+            ActiveAndroid.endTransaction();
         }
 
         return true;
+    }
+
+    private void deleteStaleData()
+    {
+
+        List<MoodlePost> stale_posts = new Select().all().from(MoodlePost.class).execute();
+        for(int i=0;i<stale_posts.size();i++)
+        {
+            if(!doesPostExistInJson(stale_posts.get(i)))
+            {
+                MoodlePost.delete(MoodlePost.class,stale_posts.get(i).getId());
+            }
+        }
+    }
+
+    private boolean doesPostExistInJson(MoodlePost post)
+    {
+        return posts.contains(post);
     }
 }

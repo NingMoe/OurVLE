@@ -50,6 +50,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.stoneapp.ourvlemoodle2.adapters.MemberListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleMember;
@@ -103,7 +104,7 @@ public class MembersFragment extends Fragment
 
         //this.token = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getToken();
 
-        members = MoodleMember.find(MoodleMember.class, "courseid = ?", courseid);
+        getMembersFromDatabase();
 
         Collections.sort(members, new Comparator<MoodleMember>() {
             @Override
@@ -130,6 +131,11 @@ public class MembersFragment extends Fragment
             new LoadMembersTask(context, courseid, token).execute(""); // refresh member list
 
         return rootView;
+    }
+
+    private void getMembersFromDatabase()
+    {
+        members = new Select().from(MoodleMember.class).where("courseid = ?", courseid).execute();
     }
 
     @Override
@@ -236,7 +242,7 @@ public class MembersFragment extends Fragment
         protected Boolean doInBackground(String... params) {
             boolean sync = msync.syncMembers(courseid); //sync members
             if (sync) {
-                members = MoodleMember.find(MoodleMember.class, "courseid = ?", courseid);
+                getMembersFromDatabase();
                 // sorts members in order of firstname in ascending
                 Collections.sort(members, new Comparator<MoodleMember>() {
                     @Override

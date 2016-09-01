@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.CourseContentListAdapter;
 import com.stoneapp.ourvlemoodle2.models.ContentListItem;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
@@ -124,7 +125,8 @@ public class CourseContentFragment extends Fragment
 
         //List<MoodleSiteInfo> sites = MoodleSiteInfo.listAll(MoodleSiteInfo.class); //retrieves site info
 
-        course = MoodleCourse.find(MoodleCourse.class, "courseid = ?", courseid + "").get(0);
+       /// course = MoodleCourse.find(MoodleCourse.class, "courseid = ?", courseid + "").get(0);
+        course = new Select().from(MoodleCourse.class).where("courseid = ?", courseid+"").executeSingle();
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
         mSwipeRefreshLayout.setOnRefreshListener(this);

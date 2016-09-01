@@ -19,14 +19,18 @@
 
 package com.stoneapp.ourvlemoodle2.models;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import java.util.List;
 
-public class MoodleMember extends SugarRecord<MoodleMember> {
+public class MoodleMember extends Model{
 
+    @Column(name="memberid")
     @SerializedName("id")
     int memberid ;  //ID of the user
 
@@ -39,9 +43,11 @@ public class MoodleMember extends SugarRecord<MoodleMember> {
     @SerializedName("lastname")
     String lastname;  //The family name of the user
 
+    @Column(name="fullname")
     @SerializedName("fullname")
     String fullname;  //The fullname of the user
 
+    @Column(name="email")
     @SerializedName("email")
     String  email;   //An email address - allow email as root@localhost
 
@@ -87,6 +93,7 @@ public class MoodleMember extends SugarRecord<MoodleMember> {
     @SerializedName("lastaccess")
     int lastaccess; //last access to the site (0 if never)
 
+    @Column(name="description")
     @SerializedName("description")
     String description;  //User profile description
 
@@ -113,6 +120,7 @@ public class MoodleMember extends SugarRecord<MoodleMember> {
     @SerializedName("enrolledcourses")
     List<MemberCourse> courses;
 
+    @Column(name="courseid")
     String courseid;
 
     public void setCourseid(String courseid) {
@@ -235,5 +243,29 @@ public class MoodleMember extends SugarRecord<MoodleMember> {
 
     public int getMemberid() {
         return memberid;
+    }
+
+
+    public static MoodleMember findOrCreateFromJson(MoodleMember new_member) {
+        int memberid = new_member.getMemberid();
+        MoodleMember existingMember =
+                new Select().from(MoodleMember.class).where("memberid = ? ", memberid).executeSingle();
+        if (existingMember != null) {
+            // found and return existing
+            UpdateMember(existingMember,new_member);
+            return existingMember;
+        } else {
+            // create and return new user
+            MoodleMember member = new_member;
+            member.save();
+            return member;
+        }
+    }
+
+    private static void UpdateMember(MoodleMember old_member,MoodleMember new_member)
+    {
+        old_member = new_member;
+        old_member.save();
+
     }
 }

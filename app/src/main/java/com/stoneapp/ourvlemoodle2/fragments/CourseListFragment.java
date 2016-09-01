@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.CourseListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
@@ -63,8 +64,10 @@ public class CourseListFragment extends Fragment
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         RecyclerView courseList = (RecyclerView) view.findViewById(R.id.courseList);
 
-        List<MoodleSiteInfo> sites =  MoodleSiteInfo.listAll(MoodleSiteInfo.class); // the moodle site info from database
-        courses = MoodleCourse.listAll(MoodleCourse.class); // the moodle courses
+        List<MoodleSiteInfo> sites =  new Select().all().from(MoodleSiteInfo.class).execute(); // the moodle site info from database
+
+        getCoursesFromDatabase(); // the moodle courses
+
         name = sites.get(0).getFullname();  // full name from first site info
         long siteid = sites.get(0).getId();
         token = sites.get(0).getToken(); // the url token
@@ -87,6 +90,11 @@ public class CourseListFragment extends Fragment
             new LoadCoursesTask(getActivity(), userid, token).execute("");
 
         return view;
+    }
+
+    private void getCoursesFromDatabase()
+    {
+        courses = new Select().all().from(MoodleCourse.class).execute();
     }
 
     @Override
@@ -114,7 +122,7 @@ public class CourseListFragment extends Fragment
             boolean sync = csync.syncCourses(userid + "");
 
             if (sync)
-                courses = MoodleCourse.listAll(MoodleCourse.class); // populate course list
+                getCoursesFromDatabase(); // populate course list
 
             return sync;
         }

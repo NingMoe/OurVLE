@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 
-public class MoodleEvents extends SugarRecord<MoodleEvents>{
+public class MoodleEvents{
 
     @SerializedName("events")
     ArrayList<MoodleEvent>events;

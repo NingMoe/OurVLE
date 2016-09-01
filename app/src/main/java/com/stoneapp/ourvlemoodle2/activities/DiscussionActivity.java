@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.DiscussionListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.tasks.DiscussionSync;
@@ -90,7 +91,9 @@ public class DiscussionActivity extends AppCompatActivity
         forumids = new ArrayList<>();
         forumids.add(forumid + "");
 
-        discussions = MoodleDiscussion.find(MoodleDiscussion.class, "forumid = ?", forumid + "");
+
+        getDiscussionsFromDatabase();
+
 
         Collections.sort(discussions, new Comparator<MoodleDiscussion>() {
             @Override
@@ -130,6 +133,11 @@ public class DiscussionActivity extends AppCompatActivity
         }
     }
 
+    private void getDiscussionsFromDatabase()
+    {
+        discussions = new Select().from(MoodleDiscussion.class).where("forumid = ?", forumid).execute();
+    }
+
     private class LoadDiscussionTask extends AsyncTask<String, Integer, Boolean> {
         ArrayList<String>forumids;
         DiscussionSync dsync;
@@ -160,9 +168,7 @@ public class DiscussionActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Boolean status) {
             if(status) {
-                discussions = MoodleDiscussion.find(MoodleDiscussion.class, "forumid = ?",forumid+"");
-                //discussions = new_discussions;
-
+                getDiscussionsFromDatabase();
                 //Order discussions by time modified
                 Collections.sort(discussions, new Comparator<MoodleDiscussion>() {
                     @Override

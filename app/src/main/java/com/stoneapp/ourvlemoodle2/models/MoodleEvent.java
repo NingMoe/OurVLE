@@ -19,23 +19,34 @@
 
 package com.stoneapp.ourvlemoodle2.models;
 
+import android.graphics.PorterDuff;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 
-public class MoodleEvent extends SugarRecord<MoodleEvent>{
+@Table(name="MoodleEvent")
+public class MoodleEvent extends Model{
 
+    @Column(name="eventid")
     @SerializedName("id")
     int eventid;//event id
 
+    @Column(name="name")
     @SerializedName("name")
     String name;//event name
 
+    @Column(name="description")
     @SerializedName("description")
     String description;   //Optional //Description
 
     @SerializedName("format")
     int format;   //description format (1 = HTML, 0 = MOODLE, 2 = PLAIN or 4 = MARKDOWN)
 
+    @Column(name="courseid")
     @SerializedName("courseid")
     int courseid;  //course id
 
@@ -57,9 +68,11 @@ public class MoodleEvent extends SugarRecord<MoodleEvent>{
     @SerializedName("eventtype")
     String eventtype;  //Event type
 
+    @Column(name="timestart")
     @SerializedName("timestart")
     int timestart;  //timestart
 
+    @Column(name="timeduration")
     @SerializedName("timeduration")
     int timeduration;   //time duration
 
@@ -159,6 +172,29 @@ public class MoodleEvent extends SugarRecord<MoodleEvent>{
 
     public int getSubscriptionid() {
         return subscriptionid;
+    }
+
+    public static MoodleEvent findOrCreateFromJson(MoodleEvent new_event) {
+        int eventid = new_event.getEventid();
+        MoodleEvent existingEvent =
+                new Select().from(MoodleEvent.class).where("eventid = ?", eventid).executeSingle();
+        if (existingEvent != null) {
+            // found and return existing
+            UpdateEvent(existingEvent,new_event);
+            return existingEvent;
+        } else {
+            // create and return new user
+            MoodleEvent event = new_event;
+            event.save();
+            return event;
+        }
+    }
+
+    private static void UpdateEvent(MoodleEvent old_event,MoodleEvent new_event)
+    {
+        old_event = new_event;
+        old_event.save();
+
     }
 
 

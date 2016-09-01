@@ -19,21 +19,45 @@
 
 package com.stoneapp.ourvlemoodle2.models;
 
+
+
+import android.graphics.PorterDuff;
+
 import java.util.ArrayList;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.query.Select;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
-public class MoodleSiteInfo extends SugarRecord<MoodleSiteInfo> {
+public class MoodleSiteInfo extends Model {
+
+    @Column(name="sitename")
     String sitename;
+
+    @Column(name="username")
     String username;
+
+    @Column(name="firstname")
     String firstname;
+
+    @Column(name="lastname")
     String lastname;
+
+    @Column(name="fullname")
     String fullname;
+
     String lang;
+
+    @Column(name="userid")
     int userid;
+
     String siteurl;
+
+    @Column(name="userpictureurl")
     String userpictureurl;
+
     @Ignore
     ArrayList<MoodleFunction> functions;
     int downloadfiles;
@@ -56,6 +80,7 @@ public class MoodleSiteInfo extends SugarRecord<MoodleSiteInfo> {
      * SiteInfo is basically an account Token is needed for an account to get
      * new info from Moodle site
      */
+    @Column(name="token")
     String token;
 
     public MoodleSiteInfo() {
@@ -223,5 +248,28 @@ public class MoodleSiteInfo extends SugarRecord<MoodleSiteInfo> {
      */
     public void appenedMessage(String message) {
         this.message += message + "\n";
+    }
+
+    public static MoodleSiteInfo findOrCreateFromJson(MoodleSiteInfo new_site) {
+        int siteid = new_site.getUserid();
+        MoodleSiteInfo existingSiteInfo =
+                new Select().from(MoodlePost.class).where("userid = ?", siteid).executeSingle();
+        if (existingSiteInfo != null) {
+            // found and return existing
+           // UpdatePost(existingPost,new_post);
+            return existingSiteInfo;
+        } else {
+            // create and return new user
+            MoodleSiteInfo siteInfo = new_site;
+            siteInfo.save();
+            return siteInfo;
+        }
+    }
+
+    private static void UpdatePost(MoodlePost old_post,MoodlePost new_post)
+    {
+        old_post = new_post;
+        old_post.save();
+
     }
 }

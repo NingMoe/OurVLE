@@ -22,21 +22,28 @@ package com.stoneapp.ourvlemoodle2.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
-public class MoodleModule  extends SugarRecord<MoodleModule> {
+public class MoodleModule extends Model {
 
+    @Column(name="moduleid")
     @SerializedName("id")
     int moduleid;
 
+    @Column(name="url")
     @SerializedName("url")
     String url;
 
+    @Column(name="name")
     @SerializedName("name")
     String name;
 
+    @Column(name="description")
     @SerializedName("description")
     String description;
 
@@ -46,6 +53,7 @@ public class MoodleModule  extends SugarRecord<MoodleModule> {
     @SerializedName("modicon")
     String modicon;
 
+    @Column(name="modname")
     @SerializedName("modname")
     String modname;
 
@@ -66,9 +74,16 @@ public class MoodleModule  extends SugarRecord<MoodleModule> {
     ArrayList<MoodleModuleContent> contents;
 
     // Relational parameters
+    @Column(name="parentid")
     Long parentid;
+
+    @Column(name="sectionid")
     int sectionid;
+
+    @Column(name="courseid")
     int courseid;
+
+    @Column(name="siteid")
     Long siteid;
 
     /**
@@ -251,8 +266,7 @@ public class MoodleModule  extends SugarRecord<MoodleModule> {
     /**
      * Set the module parent section Moodle id
      *
-     * @param section
-     *            .id
+     * @param sectionid
      */
     public void setSectionid(int sectionid) {
         this.sectionid = sectionid;
@@ -265,6 +279,30 @@ public class MoodleModule  extends SugarRecord<MoodleModule> {
      */
     public void setSiteid(Long siteid) {
         this.siteid = siteid;
+    }
+
+
+    public static MoodleModule findOrCreateFromJson(MoodleModule new_module) {
+        int moduleid = new_module.getModuleid();
+        MoodleModule existingModule =
+                new Select().from(MoodleModule.class).where("moduleid = ?", moduleid).executeSingle();
+        if (existingModule != null) {
+            // found and return existing
+            UpdateModule(existingModule,new_module);
+            return existingModule;
+        } else {
+            // create and return new user
+            MoodleModule module = new_module;
+            module.save();
+            return module;
+        }
+    }
+
+    private static void UpdateModule(MoodleModule old_module,MoodleModule new_module)
+    {
+        old_module = new_module;
+        old_module.save();
+
     }
 
 }

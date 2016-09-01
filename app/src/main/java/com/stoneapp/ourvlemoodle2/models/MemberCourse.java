@@ -22,7 +22,7 @@ package com.stoneapp.ourvlemoodle2.models;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 
-public class MemberCourse extends SugarRecord<MemberCourse> {
+public class MemberCourse{
 
 
     @SerializedName("id")

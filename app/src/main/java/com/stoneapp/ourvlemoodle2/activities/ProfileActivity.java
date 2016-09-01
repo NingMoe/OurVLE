@@ -46,6 +46,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.models.MemberCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleMember;
 import com.stoneapp.ourvlemoodle2.models.MoodleMessage;
@@ -88,23 +89,13 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         MoodleMember member =
-                MoodleMember.find(MoodleMember.class, "memberid = ?", memberid + "").get(0);
-
-        List<MemberCourse> courses = member.getCourses();
+                new Select().from(MoodleMember.class).where("memberid = ?", memberid).executeSingle();
 
 
-        clientid = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getUserid();
 
-        /*btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = editMessage.getText().toString();
-                //check field is empty
-                if (message.length() > 0)
-                    //send message
-                    new SendMessageTask(memberid, clientid, message, v.getContext()).execute("");
-            }
-        });*/
+
+        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        clientid = sites.get(0).getUserid();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,13 +110,6 @@ public class ProfileActivity extends AppCompatActivity {
                 alertDialogBuilder.setView(promptsView);
 
                  editTextMessage = (EditText)promptsView.findViewById(R.id.editTextMessage);
-
-                // final EditText forumnameInput = (EditText) promptsView
-                //.findViewById(R.id.editTextForumName);
-
-                //final EditText forumdescInput = (EditText) promptsView
-                // .findViewById(R.id.editTextForumDesc);
-
                 // set dialog message
                 alertDialogBuilder
                         .setCancelable(false)

@@ -19,14 +19,20 @@
 
 package com.stoneapp.ourvlemoodle2.models;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 
-public class MoodleModuleContent extends SugarRecord<MoodleModuleContent> {
+public class MoodleModuleContent extends Model{
 
+
+    @Column(name="type")
     @SerializedName("type")
     String type;
 
+    @Column(name="filename")
     @SerializedName("filename")
     String filename;
 
@@ -36,6 +42,7 @@ public class MoodleModuleContent extends SugarRecord<MoodleModuleContent> {
     @SerializedName("filesize")
     int filesize;
 
+    @Column(name="fileurl")
     @SerializedName("fileurl")
     String fileurl;
 
@@ -61,10 +68,19 @@ public class MoodleModuleContent extends SugarRecord<MoodleModuleContent> {
     String license;
 
     // Relational parameters
+    @Column(name="parentid")
     Long parentid;
+
+    @Column(name="moduleid")
     int moduleid;
+
+    @Column(name="sectionid")
     int sectionid;
+
+    @Column(name="courseid")
     int courseid;
+
+    @Column(name="siteid")
     Long siteid;
 
     /**
@@ -244,5 +260,30 @@ public class MoodleModuleContent extends SugarRecord<MoodleModuleContent> {
     public void setSiteid(Long siteid) {
         this.siteid = siteid;
     }
+
+    public static MoodleModuleContent findOrCreateFromJson(MoodleModuleContent new_content) {
+
+        MoodleModuleContent existingContent =
+                new Select().from(MoodleModuleContent.class).where("mouleid = ?",new_content.getModuleid()).executeSingle();
+        if (existingContent != null) {
+            // found and return existing
+            UpdateContent(existingContent,new_content);
+            return existingContent;
+        } else {
+            // create and return new user
+            MoodleModuleContent content = new_content;
+            content.save();
+            return content;
+        }
+    }
+
+    private static void UpdateContent(MoodleModuleContent old_content,MoodleModuleContent new_contnent)
+    {
+        old_content = new_contnent;
+        old_content.save();
+
+    }
+
+
 
 }

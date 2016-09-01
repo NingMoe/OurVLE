@@ -36,6 +36,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.DiscussionListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.models.MoodleForum;
@@ -70,9 +71,10 @@ public class NewsFragment extends Fragment
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        token = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getToken(); // url token
+        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        token = sites.get(0).getToken(); // url token
 
-        List<MoodleForum>forums  = MoodleForum.listAll(MoodleForum.class); // all forums
+        List<MoodleForum>forums  = new Select().all().from(MoodleForum.class).execute(); // all forums
         ArrayList<MoodleForum> news_forums = new ArrayList<>();
 
         int len = forums.size();
@@ -90,7 +92,8 @@ public class NewsFragment extends Fragment
                 forumids.add(news_forums.get(i).getForumid() + "");
         }
 
-        discussions = MoodleDiscussion.listAll(MoodleDiscussion.class);
+        getDiscussionsFromDatabase();
+
 
         // Order discussion by time modified
         Collections.sort(discussions,new Comparator<MoodleDiscussion>() {
@@ -131,6 +134,11 @@ public class NewsFragment extends Fragment
         return view;
     }
 
+    private void getDiscussionsFromDatabase()
+    {
+        discussions = new Select().all().from(MoodleDiscussion.class).execute();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -166,7 +174,7 @@ public class NewsFragment extends Fragment
         protected Boolean doInBackground(String... params) {
            boolean sync = dsync.syncDiscussions(forumids); //syncs discussions
             if(sync) {
-                discussions = MoodleDiscussion.listAll(MoodleDiscussion.class); //gets discussions
+                getDiscussionsFromDatabase(); //gets discussions
 
                 //Order discussions by time modified
                 Collections.sort(discussions,new Comparator<MoodleDiscussion>() {

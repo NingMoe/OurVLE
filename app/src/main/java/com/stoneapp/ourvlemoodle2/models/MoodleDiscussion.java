@@ -19,19 +19,30 @@
 
 package com.stoneapp.ourvlemoodle2.models;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 
-public class MoodleDiscussion extends SugarRecord<MoodleDiscussion>{
+
+@Table(name="MoodleDiscussion")
+public class MoodleDiscussion extends Model{
+
+    @Column(name="discussionid")
     @SerializedName("id")
     int discussionid;  //Forum id
 
+    @Column(name="courseid")
     @SerializedName("course")
     int courseid;   //Course id
 
+    @Column(name="forumid")
     @SerializedName("forum")
     int  forumid;  //The forum id
 
+    @Column(name="name")
     @SerializedName("name")
     String name;  //Discussion name
 
@@ -44,6 +55,7 @@ public class MoodleDiscussion extends SugarRecord<MoodleDiscussion>{
     @SerializedName("assesed")
     int assesed;  //Is this assessed?
 
+    @Column(name="timemodified")
     @SerializedName("timemodified")
     int timemodified;   //Time modified
 
@@ -59,6 +71,7 @@ public class MoodleDiscussion extends SugarRecord<MoodleDiscussion>{
     @SerializedName("firstpost")
     int firstpost;   //The first post in the discussion
 
+    @Column(name="firstuserfullname")
     @SerializedName("firstuserfullname")
     String firstuserfullname;  //The discussion creators fullname
 
@@ -71,6 +84,7 @@ public class MoodleDiscussion extends SugarRecord<MoodleDiscussion>{
     @SerializedName("firstuseremail")
     String firstuseremail;   //The discussion creators email
 
+    @Column(name="subject")
     @SerializedName("subject")
     String subject;  //The discussion subject
 
@@ -86,6 +100,7 @@ public class MoodleDiscussion extends SugarRecord<MoodleDiscussion>{
     @SerializedName("lastuserid")
     int lastuserid;  //The id of the user who made the last post
 
+    @Column(name="lastuserfullname")
     @SerializedName("lastuserfullname")
     String lastuserfullname;   //The last person to posts fullname
 
@@ -200,11 +215,27 @@ public class MoodleDiscussion extends SugarRecord<MoodleDiscussion>{
         return lastuseremail;
     }
 
-   /* public String getCoursename() {
-        return coursename;
+
+    public static MoodleDiscussion findOrCreateFromJson(MoodleDiscussion new_discussion) {
+        int discussionid = new_discussion.getDiscussionid();
+        MoodleDiscussion existingDiscussion =
+                new Select().from(MoodleDiscussion.class).where("discussionid = ?", discussionid).executeSingle();
+        if (existingDiscussion != null) {
+            // found and return existing
+            UpdateDiscussion(existingDiscussion,new_discussion);
+            return existingDiscussion;
+        } else {
+            // create and return new user
+            MoodleDiscussion discussion = new_discussion;
+            discussion.save();
+            return discussion;
+        }
     }
 
-    public void setCoursename(String coursename) {
-        this.coursename = coursename;
-    }*/
+    private static void UpdateDiscussion(MoodleDiscussion old_discussion,MoodleDiscussion new_discussion)
+    {
+        old_discussion = new_discussion;
+        old_discussion.save();
+
+    }
 }

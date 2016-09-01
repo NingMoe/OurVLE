@@ -21,6 +21,7 @@ package com.stoneapp.ourvlemoodle2.activities;
 
 import java.util.List;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.activities.settings.SettingsActivity;
 import com.stoneapp.ourvlemoodle2.fragments.CourseContentFragment;
 import com.stoneapp.ourvlemoodle2.fragments.EventFragment;
@@ -106,7 +107,7 @@ public class CourseViewActivity extends AppCompatActivity
         viewPager.setAdapter(new TabsPagerAdapter(getSupportFragmentManager()));
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
-        List<MoodleSiteInfo> sites = MoodleSiteInfo.listAll(MoodleSiteInfo.class);
+        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
         token = sites.get(0).getToken();
         name = sites.get(0).getFullname();
         userid = sites.get(0).getUserid();

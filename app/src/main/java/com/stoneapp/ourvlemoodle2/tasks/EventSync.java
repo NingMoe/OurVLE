@@ -38,9 +38,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.BuildConfig;
 import com.stoneapp.ourvlemoodle2.activities.MainActivity;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
+import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
 import com.stoneapp.ourvlemoodle2.models.MoodleEvents;
 import com.stoneapp.ourvlemoodle2.rest.MoodleRestEvent;
@@ -49,18 +52,13 @@ import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 public class EventSync {
-    private final boolean first_update;
     String token;
     Context context;
+    List<MoodleEvent> mevents;
 
     public EventSync(Context context, String token) {
         this.token = token;
         this.context = context;
-
-        SharedPreferences sharedPref =
-                context.getSharedPreferences(MoodleConstants.PREFS_STRING, Context.MODE_PRIVATE);
-
-        first_update = sharedPref.getBoolean(MoodleConstants.FIRST_UPDATE, true); // first sync flag
     }
 
     public boolean syncEvents(ArrayList<String> courseids) {
@@ -71,7 +69,7 @@ public class EventSync {
         if (events == null)
             return false;
 
-        ArrayList<MoodleEvent> mevents = events.getEvents();
+        mevents = events.getEvents();
         if (mevents == null)
             return false;
 
@@ -79,41 +77,44 @@ public class EventSync {
             return false;
         }
 
-        List<MoodleEvent>saved_events = MoodleEvent.listAll(MoodleEvent.class); // gets previously stored events
-        MoodleEvent.deleteAll(MoodleEvent.class);
 
-        MoodleEvent event;
-
-        String eventCourseName;
-        for (int i = 0; i < mevents.size(); i++) {
-            event = mevents.get(i);
-
-            eventCourseName = MoodleCourse.find(MoodleCourse.class, "courseid = ?", event.getCourseid() + "").get(0).getShortname();
-
-            if (eventCourseName != null)
-                event.setCoursename(eventCourseName); // set the course name of the event
-
-            int count = 0; // counter to check new events
-
-            if (saved_events != null && saved_events.size() > 0) {
-                for (int j = 0; j < saved_events.size(); j++) {
-                    if (event.getEventid() == saved_events.get(j).getEventid()) // check if event already exists
-                        count++;
+        ActiveAndroid.beginTransaction();
+        try {
+            deleteStaleData();
+            for (int i = 0; i < mevents.size(); i++) {
+                final MoodleEvent event = mevents.get(i);
+                MoodleCourse eventCourse = new Select().from(MoodleEvent.class).where("courseid = ?",event.getCourseid()).executeSingle();
+                if(eventCourse!=null)
+                {
+                    event.setCoursename(eventCourse.getShortname());
                 }
+
+                MoodleEvent.findOrCreateFromJson(event); // saves contact to database
             }
-
-            if (count == 0 && !first_update) { //if event is a new event
-                if (SettingsUtils.shouldSyncCalendar(context) && !isEventInCal(context,event.getEventid()+""))
-                    addCalendarEvent(event); //add event to user calendar
-
-                if (SettingsUtils.shouldShowNotifications(context))
-                    addNotification(event); // notify user about event
-            }
-
-            event.save();
+            ActiveAndroid.setTransactionSuccessful();
+        }finally {
+            ActiveAndroid.endTransaction();
         }
 
         return true;
+    }
+
+    private void deleteStaleData()
+    {
+
+        List<MoodleEvent> stale_events = new Select().all().from(MoodleEvent.class).execute();
+        for(int i=0;i<stale_events.size();i++)
+        {
+            if(!doesEventExistInJson(stale_events.get(i)))
+            {
+                MoodleEvent.delete(MoodleEvent.class,stale_events.get(i).getId());
+            }
+        }
+    }
+
+    private boolean doesEventExistInJson(MoodleEvent event)
+    {
+        return mevents.contains(event);
     }
 
     public boolean isEventInCal(Context context, String cal_meeting_id) {

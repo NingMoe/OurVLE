@@ -22,6 +22,7 @@ package com.stoneapp.ourvlemoodle2.fragments;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.EventListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
@@ -57,7 +58,7 @@ public class EventFragment extends Fragment
 
     private String token;
     private String courseid;
-    private String eventcourse;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,11 +88,10 @@ public class EventFragment extends Fragment
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
 
         //Searches database for all events matching courseid
-        mevents = MoodleEvent.find(MoodleEvent.class, "courseid = ?", courseid);
+        getEventsFromDatabase();
 
         eventadapter = new EventListAdapter(context, mevents);
 
-        eventcourse = MoodleCourse.find(MoodleCourse.class, "courseid = ?", courseid).get(0).getShortname(); // gets event course
 
         if (mevents.size() > 0) { // check if there are any events
             img_notpresent.setVisibility(View.GONE);
@@ -117,6 +117,14 @@ public class EventFragment extends Fragment
 
         return rootView;
     }
+
+    private void getEventsFromDatabase()
+    {
+        mevents = new Select().from(MoodleEvent.class).where("courseid = ?", courseid).execute();
+    }
+
+
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -154,7 +162,7 @@ public class EventFragment extends Fragment
         protected Boolean doInBackground(String... params) {
             boolean sync = evsync.syncEvents(courseids); // sync events
             if (sync)
-                mevents = MoodleEvent.find(MoodleEvent.class, "courseid = ?", courseid);
+                getEventsFromDatabase();
 
             return sync;
         }
