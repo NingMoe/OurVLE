@@ -264,7 +264,7 @@ public class MoodleModuleContent extends Model{
     public static MoodleModuleContent findOrCreateFromJson(MoodleModuleContent new_content) {
 
         MoodleModuleContent existingContent =
-                new Select().from(MoodleModuleContent.class).where("mouleid = ?",new_content.getModuleid()).executeSingle();
+                new Select().from(MoodleModuleContent.class).where("moduleid = ?",new_content.getModuleid()).executeSingle();
         if (existingContent != null) {
             // found and return existing
             UpdateContent(existingContent,new_content);

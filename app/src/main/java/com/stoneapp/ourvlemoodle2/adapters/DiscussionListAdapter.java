@@ -134,7 +134,7 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
         if (!TextUtils.isEmpty(topic_name))
             holder.getTopicNameView().setText(topic_name);
 
-        MoodleCourse course = new Select().from(MoodleCourse.class).where("ccourseid = ?", discussion.getCourseid()).executeSingle();
+        MoodleCourse course = new Select().from(MoodleCourse.class).where("courseid = ?", discussion.getCourseid()).executeSingle();
         if(course!=null)
         {
             String coursename = course.getShortname();
