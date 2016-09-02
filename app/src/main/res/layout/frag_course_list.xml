@@ -31,10 +31,8 @@
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
             android:id="@+id/courseList"
-            android:scrollbars="vertical"
+            android:scrollbars="none"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             tools:listitem="@layout/course_list_item"/>

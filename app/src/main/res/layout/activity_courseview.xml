@@ -24,7 +24,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context=".CourseViewActivity">
+    tools:context=".activities.CourseViewActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -35,7 +35,6 @@
             android:id="@+id/tool_bar"
             android:layout_width="fill_parent"
             android:layout_height="?actionBarSize"
-            app:layout_scrollFlags="scroll|enterAlways"
             layout="@layout/tool_bar" />
 
         <android.support.design.widget.TabLayout
