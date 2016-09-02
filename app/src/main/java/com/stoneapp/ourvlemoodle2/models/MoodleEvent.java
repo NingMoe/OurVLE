@@ -180,7 +180,7 @@ public class MoodleEvent extends Model{
                 new Select().from(MoodleEvent.class).where("eventid = ?", eventid).executeSingle();
         if (existingEvent != null) {
             // found and return existing
-            UpdateEvent(existingEvent,new_event);
+           // UpdateEvent(existingEvent,new_event);
             return existingEvent;
         } else {
             // create and return new user

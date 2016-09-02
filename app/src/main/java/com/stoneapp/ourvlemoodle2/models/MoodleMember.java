@@ -252,7 +252,7 @@ public class MoodleMember extends Model{
                 new Select().from(MoodleMember.class).where("memberid = ? ", memberid).executeSingle();
         if (existingMember != null) {
             // found and return existing
-            UpdateMember(existingMember,new_member);
+            //UpdateMember(existingMember,new_member);
             return existingMember;
         } else {
             // create and return new user

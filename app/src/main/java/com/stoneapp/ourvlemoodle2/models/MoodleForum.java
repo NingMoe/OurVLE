@@ -376,7 +376,10 @@ public class MoodleForum extends Model{
 
     private static void UpdateForum(MoodleForum old_forum,MoodleForum new_forum)
     {
-        old_forum = new_forum;
+        old_forum.setCoursename(new_forum.getCoursename());
+        old_forum.setIntro(new_forum.getIntro());
+        old_forum.setCourseid(new_forum.getCourseid());
+        old_forum.setName(new_forum.getName());
         old_forum.save();
 
     }

@@ -53,7 +53,7 @@ public class ForumSync {
 
         ActiveAndroid.beginTransaction();
         try {
-            deleteStaleData();
+           // deleteStaleData();
             for (int i = 0; i < forums.size(); i++) {
                 final MoodleForum forum = forums.get(i);
 

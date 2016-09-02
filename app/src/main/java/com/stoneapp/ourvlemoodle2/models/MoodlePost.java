@@ -222,7 +222,7 @@ public class MoodlePost extends Model {
                 new Select().from(MoodlePost.class).where("postid = ?", postid).executeSingle();
         if (existingPost != null) {
             // found and return existing
-            UpdatePost(existingPost,new_post);
+            //UpdatePost(existingPost,new_post);
             return existingPost;
         } else {
             // create and return new user

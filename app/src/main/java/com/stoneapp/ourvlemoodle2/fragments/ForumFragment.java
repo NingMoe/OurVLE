@@ -45,6 +45,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class ForumFragment extends Fragment implements OnRefreshListener {
@@ -86,6 +87,8 @@ public class ForumFragment extends Fragment implements OnRefreshListener {
         initViews();
 
         setUpSwipeRefresh();
+
+      //  mCourseids.add(mCourseId+"");
 
         getForumsFromDatabase();
 
@@ -225,11 +228,10 @@ public class ForumFragment extends Fragment implements OnRefreshListener {
             if (result) {
                 getForumsFromDatabase();
                 mForumListAdapter.updateForumList(mForums);
-            } else {
-                if (mForums.size() == 0) {
-                    mImgPlaceHolder.setVisibility(View.VISIBLE);
-                    mTvPlaceHolder.setVisibility(View.VISIBLE);
-                }
+            }
+            if (mForums.size() == 0) {
+                mImgPlaceHolder.setVisibility(View.VISIBLE);
+                mTvPlaceHolder.setVisibility(View.VISIBLE);
             }
         }
 

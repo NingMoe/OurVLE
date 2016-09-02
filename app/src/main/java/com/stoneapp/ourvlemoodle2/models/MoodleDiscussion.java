@@ -222,7 +222,7 @@ public class MoodleDiscussion extends Model{
                 new Select().from(MoodleDiscussion.class).where("discussionid = ?", discussionid).executeSingle();
         if (existingDiscussion != null) {
             // found and return existing
-            UpdateDiscussion(existingDiscussion,new_discussion);
+            //UpdateDiscussion(existingDiscussion,new_discussion);
             return existingDiscussion;
         } else {
             // create and return new user

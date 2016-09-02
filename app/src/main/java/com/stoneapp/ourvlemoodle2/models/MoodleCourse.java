@@ -464,6 +464,18 @@ public class MoodleCourse extends Model{
         this.siteid = siteid;
     }
 
+    public void setShortname(String shortname) {
+        this.shortname = shortname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public void setCourseid(int courseid) {
+        this.courseid = courseid;
+    }
+
     public static MoodleCourse findOrCreateFromJson(MoodleCourse new_course) {
         int courseid = new_course.getCourseid();
         MoodleCourse existingCourse =
@@ -482,7 +494,8 @@ public class MoodleCourse extends Model{
 
     private static void UpdateCourse(MoodleCourse old_course,MoodleCourse new_course)
     {
-        old_course = new_course;
+        old_course.setFullname(new_course.getFullname());
+        old_course.setShortname(new_course.getShortname());
         old_course.save();
 
     }
