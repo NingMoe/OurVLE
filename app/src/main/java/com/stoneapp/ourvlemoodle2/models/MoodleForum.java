@@ -42,6 +42,7 @@ public class MoodleForum extends Model{
     @SerializedName("name")
     String name;
 
+    @Column(name="intro")
     @SerializedName("intro")
     String intro;
 
