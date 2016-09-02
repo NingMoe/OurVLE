@@ -48,7 +48,7 @@ import java.util.List;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class CourseListFragment extends Fragment
-        implements SwipeRefreshLayout.OnRefreshListener {
+         {
     private List<MoodleCourse> mCourses ;
     private String mToken;
     private int mUserid;
@@ -97,14 +97,14 @@ public class CourseListFragment extends Fragment
 
     private void initViews()
     {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
+       // mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
         mCourseListView = (RecyclerView) mRootView.findViewById(R.id.courseList);
     }
 
     private void setUpSwipeRefresh()
     {
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+       // mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
+        //mSwipeRefreshLayout.setOnRefreshListener(this);
     }
 
     private void setUpRecyclerView()
@@ -132,10 +132,10 @@ public class CourseListFragment extends Fragment
         return  hasInternet;
     }
 
-    @Override
-    public void onRefresh() {
-        new LoadCoursesTask(getActivity(), mUserid, mToken).execute();
-    }
+   // @Override
+    //public void onRefresh() {
+     //   new LoadCoursesTask(getActivity(), mUserid, mToken).execute();
+    //}
 
     private class LoadCoursesTask extends AsyncTask<Void,Void, Boolean> {
         int userid;
@@ -167,7 +167,7 @@ public class CourseListFragment extends Fragment
 
         @Override
         protected void onPostExecute(Boolean result) {
-            mSwipeRefreshLayout.setRefreshing(false);
+         //   mSwipeRefreshLayout.setRefreshing(false);
             if (result)
             {
                 getCoursesFromDatabase();
