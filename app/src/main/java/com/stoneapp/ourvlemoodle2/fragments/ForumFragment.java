@@ -28,6 +28,8 @@ import com.stoneapp.ourvlemoodle2.models.MoodleForum;
 import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
+import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -127,7 +129,7 @@ public class ForumFragment extends Fragment implements OnRefreshListener {
     private void setUpRecyclerView()
     {
         mForumListAdapter = new ForumListAdapter(getActivity(), mForums, mToken);
-        mForumRecView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mForumRecView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
         mForumRecView.setAdapter(mForumListAdapter);
 
     }

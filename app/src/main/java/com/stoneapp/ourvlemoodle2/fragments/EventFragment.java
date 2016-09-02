@@ -28,6 +28,8 @@ import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.tasks.EventSync;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
+import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -52,12 +54,18 @@ import android.widget.Toast;
 @SuppressWarnings("FieldCanBeLocal")
 public class EventFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener {
-    private EventListAdapter eventadapter;
-    private Context context;
-    private List<MoodleEvent>mevents;
 
-    private String token;
-    private String courseid;
+    private EventListAdapter mEventAdapter;
+    private Context mContext;
+    private List<MoodleEvent> mEvents;
+    private String mToken;
+    private String mCourseid;
+    private View mRootView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerView mEventListView;
+    private ProgressBar mProgressBar;
+    private TextView mTvPlaceHolder;
+    private ImageView mImgPlaceHolder;
 
 
     @Override
@@ -67,64 +75,92 @@ public class EventFragment extends Fragment
         Bundle args = getArguments();
 
         if (args != null) {
-            this.courseid = args.getInt("courseid") + "";
-            this.token = args.getString("token");
+            this.mCourseid = args.getInt("courseid") + "";
+            this.mToken = args.getString("token");
         }
 
-        context = getActivity();
+        mContext = getActivity();
 
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.frag_event, container, false);
+                             Bundle savedInstanceState) {
+        mRootView = inflater.inflate(R.layout.frag_event, container, false);
 
-        tv_notpresent = (TextView) rootView.findViewById(R.id.txt_notpresent);
-        img_notpresent = (ImageView) rootView.findViewById(R.id.no_events);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressEvent);
-        eventList = (RecyclerView) rootView.findViewById(R.id.eventList);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
+        initViews();
+
+        setUpSwipeRefresh();
 
         //Searches database for all events matching courseid
         getEventsFromDatabase();
 
-        eventadapter = new EventListAdapter(context, mevents);
-
-
-        if (mevents.size() > 0) { // check if there are any events
-            img_notpresent.setVisibility(View.GONE);
-            tv_notpresent.setVisibility(View.GONE);
+        if (mEvents.size() > 0) { // check if there are any events
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
         }
 
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.GONE);
+        setUpRecyclerView();
 
-        eventList.setHasFixedSize(true);
-        eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        eventList.setAdapter(eventadapter);
+        setUpProgressBar();
 
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            //refreshes events
-            new LoadEventTask(context, courseid, token).execute("");
+        new LoadEventTask(mContext,mCourseid,mToken).execute();
 
-        return rootView;
+        return mRootView;
+    }
+
+    private void initViews()
+    {
+        mTvPlaceHolder = (TextView) mRootView.findViewById(R.id.txt_notpresent);
+        mImgPlaceHolder = (ImageView) mRootView.findViewById(R.id.no_events);
+        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressEvent);
+        mEventListView = (RecyclerView) mRootView.findViewById(R.id.eventList);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
     }
 
     private void getEventsFromDatabase()
     {
-        mevents = new Select().from(MoodleEvent.class).where("courseid = ?", courseid).execute();
+        mEvents = new Select().from(MoodleEvent.class).where("courseid = ?", mCourseid).execute();
     }
 
+    private void setUpSwipeRefresh()
+    {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+    }
 
+    private void setUpProgressBar()
+    {
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.GONE);
+    }
 
+    private void setUpRecyclerView()
+    {
+        mEventAdapter = new EventListAdapter(mContext, mEvents);
+        mEventListView.setHasFixedSize(true);
+        mEventListView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
+        mEventListView.setAdapter(mEventAdapter);
+    }
+
+    private boolean isConnected() {
+        return ConnectUtils.isConnected(getActivity());
+    }
+
+    private static boolean hasInternet()
+    {
+        boolean hasInternet;
+
+        try {
+            hasInternet = ConnectUtils.haveInternetConnectivity();
+        } catch(Exception e) {
+            hasInternet = false;
+        }
+
+        return  hasInternet;
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -136,7 +172,7 @@ public class EventFragment extends Fragment
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 mSwipeRefreshLayout.setRefreshing(true);
-                new LoadEventTask(getActivity(), courseid, token).execute(""); // refresh content
+                new LoadEventTask(getActivity(), mCourseid, mToken).execute(); // refresh content
                 return true;
 
             default:
@@ -144,8 +180,8 @@ public class EventFragment extends Fragment
         }
     }
 
-    private class LoadEventTask extends AsyncTask<String, Integer, Boolean> {
-        EventSync evsync;
+    private class LoadEventTask extends AsyncTask<Void,Void,Boolean> {
+
         ArrayList<String> courseids;
         String courseid;
         Context context;
@@ -153,64 +189,64 @@ public class EventFragment extends Fragment
         public LoadEventTask(Context context, String courseid, String token) {
             this.context = context;
             this.courseid = courseid;
-            evsync = new EventSync(context, token);
+
             courseids = new ArrayList<>();
             courseids.add(courseid);
         }
 
         @Override
-        protected Boolean doInBackground(String... params) {
-            boolean sync = evsync.syncEvents(courseids); // sync events
-            if (sync)
-                getEventsFromDatabase();
-
-            return sync;
-        }
-
-        @Override
         protected void onPreExecute() {
-            img_notpresent.setVisibility(View.INVISIBLE);
-            tv_notpresent.setVisibility(View.INVISIBLE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
 
-            if (mevents.size() == 0) { // check if any events are present
-                progressBar.setVisibility(View.VISIBLE);
+            if (mEvents.size() == 0) { // check if any news are present
+                mProgressBar.setVisibility(View.VISIBLE);
                 if (mSwipeRefreshLayout.isRefreshing())
-                    progressBar.setVisibility(View.GONE);
+                    mProgressBar.setVisibility(View.GONE);
+
             }
         }
 
         @Override
+        protected Boolean doInBackground(Void... params) {
+            final EventSync evsync = new EventSync(context, mToken);
+
+            if (!isConnected()) {  // if there is no internet connection
+                return false;
+            }
+
+            if (!hasInternet()) { // if there is no internet
+                return false;
+            }
+
+            boolean sync = evsync.syncEvents(courseids); // sync events
+
+            return sync;
+        }
+
+
+
+        @Override
         protected void onPostExecute(Boolean result) {
-            eventadapter.updateEventList(mevents);
-            progressBar.setVisibility(View.GONE);
             mSwipeRefreshLayout.setRefreshing(false);
-
-            if (!result)
-                // Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
-
-            if (mevents.size() == 0) { // if any events are present
-                img_notpresent.setVisibility(View.VISIBLE);
-                tv_notpresent.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
+            if (result) {
+                getEventsFromDatabase();
+                mEventAdapter.updateEventList(mEvents);
+            }
+            if (mEvents.size() == 0) {
+                mImgPlaceHolder.setVisibility(View.VISIBLE);
+                mTvPlaceHolder.setVisibility(View.VISIBLE);
             }
         }
     }
 
     @Override
     public void onRefresh() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            new LoadEventTask(context, courseid, token).execute(""); // refresh content
+        new LoadEventTask(mContext,mCourseid,mToken).execute(); // refresh content
     }
 
-    private View rootView;
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerView eventList;
-    private ProgressBar progressBar;
-    private TextView tv_notpresent;
-    private ImageView img_notpresent;
 
     public EventFragment() {/* required empty constructor */}
 }

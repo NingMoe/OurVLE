@@ -43,6 +43,7 @@ import com.stoneapp.ourvlemoodle2.tasks.CourseSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.view.DividerItemDecoration;
+import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import java.util.List;
 
@@ -111,7 +112,7 @@ public class CourseListFragment extends Fragment
     {
         mCourseListAdapter = new CourseListAdapter(getActivity(), mCourses, mToken, mSiteId);
         mCourseListView.setHasFixedSize(true);
-        mCourseListView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mCourseListView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
         mCourseListView.setAdapter(mCourseListAdapter);
     }
 

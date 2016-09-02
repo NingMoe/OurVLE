@@ -58,6 +58,7 @@ import com.stoneapp.ourvlemoodle2.tasks.MemberSync;
 import com.stoneapp.ourvlemoodle2.activities.ProfileActivity;
 
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,7 +101,7 @@ public class MembersFragment extends Fragment
         img_notpresent = (ImageView) rootView.findViewById(R.id.no_members);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarMember);
 
-        memberList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        memberList.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
 
         //this.token = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getToken();
 

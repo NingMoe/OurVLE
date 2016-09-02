@@ -48,6 +48,7 @@ import com.stoneapp.ourvlemoodle2.tasks.DiscussionSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
+import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -155,7 +156,7 @@ public class NewsFragment extends Fragment
     {
         mDiscussionListAdapter = new DiscussionListAdapter(this.getActivity(), mDiscussions, mToken);
         mNewsListView.setHasFixedSize(true);
-        mNewsListView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        mNewsListView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
         mNewsListView.setAdapter(mDiscussionListAdapter);
 
     }

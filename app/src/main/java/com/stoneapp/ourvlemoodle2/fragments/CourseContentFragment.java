@@ -32,6 +32,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleSection;
 import com.stoneapp.ourvlemoodle2.tasks.ContentSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.FileUtils;
+import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import android.Manifest;
 import android.app.DownloadManager;
@@ -142,7 +143,7 @@ public class CourseContentFragment extends Fragment
         sectionsToListItems(sections); // adds content to list items
 
         contentList.setHasFixedSize(true);
-        contentList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        contentList.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
 
         cadapter = new CourseContentListAdapter(getActivity(), items, token, courseid, course.getShortname(), this);
         contentList.setAdapter(cadapter);

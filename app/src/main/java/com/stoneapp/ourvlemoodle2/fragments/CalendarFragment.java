@@ -45,6 +45,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
 import com.stoneapp.ourvlemoodle2.tasks.EventSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
+import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +126,7 @@ public class CalendarFragment extends Fragment
     {
         mEventListAdapter = new EventListAdapter(getActivity(), mEvents);
         mEventListView.setHasFixedSize(true);
-        mEventListView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mEventListView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
         mEventListView.setAdapter(mEventListAdapter);
     }
 
