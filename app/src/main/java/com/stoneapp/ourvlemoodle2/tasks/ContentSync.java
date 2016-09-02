@@ -84,8 +84,8 @@ public class ContentSync {
                 section.setCourseid(courseid);
                 section.setParentid(coursepid);
 
-                MoodleSection.findOrCreateFromJson(section); // saves contact to database
-                syncModules(section.getModules(),section.getSectionid(),section.getId());
+                MoodleSection db_section = MoodleSection.findOrCreateFromJson(section); // saves contact to database
+                syncModules(db_section.getModules(),db_section.getSectionid(),db_section.getId());
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
@@ -109,9 +109,9 @@ public class ContentSync {
             module.setParentid(sectionpid); // set section database id
             module.setSiteid(siteid);
             module.setSectionid(sectionid); // set section id
-            MoodleModule.findOrCreateFromJson(module);
+            MoodleModule db_module = MoodleModule.findOrCreateFromJson(module);
 
-            syncModuleContents(module.getContents(), module.getModuleid(), module.getId(), sectionid); //sync module contents
+            syncModuleContents(db_module.getContents(), db_module.getModuleid(), db_module.getId(), sectionid); //sync module contents
         }
     }
 

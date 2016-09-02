@@ -117,6 +117,7 @@ public class NewsFragment extends Fragment
         mImgPlaceHolder = (ImageView) mRootView.findViewById(R.id.no_topics);
         mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
         mNewsListView = (RecyclerView) mRootView.findViewById(R.id.newsList);
+        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressBar);
     }
 
     private void sortDiscussions()
