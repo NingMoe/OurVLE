@@ -191,7 +191,7 @@ public class MoodleSection extends Model{
                 new Select().from(MoodleSection.class).where("sectionid = ?", sectionid).executeSingle();
         if (existingSection != null) {
             // found and return existing
-            UpdateSection(existingSection,new_section);
+           // UpdateSection(existingSection,new_section);
             return existingSection;
         } else {
             // create and return new user

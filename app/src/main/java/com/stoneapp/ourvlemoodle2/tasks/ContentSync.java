@@ -78,7 +78,7 @@ public class ContentSync {
 
         ActiveAndroid.beginTransaction();
         try {
-            deleteStaleSections();
+            //deleteStaleSections();
             for (int i = 0; i < sections.size(); i++) {
                 final MoodleSection section = sections.get(i);
                 section.setCourseid(courseid);
@@ -102,7 +102,7 @@ public class ContentSync {
         if (modules == null) // checks if there are no modules
             return;
 
-        deleteStaleModules(modules);
+      //  deleteStaleModules(modules);
         for(int i = 0; i < modules.size(); i++) {
             final MoodleModule module = modules.get(i);
             module.setCourseid(courseid); // set course id of module
@@ -119,7 +119,7 @@ public class ContentSync {
         if (contents == null) // checks if there are no contents
             return;
 
-        deleteStaleContent(contents);
+      //  deleteStaleContent(contents);
 
         for (int i = 0; i < contents.size(); i++) {
             final MoodleModuleContent content = contents.get(i);
@@ -128,7 +128,6 @@ public class ContentSync {
             content.setSectionid(sectionid);
             content.setCourseid(courseid); // set course id
             content.setSiteid(siteid);
-
             MoodleModuleContent.findOrCreateFromJson(content);
         }
     }

@@ -267,7 +267,7 @@ public class MoodleModuleContent extends Model{
                 new Select().from(MoodleModuleContent.class).where("moduleid = ?",new_content.getModuleid()).executeSingle();
         if (existingContent != null) {
             // found and return existing
-            UpdateContent(existingContent,new_content);
+        //    UpdateContent(existingContent,new_content);
             return existingContent;
         } else {
             // create and return new user

@@ -44,6 +44,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
 import com.stoneapp.ourvlemoodle2.tasks.EventSync;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,132 +52,182 @@ import java.util.List;
 @SuppressWarnings("FieldCanBeLocal")
 public class CalendarFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener {
-    private List<MoodleEvent> mevents = new ArrayList<>();
-    private EventListAdapter eventListAdapter;
-    private ArrayList<String> courseids;
-    private List<MoodleCourse> courses = new ArrayList<>();
-    private String token;
+
+    private List<MoodleEvent> mEvents = new ArrayList<>();
+    private List<MoodleCourse> mCourses;
+    private EventListAdapter mEventListAdapter;
+    private List<String> mCourseids = new ArrayList<>();
+    private String mToken;
+    private RecyclerView mEventListView;
+    private ProgressBar mProgressBar;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private TextView mTvPlaceHolder;
+    private ImageView mImgPlaceHolder;
+    private View mRootView;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_all_events, container, false);
 
-        txt_notpresent = (TextView) view.findViewById(R.id.txt_notpresent);
-        img_notpresent = (ImageView) view.findViewById(R.id.no_events);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
-        eventList = (RecyclerView) view.findViewById(R.id.eventList);
-        progressbar = (ProgressBar)view.findViewById(R.id.progressEvent);
+        mRootView = inflater.inflate(R.layout.frag_all_events, container, false);
 
-        txt_notpresent.setVisibility(View.GONE);
-        img_notpresent.setVisibility(View.GONE);
+        initViews();
 
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-
-        progressbar.setIndeterminate(true);
-        progressbar.setVisibility(View.GONE);
-
-        courses = new Select().all().from(MoodleCourse.class).execute();
-        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
-        token = sites.get(0).getToken(); // url token
-
-        courseids = new ArrayList<>();
-
-        for (int i = 0; i < courses.size(); i++)
-            courseids.add(courses.get(i).getCourseid() + "");
+        setUpSwipeRefresh();
 
         getEventsFromDatabase();
 
-        eventListAdapter = new EventListAdapter(getActivity(), mevents);
+        if(mEvents.size()>0)
+        {
+            mTvPlaceHolder.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+        }
 
-        eventList.setHasFixedSize(true);
-        eventList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        eventList.setAdapter(eventListAdapter);
+        mCourses = new Select().all().from(MoodleCourse.class).execute();
+        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        mToken = sites.get(0).getToken(); // url token
 
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            new LoadAllEventsTask(getActivity(), courseids, token).execute(""); // refresh events
+        initCourseIds();
 
-        return view;
+        setUpRecyclerView();
+
+        setUpProgressBar();
+
+        new LoadAllEventsTask(getActivity(), mCourseids, mToken).execute(); // refresh events
+
+        return mRootView;
     }
 
+
+    private void initViews()
+    {
+        mTvPlaceHolder = (TextView) mRootView.findViewById(R.id.txt_notpresent);
+        mImgPlaceHolder = (ImageView) mRootView.findViewById(R.id.no_events);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
+        mEventListView = (RecyclerView) mRootView.findViewById(R.id.eventList);
+        mProgressBar = (ProgressBar)mRootView.findViewById(R.id.progressEvent);
+    }
+
+    private void setUpSwipeRefresh()
+    {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+    }
+
+    private void setUpProgressBar()
+    {
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    private void setUpRecyclerView()
+    {
+        mEventListAdapter = new EventListAdapter(getActivity(), mEvents);
+        mEventListView.setHasFixedSize(true);
+        mEventListView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mEventListView.setAdapter(mEventListAdapter);
+    }
+
+    private void initCourseIds()
+    {
+        for(int i=0;i<mCourses.size();i++)
+        {
+            mCourseids.add(mCourses.get(i).getCourseid()+"");
+        }
+    }
 
     private void getEventsFromDatabase()
     {
-        new Select().all().from(MoodleEvent.class).execute();
+        mEvents = new Select().all().from(MoodleEvent.class).execute();
+    }
+
+    private boolean isConnected() {
+        return ConnectUtils.isConnected(getActivity());
+    }
+
+    private static boolean hasInternet()
+    {
+        boolean hasInternet;
+
+        try {
+            hasInternet = ConnectUtils.haveInternetConnectivity();
+        } catch(Exception e) {
+            hasInternet = false;
+        }
+
+        return  hasInternet;
     }
 
 
-    private class LoadAllEventsTask extends AsyncTask<String, Integer, Boolean> {
-        EventSync evsync;
-        ArrayList<String> courseids;
+
+
+
+    private class LoadAllEventsTask extends AsyncTask<Void,Void, Boolean> {
+
+        List<String> courseids;
         Context context;
+        String token;
 
-        public LoadAllEventsTask(Context context, ArrayList<String>courseids, String token) {
+        public LoadAllEventsTask(Context context,List<String>courseids, String token) {
             this.context = context;
-            this.courseids = courseids;
+            this.courseids = new ArrayList<>(courseids);
+            this.token = token;
 
-            evsync = new EventSync(context, token);
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            boolean sync = evsync.syncEvents(courseids);
-            if (sync)
-                getEventsFromDatabase();
-                //Collections.reverse(mevents);
-
-            return sync;
         }
 
         @Override
         protected void onPreExecute() {
-            txt_notpresent.setVisibility(View.GONE);
-            img_notpresent.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
 
-//            if (mevents.size() == 0) {  //check if any events are present
-        //        progressbar.setVisibility(View.VISIBLE);
-
+            if (mEvents.size() == 0) { // check if any news are present
+                mProgressBar.setVisibility(View.VISIBLE);
                 if (mSwipeRefreshLayout.isRefreshing())
-                    progressbar.setVisibility(View.GONE);
+                    mProgressBar.setVisibility(View.GONE);
             }
-        //}
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            EventSync evsync = new EventSync(context, token);
+
+            if (!isConnected()) {  // if there is no internet connection
+                return false;
+            }
+
+            if (!hasInternet()) { // if there is no internet
+                return false;
+            }
+
+            boolean sync = evsync.syncEvents(courseids);
+
+            return sync;
+        }
+
+
         @Override
         protected void onPostExecute(Boolean result) {
-            eventListAdapter.updateEventList(mevents);
-            progressbar.setVisibility(View.GONE);
             mSwipeRefreshLayout.setRefreshing(false);
-
-            if (!result) {
-                if (mevents.size() > 0)
-                    Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
-            }
-
-            if (mevents.size() == 0) { //if any events are present
-                txt_notpresent.setVisibility(View.VISIBLE);
-                img_notpresent.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
+            if (result) {
+                getEventsFromDatabase();
+                mEventListAdapter.updateEventList(mEvents);
+            } else {
+                if (mEvents.size() == 0) {
+                    mImgPlaceHolder.setVisibility(View.VISIBLE);
+                    mTvPlaceHolder.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
 
     @Override
     public void onRefresh() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            new LoadAllEventsTask(getActivity(), courseids, token).execute(""); // refresh events
+
+        new LoadAllEventsTask(getActivity(), mCourseids, mToken).execute(); // refresh events
     }
 
-    private RecyclerView eventList;
-    private ProgressBar progressbar;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private TextView txt_notpresent;
-    private ImageView img_notpresent;
-    private View view;
 
     public CalendarFragment() {/* required empty constructor */}
 }

@@ -61,7 +61,7 @@ public class EventSync {
         this.context = context;
     }
 
-    public boolean syncEvents(ArrayList<String> courseids) {
+    public boolean syncEvents(List<String> courseids) {
         MoodleRestEvent mrevent  = new MoodleRestEvent(token);
         MoodleEvents events = mrevent.getEvents(courseids); // get events from api call
 

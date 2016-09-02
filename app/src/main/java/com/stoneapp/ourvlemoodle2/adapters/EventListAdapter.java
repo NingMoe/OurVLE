@@ -34,6 +34,7 @@ import com.stoneapp.ourvlemoodle2.util.TimeUtils;
 import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
 import com.stoneapp.ourvlemoodle2.R;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
     }
 
     public EventListAdapter(Context context, List<MoodleEvent> events){
-        this.events = events;
+        this.events = new ArrayList<>(events);
         this.context = context;
     }
 
@@ -138,7 +139,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
     }
 
     public void updateEventList(List<MoodleEvent> events){
-        this.events = events;
+        this.events = new ArrayList<>(events);
         notifyDataSetChanged();
     }
 }

@@ -41,6 +41,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
 import com.stoneapp.ourvlemoodle2.tasks.CourseSync;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.view.DividerItemDecoration;
 
 import java.util.List;
@@ -48,91 +49,131 @@ import java.util.List;
 @SuppressWarnings("FieldCanBeLocal")
 public class CourseListFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener {
-    private List<MoodleCourse> courses ;
-    private String token;
-    private int userid;
+    private List<MoodleCourse> mCourses ;
+    private String mToken;
+    private int mUserid;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private String name;
-    private CourseListAdapter courseListAdapter;
+    private CourseListAdapter mCourseListAdapter;
+    private RecyclerView mCourseListView;
+    private View mRootView;
+    private long mSiteId;
+    private List<MoodleSiteInfo> mSites;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                 Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.frag_course_list, container, false);
+        mRootView = inflater.inflate(R.layout.frag_course_list, container, false);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
-        RecyclerView courseList = (RecyclerView) view.findViewById(R.id.courseList);
+        mSites = new Select().all().from(MoodleSiteInfo.class).execute(); // the moodle site info from database
 
-        List<MoodleSiteInfo> sites =  new Select().all().from(MoodleSiteInfo.class).execute(); // the moodle site info from database
+        initViews();
+
+        intiSiteInfo();
+
+        setUpSwipeRefresh();
 
         getCoursesFromDatabase(); // the moodle courses
 
-        name = sites.get(0).getFullname();  // full name from first site info
-        long siteid = sites.get(0).getId();
-        token = sites.get(0).getToken(); // the url token
-        userid = sites.get(0).getUserid();
+        setUpRecyclerView();
 
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        new LoadCoursesTask(getActivity(), mUserid, mToken).execute();
 
-        courseListAdapter = new CourseListAdapter(getActivity(), courses, token, siteid);
-
-        courseList.setHasFixedSize(true);
-        courseList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        courseList.setAdapter(courseListAdapter);
-
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            // refreshes courses list
-            new LoadCoursesTask(getActivity(), userid, token).execute("");
-
-        return view;
+        return mRootView;
     }
+
+    private void intiSiteInfo()
+    {
+        mSiteId = mSites.get(0).getId();
+        mToken = mSites.get(0).getToken(); // the url token
+        mUserid = mSites.get(0).getUserid();
+    }
+
 
     private void getCoursesFromDatabase()
     {
-        courses = new Select().all().from(MoodleCourse.class).execute();
+        mCourses = new Select().all().from(MoodleCourse.class).execute();
+    }
+
+    private void initViews()
+    {
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
+        mCourseListView = (RecyclerView) mRootView.findViewById(R.id.courseList);
+    }
+
+    private void setUpSwipeRefresh()
+    {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+    }
+
+    private void setUpRecyclerView()
+    {
+        mCourseListAdapter = new CourseListAdapter(getActivity(), mCourses, mToken, mSiteId);
+        mCourseListView.setHasFixedSize(true);
+        mCourseListView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mCourseListView.setAdapter(mCourseListAdapter);
+    }
+
+    private boolean isConnected() {
+        return ConnectUtils.isConnected(getActivity());
+    }
+
+    private static boolean hasInternet()
+    {
+        boolean hasInternet;
+
+        try {
+            hasInternet = ConnectUtils.haveInternetConnectivity();
+        } catch(Exception e) {
+            hasInternet = false;
+        }
+
+        return  hasInternet;
     }
 
     @Override
     public void onRefresh() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            new LoadCoursesTask(getActivity(), userid, token).execute("");
+        new LoadCoursesTask(getActivity(), mUserid, mToken).execute();
     }
 
-    private class LoadCoursesTask extends AsyncTask<String, Integer, Boolean> {
+    private class LoadCoursesTask extends AsyncTask<Void,Void, Boolean> {
         int userid;
-        CourseSync csync;
+        String token;
         Context context;
 
         public LoadCoursesTask(Context context, int userid, String token) {
             this.userid = userid;
-            csync = new CourseSync(token);
+            this.token = token;
             this.context = context;
         }
 
         @Override
-        protected Boolean doInBackground(String... params) {
-            boolean sync = csync.syncCourses(userid + "");
+        protected Boolean doInBackground(Void... params) {
+            CourseSync csync = new CourseSync(token);
 
-            if (sync)
-                getCoursesFromDatabase(); // populate course list
+            if (!isConnected()) {  // if there is no internet connection
+                return false;
+            }
+
+            if (!hasInternet()) { // if there is no internet
+                return false;
+            }
+
+            boolean sync = csync.syncCourses(userid + "");
 
             return sync;
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
-            courseListAdapter.updateList(courses);
             mSwipeRefreshLayout.setRefreshing(false);
-            if (!result)
-                Toast.makeText(context, "Failed to Update", Toast.LENGTH_SHORT).show();
+            if (result)
+            {
+                getCoursesFromDatabase();
+                mCourseListAdapter.updateList(mCourses);
+            }
+
         }
     }
 

@@ -288,7 +288,7 @@ public class MoodleModule extends Model {
                 new Select().from(MoodleModule.class).where("moduleid = ?", moduleid).executeSingle();
         if (existingModule != null) {
             // found and return existing
-            UpdateModule(existingModule,new_module);
+          //  UpdateModule(existingModule,new_module);
             return existingModule;
         } else {
             // create and return new user

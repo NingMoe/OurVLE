@@ -29,6 +29,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.stoneapp.ourvlemoodle2.models.MoodleEvents;
 import com.stoneapp.ourvlemoodle2.util.GsonExclude;
@@ -47,7 +48,7 @@ public class MoodleRestEvent {
         this.token = token;
     }
 
-    public MoodleEvents getEvents(ArrayList<String> courseids) {
+    public MoodleEvents getEvents(List<String> courseids) {
         long today_millis = System.currentTimeMillis();
         Timestamp timestamp = new Timestamp(today_millis);
         long timestart = timestamp.getTime() / 1000;

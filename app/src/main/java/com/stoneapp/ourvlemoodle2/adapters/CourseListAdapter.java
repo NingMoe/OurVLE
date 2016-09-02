@@ -40,6 +40,7 @@ import com.stoneapp.ourvlemoodle2.activities.CourseViewActivity;
 import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.CourseViewHolder> {
@@ -93,7 +94,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
     }
 
     public CourseListAdapter(Context context, List<MoodleCourse> courses, String token, long siteid) {
-        this.courses = courses;
+        this.courses = new ArrayList<>(courses);
         this.context = context;
         this.token = token;
         this.siteid = siteid;
@@ -147,7 +148,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
     }
 
     public void updateList(List<MoodleCourse> courses) {
-        this.courses = courses;
+        this.courses = new ArrayList<>(courses);
         notifyDataSetChanged();
     }
 }
