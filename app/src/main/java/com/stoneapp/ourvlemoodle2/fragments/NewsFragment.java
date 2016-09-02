@@ -177,7 +177,7 @@ public class NewsFragment extends Fragment
         int len = forums.size();
 
         for (int i = 0; i < len; i++) {
-            if (forums.get(i).getName().toUpperCase().contains("NEWS FORUM")) //if forum is news forum
+            if (forums.get(i).getName().toUpperCase().contains("NEWS")) //if forum is news forum
                 news_forums.add(forums.get(i)); //add forum to list of news forums
         }
         mForumIds = new ArrayList<>();
@@ -265,8 +265,7 @@ public class NewsFragment extends Fragment
                 return false;
             }
             initForumIds();
-            boolean sync = dsync.syncDiscussions(forumids); //syncs discussions
-
+            boolean sync = dsync.syncDiscussions(mForumIds); //syncs discussions
             return sync;
 
         }
