@@ -47,7 +47,7 @@ public class SplashActivity extends AppCompatActivity {
         SharedPreferences mPref =
                 getSharedPreferences(MoodleConstants.PREFS_STRING, Context.MODE_PRIVATE);
 
-        firstTime = mPref.getBoolean(MoodleConstants.ID_PRESENT, true);
+        firstTime = mPref.getBoolean(MoodleConstants.ID_PRESENTNEW, true);
 
         new Handler().postDelayed(new Runnable() {
             @Override

@@ -33,7 +33,7 @@ public class MoodleConstants {
     public static final String FORUM_FUNCTION = "mod_forum_get_forums_by_courses";
     public static final String SITE_FUNCTION = "moodle_webservice_get_siteinfo";
     public static final String PREFS_STRING = "OURVLE_SHARED_PREFERENCES_test";
-    public static final String ID_PRESENT = "ID_PRESENT_test";
+    public static final String ID_PRESENTNEW = "ID_PRESENTNEW";
     public static final String FIRST_UPDATE = "FIRST_UPDATE_test";
     public static final String MESSAGE_FUNCTION ="core_message_send_instant_messages";
 }

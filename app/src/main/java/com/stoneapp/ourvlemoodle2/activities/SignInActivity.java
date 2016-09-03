@@ -327,7 +327,7 @@ public class SignInActivity extends AppCompatActivity {
             if (status) { // if the user has successfully logged on
                 SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(MoodleConstants.PREFS_STRING, Context.MODE_PRIVATE);
                 SharedPreferences.Editor prefsEditor = sharedPrefs.edit();
-                prefsEditor.putBoolean(MoodleConstants.ID_PRESENT, false); // to save that the user has successfully logged in
+                prefsEditor.putBoolean(MoodleConstants.ID_PRESENTNEW, false); // to save that the user has successfully logged in
                 prefsEditor.commit();
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
