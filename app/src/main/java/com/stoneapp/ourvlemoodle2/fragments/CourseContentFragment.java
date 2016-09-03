@@ -31,6 +31,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleModule;
 import com.stoneapp.ourvlemoodle2.models.MoodleSection;
 import com.stoneapp.ourvlemoodle2.tasks.ContentSync;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.util.FileUtils;
 import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
@@ -73,25 +74,27 @@ public class CourseContentFragment extends Fragment
         OnRefreshListener,
         SearchView.OnQueryTextListener,
         ActivityCompat.OnRequestPermissionsResultCallback {
-    private String coursename;
-    private String coursefname;
-    private int courseid;
-    private long coursepid;
-    private long siteid;
-    private String token;
-
-    private CourseContentListAdapter cadapter;
-    private ArrayList<ContentListItem> items = new ArrayList<>();
-    private List<ContentListItem> filtered_items;
-
-    private ArrayList<MoodleSection>sections;
-    public File file;
+    private int mCourseid;
+    private long mCoursepid;
+    private String mCourseName;
+    private long mSiteId;
+    private String mToken;
+    private CourseContentListAdapter mContentListAdapter;
+    private ArrayList<ContentListItem> mItems = new ArrayList<>();
+    private ArrayList<MoodleSection>mSections;
+    public File mFile;
     private MenuItem searchitem;
-
     private static int TYPE_HEADER = 1;
     private static int TYPE_MODULE = 0;
-    private MoodleCourse course;
     private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0x1;
+    private View mRootView;
+    private RecyclerView mContentListView;
+    private ProgressBar mProgressBar;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private SearchView searchView;
+    private TextView mTvPlaceHolder;
+    private ImageView mImgPlaceHolder;
+    private ContentSync mContentSync;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,12 +103,11 @@ public class CourseContentFragment extends Fragment
         Bundle args = getArguments();
 
         if (args != null) {
-            this.coursefname = args.getString("coursefname");
-            this.coursename = args.getString("coursename");
-            this.coursepid = args.getLong("coursepid");
-            this.courseid = args.getInt("courseid");
-            this.token = args.getString("token");
-            this.siteid = args.getLong("siteid");
+            this.mCourseName = args.getString("coursename");
+            this.mCoursepid = args.getLong("coursepid");
+            this.mCourseid = args.getInt("courseid");
+            this.mToken = args.getString("token");
+            this.mSiteId = args.getLong("siteid");
         }
 
         setHasOptionsMenu(true);
@@ -116,57 +118,88 @@ public class CourseContentFragment extends Fragment
                              Bundle savedInstanceState) {
         Context context = getActivity();
 
-        rootView = inflater.inflate(R.layout.frag_course_content, container, false);
+        mRootView = inflater.inflate(R.layout.frag_course_content, container, false);
+        mContentSync = new ContentSync(mCourseid, mCoursepid, mSiteId, mToken, context);
 
-        txt_notpresent = (TextView) rootView.findViewById(R.id.txt_notpresent);
-        img_notpresent = (ImageView) rootView.findViewById(R.id.no_content);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarContent);
-        contentList = (RecyclerView) rootView.findViewById(R.id.coursecontent_listview);
+        initViews();
 
-        //List<MoodleSiteInfo> sites = MoodleSiteInfo.listAll(MoodleSiteInfo.class); //retrieves site info
+        setUpSwipeRefresh();
 
-       /// course = MoodleCourse.find(MoodleCourse.class, "courseid = ?", courseid + "").get(0);
-        course = new Select().from(MoodleCourse.class).where("courseid = ?", courseid+"").executeSingle();
+        getContentFromDatabase();
 
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-
-       // String name =  sites.get(0).getFirstname().charAt(0)+sites.get(0).getLastname();
-        ContentSync csync = new ContentSync(courseid, coursepid, siteid, token, context);
-
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.GONE);
-
-        sections = csync.getContents(); // sync content
-
-        sectionsToListItems(sections); // adds content to list items
-
-        contentList.setHasFixedSize(true);
-        contentList.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
-
-        cadapter = new CourseContentListAdapter(getActivity(), items, token, courseid, course.getShortname(), this);
-        contentList.setAdapter(cadapter);
+        setUpRecyclerView();
 
         //checks if any content is present
-        if (items.size() > 0) {
-            img_notpresent.setVisibility(View.GONE);
-            txt_notpresent.setVisibility(View.GONE);
+        if (mItems.size() > 0) {
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
         }
 
         //register download completion receiver
         getActivity().registerReceiver(onComplete,
                 new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            //refreshes content
-            new LoadContentTask(courseid, coursepid, siteid, context).execute("");
+        setUpProgressBar();
 
-        return rootView;
+        new LoadContentTask(context).execute();
+
+        return mRootView;
     }
+
+    private void initViews()
+    {
+        mTvPlaceHolder = (TextView) mRootView.findViewById(R.id.txt_notpresent);
+        mImgPlaceHolder = (ImageView) mRootView.findViewById(R.id.no_content);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swiperefresh);
+        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressBarContent);
+        mContentListView = (RecyclerView) mRootView.findViewById(R.id.coursecontent_listview);
+    }
+
+    private void setUpProgressBar()
+    {
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    private void setUpSwipeRefresh()
+    {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+    }
+
+    private void setUpRecyclerView()
+    {
+        mContentListView.setHasFixedSize(true);
+        mContentListView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
+        mContentListAdapter = new CourseContentListAdapter(getActivity(),mItems, mToken, mCourseid, mCourseName, this);
+        mContentListView.setAdapter(mContentListAdapter);
+    }
+
+    private void getContentFromDatabase()
+    {
+        mSections = mContentSync.getContents(); // sync content
+        sectionsToListItems(mSections); // adds content to list items
+    }
+
+
+    private boolean isConnected() {
+        return ConnectUtils.isConnected(getActivity());
+    }
+
+    private static boolean hasInternet()
+    {
+        boolean hasInternet;
+
+        try {
+            hasInternet = ConnectUtils.haveInternetConnectivity();
+        } catch(Exception e) {
+            hasInternet = false;
+        }
+
+        return  hasInternet;
+    }
+
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -199,7 +232,7 @@ public class CourseContentFragment extends Fragment
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 mSwipeRefreshLayout.setRefreshing(true);
-                new LoadContentTask(courseid, coursepid, siteid, getActivity()).execute(""); // refreshes content
+                new LoadContentTask(getActivity()).execute(); // refreshes content
                 return true;
 
             default:
@@ -232,9 +265,9 @@ public class CourseContentFragment extends Fragment
                 Toast.makeText(getActivity(), "Download completed", Toast.LENGTH_SHORT).show();
                 if (ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    if (file.exists()) {
+                    if (mFile.exists()) {
                         Toast.makeText(getActivity(), "Opening file", Toast.LENGTH_SHORT).show();
-                        FileUtils.openFile(getActivity(), file);
+                        FileUtils.openFile(getActivity(), mFile);
                     }
                 }
             }
@@ -246,7 +279,7 @@ public class CourseContentFragment extends Fragment
 
         int sectionslen = sections.size();
 
-        items.clear(); // clears list
+        mItems.clear(); // clears list
         for (int i = 0; i < sectionslen; i++) {
             MoodleSection section =sections.get(i); // gets current section
             ArrayList<MoodleModule> modules = section.getModules(); // gets modules from section
@@ -254,7 +287,7 @@ public class CourseContentFragment extends Fragment
                 ContentListItem secitem = new ContentListItem();
                 secitem.section = sections.get(i);
                 secitem.type = TYPE_HEADER; // set type to header
-                items.add(secitem);
+                mItems.add(secitem);
 
                 int moduleslen = modules.size();
 
@@ -269,75 +302,71 @@ public class CourseContentFragment extends Fragment
 
                    // moditem.section = section;
                     moditem.type = TYPE_MODULE; // set type
-                    items.add(moditem);
+                    mItems.add(moditem);
                 }
             }
         }
     }
 
-    private class LoadContentTask extends AsyncTask<String, Integer, Boolean> {
+    private class LoadContentTask extends AsyncTask<Void,Void, Boolean> {
         Context context;
-        ContentSync csync;
 
-        public LoadContentTask(int courseid, long coursepid, long siteid, Context context) {
+        public LoadContentTask(Context context) {
             this.context = context;
-            csync = new ContentSync(courseid, coursepid, siteid, token, context);
+
         }
 
         @Override
         protected void onPreExecute() {
-            txt_notpresent.setVisibility(View.GONE);
-            img_notpresent.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
 
-            if(items.size() == 0) { // checks if list is empty
-                if(!mSwipeRefreshLayout.isRefreshing())
-                    progressBar.setVisibility(View.VISIBLE);
-                mSwipeRefreshLayout.setEnabled(false);
+            if (mItems.size() == 0) { // check if any news are present
+                mProgressBar.setVisibility(View.VISIBLE);
+                if (mSwipeRefreshLayout.isRefreshing())
+                    mProgressBar.setVisibility(View.GONE);
             }
         }
 
         @Override
-        protected Boolean doInBackground(String... params) {
-            boolean sync = csync.syncContent(); // syncs content
+        protected Boolean doInBackground(Void... params) {
 
-            ArrayList<MoodleSection>sections = csync.getContents();
+            if (!isConnected()) {  // if there is no internet connection
+                return false;
+            }
 
-            sectionsToListItems(sections);
+            if (!hasInternet()) { // if there is no internet
+                return false;
+            }
 
+            boolean sync = mContentSync.syncContent(); // syncs content
 
 
             return sync;
         }
 
         @Override
-        protected void onPostExecute(Boolean status) {
+        protected void onPostExecute(Boolean result) {
             mSwipeRefreshLayout.setRefreshing(false);
-
-            progressBar.setVisibility(View.GONE);
-            if (status) {
-                cadapter.updateContentList(items); // update list view
+            mProgressBar.setVisibility(View.GONE);
+            if (result) {
+                getContentFromDatabase();
+                mContentListAdapter.updateContentList(mItems);
             }
-            else
-                Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
-
-            if (items.size() == 0) {
-                txt_notpresent.setVisibility(View.VISIBLE);
-                img_notpresent.setVisibility(View.VISIBLE);
+            if (mItems.size() == 0) {
+                mImgPlaceHolder.setVisibility(View.VISIBLE);
+                mTvPlaceHolder.setVisibility(View.VISIBLE);
             }
         }
     }
 
     @Override
     public void onRefresh() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            new LoadContentTask(courseid, coursepid, siteid, getActivity()).execute(""); // refresh content
+        new LoadContentTask(getActivity()).execute(); // refresh content
     }
 
     public void setFile(File file) {
-        this.file = file;
+        this.mFile = file;
     }
 
     @Override
@@ -348,15 +377,14 @@ public class CourseContentFragment extends Fragment
     @Override
     public boolean onQueryTextChange(String query) {
 
-        final List<ContentListItem> filteredModelList = filter(items,query );
-        cadapter.animateTo(filteredModelList,query);
-        contentList.scrollToPosition(0);
+        final List<ContentListItem> filteredModelList = filter(mItems,query );
+        mContentListAdapter.animateTo(filteredModelList,query);
+        mContentListView.scrollToPosition(0);
         return true;
     }
 
     private List <ContentListItem> filter(List<ContentListItem> models, String query) {
         query = query.toLowerCase();
-        boolean headerAdded = true;
         final List<ContentListItem> filteredModelList = new ArrayList<>();
         List<ContentListItem> startModelList = new ArrayList<>();
         for (ContentListItem model : models) {
@@ -365,7 +393,6 @@ public class CourseContentFragment extends Fragment
                 if(model.section.getName().contains(query))
                     filteredModelList.add(model);
             if (model.type == TYPE_MODULE) {
-                headerAdded = true;
                 final String text = model.module.getName().toLowerCase();
                 // final String desc = model.module.getDescription().toLowerCase();
 
@@ -403,13 +430,7 @@ public class CourseContentFragment extends Fragment
         }
     }
 
-    private View rootView;
-    private RecyclerView contentList;
-    private ProgressBar progressBar;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private SearchView searchView;
-    private TextView txt_notpresent;
-    private ImageView img_notpresent;
+
 
     public CourseContentFragment() {/* required empty constructor */}
 }
