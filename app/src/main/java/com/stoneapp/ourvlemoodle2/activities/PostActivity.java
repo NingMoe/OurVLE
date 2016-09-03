@@ -35,6 +35,7 @@ import com.stoneapp.ourvlemoodle2.adapters.PostListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodlePost;
 import com.stoneapp.ourvlemoodle2.tasks.PostSync;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -52,47 +53,105 @@ import android.widget.Toast;
 @SuppressWarnings("FieldCanBeLocal")
 public class PostActivity  extends AppCompatActivity
         implements OnRefreshListener {
-    private String discussionid;
-    private List<MoodlePost> posts;
-    private PostListAdapter padapter;
-    private String discussionname;
-    private String token;
+    private String mDiscussionId;
+    private List<MoodlePost> mPosts;
+    private PostListAdapter mPostListAdapter;
+    private String mDiscussionName;
+    private String mToken;
+    private Toolbar mToolBar;
+    private TextView mTvPlaceHolder;
+    private ImageView mImgPlaceHolder;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ProgressBar mProgressBar;
+    private RecyclerView mPostListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundle extras = getIntent().getExtras();
-        discussionid = extras.getString("discussionid");
-        discussionname = extras.getString("discussionname");
-        token = extras.getString("token");
+        mDiscussionId = extras.getString("discussionid");
+        mDiscussionName = extras.getString("discussionname");
+        mToken = extras.getString("token");
 
         setContentView(R.layout.activity_post);
-        toolbar = (Toolbar)findViewById(R.id.tool_bar);
-        txt_notpresent = (TextView) findViewById(R.id.txt_notpresent);
-        img_notpresent = (ImageView) findViewById(R.id.no_posts);
-        postList = (RecyclerView)findViewById(R.id.postList);
-        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
-        progressBar = (ProgressBar)findViewById(R.id.progressBarPost);
 
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(discussionname);
-        }
+        initViews();
 
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.GONE);
+        setUpToolBar();
 
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        setUpSwipeRefresh();
 
         // get posts from database
         getPostsFromDatabase();
 
+        sortPosts();
+
+        setUpRecyclerView();
+
+        //if there are no posts
+        if (mPosts.size() > 0) {
+            mTvPlaceHolder.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+        }
+
+        setUpProgressBar();
+
+        new LoadPostsTask(mDiscussionId, mToken, this).execute(); // refresh posts
+    }
+
+    private void getPostsFromDatabase()
+    {
+        mPosts = new Select().from(MoodlePost.class).where("discussionid = ?",mDiscussionId).execute();
+    }
+
+
+
+    private void initViews()
+    {
+        mToolBar = (Toolbar)findViewById(R.id.tool_bar);
+        mTvPlaceHolder = (TextView) findViewById(R.id.txt_notpresent);
+        mImgPlaceHolder = (ImageView) findViewById(R.id.no_posts);
+        mPostListView = (RecyclerView)findViewById(R.id.postList);
+        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
+        mProgressBar = (ProgressBar)findViewById(R.id.progressBarPost);
+
+    }
+
+    private void setUpToolBar()
+    {
+        setSupportActionBar(mToolBar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(mDiscussionName);
+        }
+    }
+
+    private void setUpSwipeRefresh()
+    {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+    }
+
+    private void setUpProgressBar()
+    {
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    private void setUpRecyclerView()
+    {
+        mPostListView.setLayoutManager(new LinearLayoutManager(this));
+        mPostListView.setHasFixedSize(true);
+        mPostListAdapter = new PostListAdapter(this, mPosts);
+        mPostListView.setAdapter(mPostListAdapter);
+    }
+
+    private void sortPosts()
+    {
         //Order posts by time created
-        Collections.sort(posts, new Comparator<MoodlePost>() {
+        Collections.sort(mPosts, new Comparator<MoodlePost>() {
             @Override
             public int compare(MoodlePost lhs, MoodlePost rhs) {
                 if (lhs.getCreated() > rhs.getCreated())
@@ -101,23 +160,6 @@ public class PostActivity  extends AppCompatActivity
                     return -1;
             }
         });
-
-        //if there are no posts
-        if (posts.size() > 0) {
-            txt_notpresent.setVisibility(View.GONE);
-            img_notpresent.setVisibility(View.GONE);
-        }
-
-        postList.setLayoutManager(new LinearLayoutManager(this));
-        padapter = new PostListAdapter(this, posts);
-        postList.setAdapter(padapter);
-
-        new LoadPostsTask(discussionid, token, this).execute(""); // refresh posts
-    }
-
-    private void getPostsFromDatabase()
-    {
-        posts = new Select().from(MoodlePost.class).where("discussionid = ?",discussionid).execute();
     }
 
     @Override
@@ -137,9 +179,26 @@ public class PostActivity  extends AppCompatActivity
         }
     }
 
+    private boolean isConnected() {
+        return ConnectUtils.isConnected(this);
+    }
 
-    private class LoadPostsTask extends AsyncTask<String, Integer, Boolean> {
-        PostSync psync;
+    private static boolean hasInternet()
+    {
+        boolean hasInternet;
+
+        try {
+            hasInternet = ConnectUtils.haveInternetConnectivity();
+        } catch(Exception e) {
+            hasInternet = false;
+        }
+
+        return  hasInternet;
+    }
+
+
+    private class LoadPostsTask extends AsyncTask<Void,Void, Boolean> {
+
         String discussionid;
         String token;
         Context context;
@@ -148,51 +207,50 @@ public class PostActivity  extends AppCompatActivity
             this.discussionid = discussionid;
             this.token = token;
             this.context = context;
-            psync = new PostSync(token);
+
         }
 
         @Override
         protected void onPreExecute() {
-            txt_notpresent.setVisibility(View.GONE);
-            img_notpresent.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
 
-            if (posts.size() == 0)
-                progressBar.setVisibility(View.VISIBLE);
+            if (mPosts.size() == 0) { // check if any news are present
+                mProgressBar.setVisibility(View.VISIBLE);
+                if (mSwipeRefreshLayout.isRefreshing())
+                    mProgressBar.setVisibility(View.GONE);
+            }
         }
 
         @Override
-        protected Boolean doInBackground(String... params) {
-            boolean sync = psync.syncPosts(discussionid); // syncs posts
-            if (sync) {
-                getPostsFromDatabase(); //gets the posts from database
+        protected Boolean doInBackground(Void... params) {
+            final PostSync psync = new PostSync(token);
 
-                //Order posts by time created
-                Collections.sort(posts,new Comparator<MoodlePost>() {
-                    @Override
-                    public int compare(MoodlePost lhs, MoodlePost rhs) {
-                        if (lhs.getCreated()>rhs.getCreated())
-                            return 1;
-                        else
-                            return -1;
-                    }
-                });
+            if (!isConnected()) {  // if there is no internet connection
+                return false;
             }
+
+            if (!hasInternet()) { // if there is no internet
+                return false;
+            }
+
+            boolean sync = psync.syncPosts(discussionid); // syncs posts
 
             return sync;
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
-            padapter.updatePosts(posts);
             mSwipeRefreshLayout.setRefreshing(false);
-            progressBar.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.GONE);
             if (result) {
-            } else {
-                if (posts.size() == 0) {
-                    txt_notpresent.setVisibility(View.VISIBLE);
-                    img_notpresent.setVisibility(View.VISIBLE);
-                } else
-                    Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
+                getPostsFromDatabase();
+                sortPosts();
+                mPostListAdapter.updatePosts(mPosts);
+            }
+            if (mPosts.size() == 0) {
+                mImgPlaceHolder.setVisibility(View.VISIBLE);
+                mTvPlaceHolder.setVisibility(View.VISIBLE);
             }
         }
 
@@ -200,13 +258,8 @@ public class PostActivity  extends AppCompatActivity
 
     @Override
     public void onRefresh() {
-        new LoadPostsTask(discussionid, token, this).execute(""); // refresh posts
+        new LoadPostsTask(mDiscussionId,mToken, this).execute(); // refresh posts
     }
 
-    private Toolbar toolbar;
-    private TextView txt_notpresent;
-    private ImageView img_notpresent;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ProgressBar progressBar;
-    private RecyclerView postList;
+
 }

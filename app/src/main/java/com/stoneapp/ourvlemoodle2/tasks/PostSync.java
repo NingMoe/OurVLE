@@ -63,7 +63,7 @@ public class PostSync {
 
         ActiveAndroid.beginTransaction();
         try {
-            deleteStaleData();
+          //  deleteStaleData();
             for (int i = 0; i < posts.size(); i++) {
                 final MoodlePost post = posts.get(i);
 
