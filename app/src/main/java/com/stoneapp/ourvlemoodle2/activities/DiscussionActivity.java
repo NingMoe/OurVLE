@@ -29,6 +29,7 @@ import com.stoneapp.ourvlemoodle2.adapters.DiscussionListAdapter;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.tasks.DiscussionSync;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -51,51 +52,90 @@ import android.widget.Toast;
 @SuppressWarnings("FieldCanBeLocal")
 public class DiscussionActivity extends AppCompatActivity
         implements OnRefreshListener {
-    private List<MoodleDiscussion> discussions;
-    private int forumid;
-    private DiscussionListAdapter discuss_adapter;
-    private String forumname;
-    private String token;
-    private ArrayList<String> forumids ;
+    private List<MoodleDiscussion> mDiscussions;
+    private int mForumId;
+    private DiscussionListAdapter mDiscussionListAdapter;
+    private String mForumName;
+    private String mToken;
+    private ArrayList<String> mForumIds ;
+    private RecyclerView mDiscussListView;
+    private Toolbar mToolBar;
+    private TextView mTvPlaceHolder;
+    private ImageView mImgPlaceHolder;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ProgressBar mProgressBar;
+    private ActionBar abar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundle extras = getIntent().getExtras();
-        forumid = extras.getInt("forumid");
-        forumname = extras.getString("forumname");
-        token = extras.getString("token");
+        mForumId = extras.getInt("forumid");
+        mForumName = extras.getString("forumname");
+        mToken = extras.getString("token");
 
         setContentView(R.layout.activity_discussions);
-        toolbar = (Toolbar)findViewById(R.id.tool_bar);
-        tv_notpresent = (TextView)findViewById(R.id.txt_notpresent);
-        img_notpresent = (ImageView)findViewById(R.id.no_topics);
-        progressBar = (ProgressBar)findViewById(R.id.progressBar1);
-        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
-        discussList = (RecyclerView)findViewById(R.id.discussionList);
 
-        setSupportActionBar(toolbar);
-        abar = getSupportActionBar();
-        if (abar != null) {
-            abar.setDisplayHomeAsUpEnabled(true);
-            abar.setTitle(forumname);
-        }
+        initViews();
 
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        setUpToolBar();
 
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.GONE);
+        setUpSwipeRefresh();
 
-        forumids = new ArrayList<>();
-        forumids.add(forumid + "");
-
+        initForumIds();
 
         getDiscussionsFromDatabase();
 
+        sortDiscussions();
 
-        Collections.sort(discussions, new Comparator<MoodleDiscussion>() {
+        setUpRecyclerView();
+
+        if (mDiscussions.size() > 0) { // if there are no discussions
+            mTvPlaceHolder.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+        }
+
+        setUpProgressBar();
+
+        new LoadDiscussionTask(mToken,mForumIds, this).execute(""); // refresh discussions
+    }
+
+
+    private void initViews()
+    {
+        mToolBar = (Toolbar)findViewById(R.id.tool_bar);
+        mTvPlaceHolder = (TextView)findViewById(R.id.txt_notpresent);
+        mImgPlaceHolder = (ImageView)findViewById(R.id.no_topics);
+        mProgressBar = (ProgressBar)findViewById(R.id.progressBar1);
+        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
+        mDiscussListView = (RecyclerView)findViewById(R.id.discussionList);
+    }
+
+    private void setUpSwipeRefresh()
+    {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+    }
+
+    private void setUpProgressBar()
+    {
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    private void setUpRecyclerView()
+    {
+        mDiscussListView.setHasFixedSize(true);
+        mDiscussListView.setLayoutManager(new LinearLayoutManager(this));
+        mDiscussionListAdapter = new DiscussionListAdapter(this,mDiscussions,mToken);
+        mDiscussListView.setAdapter(mDiscussionListAdapter);
+
+    }
+
+    private void sortDiscussions()
+    {
+        Collections.sort(mDiscussions, new Comparator<MoodleDiscussion>() {
             @Override
             public int compare(MoodleDiscussion moodleDiscussion1, MoodleDiscussion moodleDiscussion2) {
                 if (moodleDiscussion1.getTimemodified() < moodleDiscussion2.getTimemodified())
@@ -104,19 +144,26 @@ public class DiscussionActivity extends AppCompatActivity
                 return -1;
             }
         });
-
-        if (discussions.size() > 0) { // if there are no discussions
-            tv_notpresent.setVisibility(View.GONE);
-            img_notpresent.setVisibility(View.GONE);
-        }
-
-        discussList.setHasFixedSize(true);
-        discussList.setLayoutManager(new LinearLayoutManager(this));
-        discuss_adapter = new DiscussionListAdapter(this, discussions, token);
-        discussList.setAdapter(discuss_adapter);
-
-        new LoadDiscussionTask(token, forumids, this).execute(""); // refresh discussions
     }
+
+    private void setUpToolBar()
+    {
+        setSupportActionBar(mToolBar);
+        abar = getSupportActionBar();
+        if (abar != null) {
+            abar.setDisplayHomeAsUpEnabled(true);
+            abar.setTitle(mForumName);
+        }
+    }
+
+    private void initForumIds()
+    {
+        mForumIds = new ArrayList<>();
+        mForumIds.add(mForumId + "");
+    }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) { return super.onCreateOptionsMenu(menu); }
@@ -135,74 +182,85 @@ public class DiscussionActivity extends AppCompatActivity
 
     private void getDiscussionsFromDatabase()
     {
-        discussions = new Select().from(MoodleDiscussion.class).where("forumid = ?", forumid).execute();
+        mDiscussions = new Select().from(MoodleDiscussion.class).where("forumid = ?",mForumId).execute();
     }
+
+    private boolean isConnected() {
+        return ConnectUtils.isConnected(this);
+    }
+
+    private static boolean hasInternet()
+    {
+        boolean hasInternet;
+
+        try {
+            hasInternet = ConnectUtils.haveInternetConnectivity();
+        } catch(Exception e) {
+            hasInternet = false;
+        }
+
+        return  hasInternet;
+    }
+
+
 
     private class LoadDiscussionTask extends AsyncTask<String, Integer, Boolean> {
         ArrayList<String>forumids;
-        DiscussionSync dsync;
+
         private Context context;
-        private List<MoodleDiscussion> new_discussions;
 
         public LoadDiscussionTask(String token, ArrayList<String> forumids, Context context) {
             this.forumids = forumids;
-            dsync = new DiscussionSync(token,context);
             this.context = context;
         }
 
         @Override
         protected void onPreExecute() {
-            tv_notpresent.setVisibility(View.GONE);
-            img_notpresent.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
 
-            if (discussions.size() == 0) {
-                progressBar.setVisibility(View.VISIBLE);
+            if (mDiscussions.size() == 0) { // check if any news are present
+                mProgressBar.setVisibility(View.VISIBLE);
+                if (mSwipeRefreshLayout.isRefreshing())
+                    mProgressBar.setVisibility(View.GONE);
             }
         }
 
         @Override
         protected Boolean doInBackground(String... params) {
+            DiscussionSync dsync = new DiscussionSync(mToken,context);
+
+            if (!isConnected()) {  // if there is no internet connection
+                return false;
+            }
+
+            if (!hasInternet()) { // if there is no internet
+                return false;
+            }
+
             return dsync.syncDiscussions(forumids);
         }
 
         @Override
-        protected void onPostExecute(Boolean status) {
-            if(status) {
-                getDiscussionsFromDatabase();
-                //Order discussions by time modified
-                Collections.sort(discussions, new Comparator<MoodleDiscussion>() {
-                    @Override
-                    public int compare(MoodleDiscussion moodleDiscussion1, MoodleDiscussion moodleDiscussion2) {
-                        if (moodleDiscussion1.getTimemodified() < moodleDiscussion2.getTimemodified())
-                            return 1;
-
-                        return -1;
-                    }
-                });
-            } else {
-                if(discussions.size() == 0){ //if there are no discussions
-                    tv_notpresent.setVisibility(View.VISIBLE);
-                    img_notpresent.setVisibility(View.VISIBLE);
-                } else
-                    Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
-            }
-
+        protected void onPostExecute(Boolean result) {
             mSwipeRefreshLayout.setRefreshing(false);
-            discuss_adapter.updateDiscussionList(discussions); //update list view
-            progressBar.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.GONE);
+            if (result) {
+                getDiscussionsFromDatabase();
+                sortDiscussions();
+                mDiscussionListAdapter.updateDiscussionList(mDiscussions);
+            }
+            if (mDiscussions.size() == 0) {
+                mImgPlaceHolder.setVisibility(View.VISIBLE);
+                mTvPlaceHolder.setVisibility(View.VISIBLE);
+            }
         }
     }
 
     @Override
     public void onRefresh() {
-        new LoadDiscussionTask(token, forumids, this).execute(""); // refresh discussions
+        new LoadDiscussionTask(mToken,mForumIds, this).execute(""); // refresh discussions
     }
 
-    private RecyclerView discussList;
-    private Toolbar toolbar;
-    private TextView tv_notpresent;
-    private ImageView img_notpresent;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ProgressBar progressBar;
-    private ActionBar abar;
+
 }
