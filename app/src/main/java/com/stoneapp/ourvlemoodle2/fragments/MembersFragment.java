@@ -58,6 +58,7 @@ import com.stoneapp.ourvlemoodle2.tasks.MemberSync;
 import com.stoneapp.ourvlemoodle2.activities.ProfileActivity;
 
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import java.util.ArrayList;
@@ -68,12 +69,18 @@ import java.util.List;
 @SuppressWarnings("FieldCanBeLocal")
 public class MembersFragment extends Fragment
         implements SearchView.OnQueryTextListener {
-    private String courseid;
-    private String token;
-    private Context context;
-    private List<MoodleMember> members;
-    private MemberListAdapter madapter;
+    private String mCourseid;
+    private String mToken;
+    private Context mContext;
+    private List<MoodleMember> mMembers;
+    private MemberListAdapter mMeberListAdapter;
     private MenuItem searchitem;
+    private View mRootView;
+    private RecyclerView mMemberListView;
+    private ProgressBar mProgressBar;
+    private SearchView searchView;
+    private TextView mTvPlaceHolder;
+    private ImageView mImgPlaceHolder;
     private List<MoodleMember> filteredMemList;
 
     @Override
@@ -83,68 +90,87 @@ public class MembersFragment extends Fragment
         Bundle args = getArguments();
 
         if (args != null) {
-            this.courseid = args.getInt("courseid") + ""; // course id from previous activity
-            this.token = args.getString("token"); // url token
+            this.mCourseid = args.getInt("courseid") + ""; // course id from previous activity
+            this.mToken = args.getString("token"); // url token
         }
 
-        context = getActivity();
+        mContext = getActivity();
 
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.frag_member, container, false);
+        mRootView = inflater.inflate(R.layout.frag_member, container, false);
 
-        memberList = (RecyclerView) rootView.findViewById(R.id.member_listview);
-        txt_notpresent = (TextView) rootView.findViewById(R.id.txt_notpresent);
-        img_notpresent = (ImageView) rootView.findViewById(R.id.no_members);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarMember);
+        initViews();
 
-        memberList.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
-
-        //this.token = MoodleSiteInfo.listAll(MoodleSiteInfo.class).get(0).getToken();
 
         getMembersFromDatabase();
 
-        Collections.sort(members, new Comparator<MoodleMember>() {
+
+        sortMembers();
+
+
+        setUpRecyclerView();
+
+        if (mMembers.size() > 0) {
+            mTvPlaceHolder.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+        }
+
+        setUpProgressBar();
+
+        new LoadMembersTask(mContext,mCourseid,mToken).execute(""); // refresh member list
+
+        return mRootView;
+    }
+
+    private void getMembersFromDatabase()
+    {
+        mMembers = new Select().from(MoodleMember.class).where("courseid = ?", mCourseid).execute();
+    }
+
+    private void initViews()
+    {
+        mMemberListView = (RecyclerView) mRootView.findViewById(R.id.member_listview);
+        mTvPlaceHolder = (TextView) mRootView.findViewById(R.id.txt_notpresent);
+        mImgPlaceHolder = (ImageView) mRootView.findViewById(R.id.no_members);
+        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressBarMember);
+    }
+
+    private void setUpProgressBar()
+    {
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.setVisibility(View.GONE);
+
+    }
+
+    private void sortMembers()
+    {
+        Collections.sort(mMembers, new Comparator<MoodleMember>() {
             @Override
             public int compare(MoodleMember lhs, MoodleMember rhs) {
                 return lhs.getFullname().toLowerCase().trim().compareTo(rhs.getFullname().toLowerCase().trim());
             }
         });
-
-        if (members.size() > 0) {
-            txt_notpresent.setVisibility(View.GONE);
-            img_notpresent.setVisibility(View.GONE);
-        }
-
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.GONE);
-
-        madapter = new MemberListAdapter(context, members, token);
-        memberList.setAdapter(madapter);
-
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected())
-            new LoadMembersTask(context, courseid, token).execute(""); // refresh member list
-
-        return rootView;
     }
 
-    private void getMembersFromDatabase()
+    private void setUpRecyclerView()
     {
-        members = new Select().from(MoodleMember.class).where("courseid = ?", courseid).execute();
+        mMeberListAdapter = new MemberListAdapter(mContext, mMembers, mToken);
+        mMemberListView.setAdapter(mMeberListAdapter);
+        mMemberListView.setHasFixedSize(true);
+        mMemberListView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            SearchManager searchManager = (SearchManager) context.getSystemService(Context.SEARCH_SERVICE);
+            SearchManager searchManager = (SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE);
 
             searchitem = menu.findItem(R.id.action_search);
             searchView = (SearchView) MenuItemCompat.getActionView(searchitem); // set up search view
@@ -179,9 +205,9 @@ public class MembersFragment extends Fragment
 
     @Override
     public boolean onQueryTextChange(String query) {
-        final List<MoodleMember> filteredModelList = filter(members,query );
-        madapter.animateTo(filteredModelList,query);
-        memberList.scrollToPosition(0);
+        final List<MoodleMember> filteredModelList = filter(mMembers,query );
+        mMeberListAdapter.animateTo(filteredModelList,query);
+        mMemberListView.scrollToPosition(0);
         return true;
 
     }
@@ -202,69 +228,80 @@ public class MembersFragment extends Fragment
         return startModelList;
     }
 
+    private boolean isConnected() {
+        return ConnectUtils.isConnected(getActivity());
+    }
+
+    private static boolean hasInternet()
+    {
+        boolean hasInternet;
+
+        try {
+            hasInternet = ConnectUtils.haveInternetConnectivity();
+        } catch(Exception e) {
+            hasInternet = false;
+        }
+
+        return  hasInternet;
+    }
+
     private class LoadMembersTask extends AsyncTask<String, Integer, Boolean> {
         Context context;
         String courseid;
-        MemberSync msync;
+
 
         public LoadMembersTask(Context context, String courseid, String token) {
             this.context = context;
             this.courseid = courseid;
 
-            msync = new MemberSync(token);
+
         }
 
         @Override
         protected void onPreExecute() {
-            img_notpresent.setVisibility(View.GONE);
-            txt_notpresent.setVisibility(View.GONE);
+            mImgPlaceHolder.setVisibility(View.GONE);
+            mTvPlaceHolder.setVisibility(View.GONE);
 
-            if (members.size() == 0)
-                progressBar.setVisibility(View.VISIBLE);
-        }
+            if (mMembers.size() == 0) { // check if any news are present
+                mProgressBar.setVisibility(View.VISIBLE);
 
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            //madapter.notifyDataSetChanged();
-            madapter.updateMemberList(members);
-            progressBar.setVisibility(View.GONE);
-
-            if (aBoolean) {}
-            else
-                Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show();
-
-            if (members.size() == 0) {
-                txt_notpresent.setVisibility(View.VISIBLE);
-                img_notpresent.setVisibility(View.VISIBLE);
             }
         }
 
         @Override
         protected Boolean doInBackground(String... params) {
-            boolean sync = msync.syncMembers(courseid); //sync members
-            if (sync) {
-                getMembersFromDatabase();
-                // sorts members in order of firstname in ascending
-                Collections.sort(members, new Comparator<MoodleMember>() {
-                    @Override
-                    public int compare(MoodleMember lhs, MoodleMember rhs) {
-                        return lhs.getFullname().toLowerCase().trim().compareTo(rhs.getFullname().toLowerCase().trim());
-                    }
-                });
+            final MemberSync msync = new MemberSync(mToken);
 
-                filteredMemList = members; // updates filtered list
+            if (!isConnected()) {  // if there is no internet connection
+                return false;
             }
+
+            if (!hasInternet()) { // if there is no internet
+                return false;
+            }
+
+
+            boolean sync = msync.syncMembers(courseid); //sync members
 
             return sync;
         }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            mProgressBar.setVisibility(View.GONE);
+            if (result) {
+                getMembersFromDatabase();
+                sortMembers();
+                mMeberListAdapter.updateMemberList(mMembers);
+            }
+            if (mMembers.size() == 0) {
+                mImgPlaceHolder.setVisibility(View.VISIBLE);
+                mTvPlaceHolder.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
-    private View rootView;
-    private RecyclerView memberList;
-    private ProgressBar progressBar;
-    private SearchView searchView;
-    private TextView txt_notpresent;
-    private ImageView img_notpresent;
+
 
     public MembersFragment() {/* required empty constructor */}
 }
