@@ -183,7 +183,7 @@ public class CourseContentFragment extends Fragment
 
 
     private boolean isConnected() {
-        return ConnectUtils.isConnected(getActivity());
+        return ConnectUtils.isConnected(mRootView.getContext());
     }
 
     private static boolean hasInternet()
