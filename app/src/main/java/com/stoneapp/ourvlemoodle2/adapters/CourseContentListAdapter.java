@@ -79,23 +79,27 @@ public class CourseContentListAdapter
                 @Override
                 public void onClick(View v) {
                     int position = CourseContentViewHolder.this.getAdapterPosition();
+                    if(position>=0)
+                    {
+                        MoodleModule module = list_items.get(position).module;
+                        if (module == null)
+                            return;
 
-                    MoodleModule module = list_items.get(position).module;
-                    if (module == null)
-                        return;
+                        switch (module.getModname()) {
+                            case "label": /* do nothing */
+                                break;
 
-                    switch (module.getModname()) {
-                        case "label": /* do nothing */
-                            break;
+                            case "resource":
+                                downloadResource(module);
+                                break;
 
-                        case "resource":
-                            downloadResource(module);
-                            break;
-
-                        default:
-                            openWebpage(module);
-                            break;
+                            default:
+                                openWebpage(module);
+                                break;
+                        }
                     }
+
+
                 }
             });
 
@@ -184,7 +188,7 @@ public class CourseContentListAdapter
 
     public CourseContentListAdapter(Context context, List<ContentListItem> list_items, String token,
                                     long courseid, String coursename, CourseContentFragment cfrag) {
-        CourseContentListAdapter.list_items = list_items;
+        CourseContentListAdapter.list_items = new ArrayList<>(list_items);
         CourseContentListAdapter.context = context;
         CourseContentListAdapter.token = token;
         CourseContentListAdapter.courseid = courseid;

@@ -94,7 +94,7 @@ public class MembersFragment extends Fragment
             this.mToken = args.getString("token"); // url token
         }
 
-        mContext = getActivity();
+       // mContext = getActivity();
 
         setHasOptionsMenu(true);
     }
@@ -102,6 +102,8 @@ public class MembersFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.frag_member, container, false);
+
+        mContext = mRootView.getContext();
 
         initViews();
 

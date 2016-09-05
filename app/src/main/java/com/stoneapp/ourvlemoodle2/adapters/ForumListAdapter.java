@@ -76,14 +76,18 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
             @Override
             public void onClick(View v) {
                 int position = forumViewHolder.getAdapterPosition();
-                MoodleForum forum = forums.get(position);
-                String forumname = forum.getName();
-                String forumid = forum.getForumid() + "";
-                Intent intent = new Intent(ctxt, DiscussionActivity.class);
-                intent.putExtra("forumid", forums.get(position).getForumid());
-                intent.putExtra("forumname", forums.get(position).getName());
-                intent.putExtra("token", token);
-                ctxt.startActivity(intent);
+                if(position>=0)
+                {
+                    MoodleForum forum = forums.get(position);
+                    String forumname = forum.getName();
+                    String forumid = forum.getForumid() + "";
+                    Intent intent = new Intent(ctxt, DiscussionActivity.class);
+                    intent.putExtra("forumid", forums.get(position).getForumid());
+                    intent.putExtra("forumname", forums.get(position).getName());
+                    intent.putExtra("token", token);
+                    ctxt.startActivity(intent);
+                }
+
             }
         });
         return forumViewHolder;

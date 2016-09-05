@@ -206,7 +206,7 @@ public class CourseContentFragment extends Fragment
         super.onCreateOptionsMenu(menu, inflater);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-             Context context = getActivity();
+            Context context = mRootView.getContext();
             SearchManager searchManager = (SearchManager) context.getSystemService(Context.SEARCH_SERVICE);
 
             searchitem = menu.findItem(R.id.action_search);

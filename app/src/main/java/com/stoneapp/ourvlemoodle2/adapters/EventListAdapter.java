@@ -95,42 +95,46 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
 
     @Override
     public void onBindViewHolder(EventViewHolder eventViewHolder, int position) {
-        final MoodleEvent event  = events.get(position);
+        if(position>=0)
+        {
+            final MoodleEvent event  = events.get(position);
 
-        String eventname = event.getName();
+            String eventname = event.getName();
 
-        if (!TextUtils.isEmpty(eventname))
-            eventViewHolder.getEventNameView().setText(eventname);
+            if (!TextUtils.isEmpty(eventname))
+                eventViewHolder.getEventNameView().setText(eventname);
 
-        String eventdesc = event.getDescription();
-        if (!TextUtils.isEmpty(eventdesc))
-            eventViewHolder.getEventDescView().setText(Html.fromHtml(eventdesc).toString().trim()); //convert html to string
+            String eventdesc = event.getDescription();
+            if (!TextUtils.isEmpty(eventdesc))
+                eventViewHolder.getEventDescView().setText(Html.fromHtml(eventdesc).toString().trim()); //convert html to string
 
-        if(!TextUtils.isEmpty(event.getCoursename()))
-            eventViewHolder.getEventCourseView().setText(event.getCoursename());
+            if(!TextUtils.isEmpty(event.getCoursename()))
+                eventViewHolder.getEventCourseView().setText(event.getCoursename());
 
-        final int eventdate = event.getTimestart();
+            final int eventdate = event.getTimestart();
 
-        Calendar cal = Calendar.getInstance();   //instantiates a new calendar instance
-        cal.setTimeInMillis((long)eventdate * 1000); //sets the time of the calendar to the event date
-        Calendar cal_now = Calendar.getInstance();
-        cal_now.setTimeInMillis(System.currentTimeMillis()); //sets time of calendar to current date
-        int day_now = cal_now.get(Calendar.DAY_OF_MONTH); //get the current day
-        final int day_date = cal.get(Calendar.DAY_OF_MONTH); //get the event date day
+            Calendar cal = Calendar.getInstance();   //instantiates a new calendar instance
+            cal.setTimeInMillis((long)eventdate * 1000); //sets the time of the calendar to the event date
+            Calendar cal_now = Calendar.getInstance();
+            cal_now.setTimeInMillis(System.currentTimeMillis()); //sets time of calendar to current date
+            int day_now = cal_now.get(Calendar.DAY_OF_MONTH); //get the current day
+            final int day_date = cal.get(Calendar.DAY_OF_MONTH); //get the event date day
 
-        int event_month = cal.get(Calendar.MONTH);
-        int now_month = cal_now.get(Calendar.MONTH);
+            int event_month = cal.get(Calendar.MONTH);
+            int now_month = cal_now.get(Calendar.MONTH);
 
-        int event_year = cal.get(Calendar.YEAR);
-        int now_year = cal.get(Calendar.YEAR);
+            int event_year = cal.get(Calendar.YEAR);
+            int now_year = cal.get(Calendar.YEAR);
 
-        final int month = cal.get(Calendar.MONTH);
-        if (day_now == day_date && event_month== now_month && event_year == now_year) //if the event date is the current date
-            eventViewHolder.getEventDateView().setTextColor(Color.RED);
-        else
-            eventViewHolder.getEventDateView().setTextColor(Color.BLACK);
+            final int month = cal.get(Calendar.MONTH);
+            if (day_now == day_date && event_month== now_month && event_year == now_year) //if the event date is the current date
+                eventViewHolder.getEventDateView().setTextColor(Color.RED);
+            else
+                eventViewHolder.getEventDateView().setTextColor(Color.BLACK);
 
-        eventViewHolder.getEventDateView().setText(TimeUtils.getTime(eventdate));
+            eventViewHolder.getEventDateView().setText(TimeUtils.getTime(eventdate));
+        }
+
     }
 
     @Override

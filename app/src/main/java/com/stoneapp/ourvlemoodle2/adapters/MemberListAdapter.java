@@ -57,16 +57,21 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MoodleMember member = mDataSet.get(MemberViewHolder.this.getAdapterPosition());
+                    int pos = MemberViewHolder.this.getAdapterPosition();
+                    if(pos>=0)
+                    {
+                        MoodleMember member = mDataSet.get(pos);
 
-                    Intent intent = new Intent(v.getContext(), ProfileActivity.class);
-                    intent.putExtra("username", member.getFullname());
-                    intent.putExtra("email", member.getEmail());
-                    intent.putExtra("description", member.getDescription());
-                    intent.putExtra("memberid", member.getMemberid());
-                    intent.putExtra("token", token);
+                        Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+                        intent.putExtra("username", member.getFullname());
+                        intent.putExtra("email", member.getEmail());
+                        intent.putExtra("description", member.getDescription());
+                        intent.putExtra("memberid", member.getMemberid());
+                        intent.putExtra("token", token);
 
-                    v.getContext().startActivity(intent);
+                        v.getContext().startActivity(intent);
+                    }
+
                 }
             });
 

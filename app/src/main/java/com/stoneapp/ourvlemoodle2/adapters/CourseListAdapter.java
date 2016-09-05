@@ -62,16 +62,20 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
                 public void onClick(View v) {
                     int pos = CourseViewHolder.this.getAdapterPosition();
 
-                    Intent intent = new Intent(v.getContext(), CourseViewActivity.class);
+                    if(pos>=0)
+                    {
+                        Intent intent = new Intent(v.getContext(), CourseViewActivity.class);
 
-                    intent.putExtra("coursename", courses.get(pos).getShortname());
-                    intent.putExtra("coursefname", courses.get(pos).getFullname());
-                    intent.putExtra("courseid", courses.get(pos).getCourseid());
-                    intent.putExtra("coursepid", courses.get(pos).getId());
-                    intent.putExtra("token", token);
-                    intent.putExtra("siteid", siteid);
+                        intent.putExtra("coursename", courses.get(pos).getShortname());
+                        intent.putExtra("coursefname", courses.get(pos).getFullname());
+                        intent.putExtra("courseid", courses.get(pos).getCourseid());
+                        intent.putExtra("coursepid", courses.get(pos).getId());
+                        intent.putExtra("token", token);
+                        intent.putExtra("siteid", siteid);
 
-                    v.getContext().startActivity(intent);
+                        v.getContext().startActivity(intent);
+                    }
+
                 }
             });
 

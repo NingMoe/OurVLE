@@ -39,6 +39,7 @@ import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.models.MoodlePost;
 import com.stoneapp.ourvlemoodle2.util.TimeUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostListViewHolder> {
@@ -84,7 +85,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
     }
 
     public PostListAdapter(Context context, List<MoodlePost> postList) {
-        this.postList = postList;
+        this.postList = new ArrayList<>(postList);
         this.context = context;
     }
 
@@ -99,63 +100,68 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
     @Override
     public void onBindViewHolder(PostListViewHolder holder, int position) {
 
-        MoodlePost post = postList.get(position);
+        if(position>=0)
+        {
+            MoodlePost post = postList.get(position);
 
-        String subject = post.getSubject();
-        if (!TextUtils.isEmpty(subject))
-            holder.getSubjectView().setText(subject);
+            String subject = post.getSubject();
+            if (!TextUtils.isEmpty(subject))
+                holder.getSubjectView().setText(subject);
 
 
-        String username = post.getUserfullname();
-        if (!TextUtils.isEmpty(username))
-            holder.getUserNameView().setText(username);
+            String username = post.getUserfullname();
+            if (!TextUtils.isEmpty(username))
+                holder.getUserNameView().setText(username);
 
-        String message = post.getMessage();
-        if (!TextUtils.isEmpty(message))
-            holder.getMessageView().setText(message);
+            String message = post.getMessage();
+            if (!TextUtils.isEmpty(message))
+                holder.getMessageView().setText(message);
 
-        //Extracts image from string to show in text view
-        CharSequence format_message = Html.fromHtml(message, new Html.ImageGetter() {
-            @Override
-            public Drawable getDrawable(String source) {
-                try {
-                    //InputStream is = (InputStream) new URL(source).getContent();
-                    //Drawable d = Drawable.createFromStream(is, "sc name");
-                    //d.setBounds(0,0,50,50);
-                    //return d;
-                    Drawable drawFromPath;
-                    int path =
-                            context.getResources().getIdentifier(source, "drawable",
-                                    context.getPackageName());
-                    drawFromPath = ContextCompat.getDrawable(context, path);
-                    drawFromPath.setBounds(0, 0, drawFromPath.getIntrinsicWidth(),
-                            drawFromPath.getIntrinsicHeight());
-                    return drawFromPath;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+            //Extracts image from string to show in text view
+            CharSequence format_message = Html.fromHtml(message, new Html.ImageGetter() {
+                @Override
+                public Drawable getDrawable(String source) {
+                    try {
+                        //InputStream is = (InputStream) new URL(source).getContent();
+                        //Drawable d = Drawable.createFromStream(is, "sc name");
+                        //d.setBounds(0,0,50,50);
+                        //return d;
+                        Drawable drawFromPath;
+                        int path =
+                                context.getResources().getIdentifier(source, "drawable",
+                                        context.getPackageName());
+                        drawFromPath = ContextCompat.getDrawable(context, path);
+                        drawFromPath.setBounds(0, 0, drawFromPath.getIntrinsicWidth(),
+                                drawFromPath.getIntrinsicHeight());
+                        return drawFromPath;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
                 }
-            }
-        }, null);
+            }, null);
 
-        if (!TextUtils.isEmpty(message))
-            holder.getMessageView().setText(format_message);
+            if (!TextUtils.isEmpty(message))
+                holder.getMessageView().setText(format_message);
 
-        int time = post.getModified();
-        holder.getPostTimeView().setText(TimeUtils.getTime(time));
+            int time = post.getModified();
+            holder.getPostTimeView().setText(TimeUtils.getTime(time));
 
-        char firstLetter = username.toUpperCase().charAt(0);
-        ColorGenerator generator = ColorGenerator.MATERIAL;
-        int color2 = generator.getColor(username);
-        TextDrawable drawable2 = TextDrawable.builder()
-                .beginConfig()
-                .textColor(Color.WHITE)
-                .useFont(Typeface.DEFAULT)
-                .toUpperCase()
-                .endConfig()
-                .buildRound(firstLetter + "", color2);
+            char firstLetter = username.toUpperCase().charAt(0);
+            ColorGenerator generator = ColorGenerator.MATERIAL;
+            int color2 = generator.getColor(username);
+            TextDrawable drawable2 = TextDrawable.builder()
+                    .beginConfig()
+                    .textColor(Color.WHITE)
+                    .useFont(Typeface.DEFAULT)
+                    .toUpperCase()
+                    .endConfig()
+                    .buildRound(firstLetter + "", color2);
 
-        holder.getPostImageView().setImageDrawable(drawable2);
+            holder.getPostImageView().setImageDrawable(drawable2);
+        }
+
+
     }
 
     @Override
@@ -164,7 +170,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
     }
 
     public void updatePosts(List<MoodlePost> newPosts) {
-        postList = newPosts;
+        postList = new ArrayList<>(newPosts);
         notifyDataSetChanged();
     }
 }

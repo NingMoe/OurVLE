@@ -43,6 +43,7 @@ import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAdapter.DiscussionViewHolder> {
@@ -114,7 +115,7 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
 
     public DiscussionListAdapter(Context context, List<MoodleDiscussion> discussionList, String token){
         this.context = context;
-        this.discussionList = discussionList;
+        this.discussionList = new ArrayList<>(discussionList);
         this.token = token;
     }
 
@@ -128,6 +129,7 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
 
     @Override
     public void onBindViewHolder(DiscussionViewHolder holder, int position) {
+
         final MoodleDiscussion discussion = discussionList.get(position);
 
         String topic_name = discussion.getName();
@@ -166,7 +168,7 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
     }
 
     public void updateDiscussionList(List<MoodleDiscussion> newDiscussions) {
-        this.discussionList = newDiscussions;
+        this.discussionList = new ArrayList<>(newDiscussions);
         notifyDataSetChanged();
     }
 }
