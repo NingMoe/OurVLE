@@ -20,7 +20,7 @@
 package com.stoneapp.ourvlemoodle2.models;
 
 public class ContentListItem {
-    public MoodleSection section;
-    public MoodleModule module;
+    public Section section;
+    public Module module;
     public int type;
 }

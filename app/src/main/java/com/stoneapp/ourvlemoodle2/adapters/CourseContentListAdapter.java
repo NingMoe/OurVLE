@@ -41,9 +41,8 @@ import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.activities.BrowserActivity;
 import com.stoneapp.ourvlemoodle2.fragments.CourseContentFragment;
 import com.stoneapp.ourvlemoodle2.models.ContentListItem;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleModule;
-import com.stoneapp.ourvlemoodle2.models.MoodleModuleContent;
+import com.stoneapp.ourvlemoodle2.models.Module;
+import com.stoneapp.ourvlemoodle2.models.ModuleContent;
 import com.stoneapp.ourvlemoodle2.util.FileUtils;
 import com.stoneapp.ourvlemoodle2.util.ImageChooser;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
@@ -81,7 +80,7 @@ public class CourseContentListAdapter
                     int position = CourseContentViewHolder.this.getAdapterPosition();
                     if(position>=0)
                     {
-                        MoodleModule module = list_items.get(position).module;
+                        Module module = list_items.get(position).module;
                         if (module == null)
                             return;
 
@@ -125,7 +124,7 @@ public class CourseContentListAdapter
             return modimage;
         }
 
-        private static void openWebpage(MoodleModule module) {
+        private static void openWebpage(Module module) {
             String url = module.getUrl();
             if (TextUtils.isEmpty(url))
                 // course container webpage
@@ -150,7 +149,7 @@ public class CourseContentListAdapter
             context.startActivity(intent);
         }
 
-        private static void downloadResource(MoodleModule module) {
+        private static void downloadResource(Module module) {
             if (module.getContents() == null) {
                 openWebpage(module);
                 return;
@@ -164,7 +163,7 @@ public class CourseContentListAdapter
             if (ContextCompat.checkSelfPermission(context,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
-                MoodleModuleContent content = module.getContents().get(0); // gets the content/file
+                ModuleContent content = module.getContents().get(0); // gets the content/file
                 String file_path = "/" + coursename + "/"; // place file in course folder
                 String filename = content.getFilename().replace("#", ""); // to fix file opening issues
                 file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")

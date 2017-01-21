@@ -24,12 +24,13 @@ import java.util.List;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
-public class MoodleModule extends Model {
+@Table(name="Module")
+public class Module extends Model {
 
     @Column(name="moduleid")
     @SerializedName("id")
@@ -71,7 +72,7 @@ public class MoodleModule extends Model {
 
     @Ignore
     @SerializedName("contents")
-    ArrayList<MoodleModuleContent> contents;
+    ArrayList<ModuleContent> contents;
 
     // Relational parameters
     @Column(name="parentid")
@@ -85,6 +86,11 @@ public class MoodleModule extends Model {
 
     @Column(name="siteid")
     Long siteid;
+
+    public Module()
+    {
+        super();
+    }
 
     /**
      * module or activity id
@@ -190,7 +196,7 @@ public class MoodleModule extends Model {
      *
      * @return
      */
-    public ArrayList<MoodleModuleContent> getContents() {
+    public ArrayList<ModuleContent> getContents() {
         return contents;
     }
 
@@ -200,8 +206,8 @@ public class MoodleModule extends Model {
      *
      * @return
      */
-    public void setContents(List<MoodleModuleContent> contents) {
-        this.contents = new ArrayList<MoodleModuleContent>(contents);
+    public void setContents(List<ModuleContent> contents) {
+        this.contents = new ArrayList<ModuleContent>(contents);
     }
 
     /**
@@ -282,23 +288,23 @@ public class MoodleModule extends Model {
     }
 
 
-    public static MoodleModule findOrCreateFromJson(MoodleModule new_module) {
+    public static Module findOrCreateFromJson(Module new_module) {
         int moduleid = new_module.getModuleid();
-        MoodleModule existingModule =
-                new Select().from(MoodleModule.class).where("moduleid = ?", moduleid).executeSingle();
+        Module existingModule =
+                new Select().from(Module.class).where("moduleid = ?", moduleid).executeSingle();
         if (existingModule != null) {
             // found and return existing
           //  UpdateModule(existingModule,new_module);
             return existingModule;
         } else {
             // create and return new user
-            MoodleModule module = new_module;
+            Module module = new_module;
             module.save();
             return module;
         }
     }
 
-    private static void UpdateModule(MoodleModule old_module,MoodleModule new_module)
+    private static void UpdateModule(Module old_module, Module new_module)
     {
         old_module = new_module;
         old_module.save();

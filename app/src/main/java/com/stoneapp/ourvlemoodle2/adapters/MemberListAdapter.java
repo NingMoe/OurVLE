@@ -34,14 +34,14 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.activities.ProfileActivity;
-import com.stoneapp.ourvlemoodle2.models.MoodleMember;
+import com.stoneapp.ourvlemoodle2.models.Member;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.MemberViewHolder> {
-    private List<MoodleMember> memberList;
+    private List<Member> memberList;
     private Context context;
     private String token;
     private String filter = "";
@@ -50,7 +50,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
         private final TextView name;
         private final ImageView memberpic;
 
-        public MemberViewHolder(View v, final Context context, final List<MoodleMember> mDataSet,
+        public MemberViewHolder(View v, final Context context, final List<Member> mDataSet,
                                 final String token) {
             super(v);
 
@@ -60,7 +60,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
                     int pos = MemberViewHolder.this.getAdapterPosition();
                     if(pos>=0)
                     {
-                        MoodleMember member = mDataSet.get(pos);
+                        Member member = mDataSet.get(pos);
 
                         Intent intent = new Intent(v.getContext(), ProfileActivity.class);
                         intent.putExtra("username", member.getFullname());
@@ -88,7 +88,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
         }
     }
 
-    public MemberListAdapter(Context context, List<MoodleMember> memberList, String token) {
+    public MemberListAdapter(Context context, List<Member> memberList, String token) {
         this.memberList = new ArrayList<>(memberList);
         this.context = context;
         this.token = token;
@@ -130,39 +130,39 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
         return memberList.size();
     }
 
-    public void updateMemberList(List<MoodleMember> memberList){
+    public void updateMemberList(List<Member> memberList){
         this.memberList = new ArrayList<>(memberList);
         notifyDataSetChanged();
     }
 
-    public void animateTo(List<MoodleMember> models, String filter) {
+    public void animateTo(List<Member> models, String filter) {
         applyAndAnimateRemovals(models);
         applyAndAnimateAdditions(models);
         applyAndAnimateMovedItems(models);
         this.filter = filter;
     }
 
-    private void applyAndAnimateRemovals(List<MoodleMember> newModels) {
+    private void applyAndAnimateRemovals(List<Member> newModels) {
         for (int i = memberList.size() - 1; i >= 0; i--) {
-            final MoodleMember model = memberList.get(i);
+            final Member model = memberList.get(i);
             if (!newModels.contains(model)) {
                 removeItem(i);
             }
         }
     }
 
-    private void applyAndAnimateAdditions(List<MoodleMember> newModels) {
+    private void applyAndAnimateAdditions(List<Member> newModels) {
         for (int i = 0, count = newModels.size(); i < count; i++) {
-            final MoodleMember model = newModels.get(i);
+            final Member model = newModels.get(i);
             if (!memberList.contains(model)) {
                 addItem(i, model);
             }
         }
     }
 
-    private void applyAndAnimateMovedItems(List<MoodleMember> newModels) {
+    private void applyAndAnimateMovedItems(List<Member> newModels) {
         for (int toPosition = newModels.size() - 1; toPosition >= 0; toPosition--) {
-            final MoodleMember model = newModels.get(toPosition);
+            final Member model = newModels.get(toPosition);
             final int fromPosition = memberList.indexOf(model);
             if (fromPosition >= 0 && fromPosition != toPosition) {
                 moveItem(fromPosition, toPosition);
@@ -170,19 +170,19 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
         }
     }
 
-    public MoodleMember removeItem(int position) {
-        final MoodleMember model = memberList.remove(position);
+    public Member removeItem(int position) {
+        final Member model = memberList.remove(position);
         notifyItemRemoved(position);
         return model;
     }
 
-    public void addItem(int pos, MoodleMember model) {
+    public void addItem(int pos, Member model) {
         memberList.add(pos, model);
         notifyItemInserted(pos);
     }
 
     public void moveItem(int fromPos, int toPos) {
-        final MoodleMember model = memberList.remove(fromPos);
+        final Member model = memberList.remove(fromPos);
         memberList.add(toPos, model);
         notifyItemMoved(fromPos, toPos);
     }

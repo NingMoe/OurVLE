@@ -25,7 +25,7 @@ import com.stoneapp.ourvlemoodle2.activities.settings.SettingsActivity;
 import com.stoneapp.ourvlemoodle2.fragments.CalendarFragment;
 import com.stoneapp.ourvlemoodle2.fragments.CourseListFragment;
 import com.stoneapp.ourvlemoodle2.fragments.NewsFragment;
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
 import com.stoneapp.ourvlemoodle2.R;
 
 import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         // hours in seconds
         final long SYNC_INTERVAL = SettingsUtils.getSyncInterval(context) * 60L * 60L;
 
-        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        List<SiteInfo> sites = new Select().all().from(SiteInfo.class).execute();
         String accountName = sites.get(0).getUsername();
 
         if (TextUtils.isEmpty(accountName))

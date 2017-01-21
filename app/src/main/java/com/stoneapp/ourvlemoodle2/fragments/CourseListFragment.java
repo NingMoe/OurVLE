@@ -20,29 +20,23 @@
 package com.stoneapp.ourvlemoodle2.fragments;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.CourseListAdapter;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
-import com.stoneapp.ourvlemoodle2.tasks.CourseSync;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
+import com.stoneapp.ourvlemoodle2.sync.CourseSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
-import com.stoneapp.ourvlemoodle2.view.DividerItemDecoration;
 import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import java.util.List;
@@ -50,7 +44,7 @@ import java.util.List;
 @SuppressWarnings("FieldCanBeLocal")
 public class CourseListFragment extends Fragment
          {
-    private List<MoodleCourse> mCourses ;
+    private List<Course> mCourses ;
     private String mToken;
     private int mUserid;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -58,7 +52,7 @@ public class CourseListFragment extends Fragment
     private RecyclerView mCourseListView;
     private View mRootView;
     private long mSiteId;
-    private List<MoodleSiteInfo> mSites;
+    private List<SiteInfo> mSites;
 
     @Nullable
     @Override
@@ -66,7 +60,7 @@ public class CourseListFragment extends Fragment
                                 Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.frag_course_list, container, false);
 
-        mSites = new Select().all().from(MoodleSiteInfo.class).execute(); // the moodle site info from database
+        mSites = new Select().all().from(SiteInfo.class).execute(); // the moodle site info from database
 
         initViews();
 
@@ -93,7 +87,7 @@ public class CourseListFragment extends Fragment
 
     private void getCoursesFromDatabase()
     {
-        mCourses = new Select().all().from(MoodleCourse.class).execute();
+        mCourses = new Select().all().from(Course.class).execute();
     }
 
     private void initViews()

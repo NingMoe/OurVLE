@@ -22,12 +22,13 @@ package com.stoneapp.ourvlemoodle2.models;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
-public class MoodleForum extends Model{
+@Table(name="Forum")
+public class Forum extends Model{
 
 
     @Column(name="forumid")
@@ -124,6 +125,11 @@ public class MoodleForum extends Model{
 
     long siteid;
     String coursename;
+
+    public Forum()
+    {
+        super();
+    }
 
     public int getForumid() {
         return forumid;
@@ -358,23 +364,23 @@ public class MoodleForum extends Model{
     }
 
 
-    public static MoodleForum findOrCreateFromJson(MoodleForum new_forum) {
+    public static Forum findOrCreateFromJson(Forum new_forum) {
         int forumid = new_forum.getForumid();
-        MoodleForum existingForum =
-                new Select().from(MoodleForum.class).where("forumid = ?", forumid).executeSingle();
+        Forum existingForum =
+                new Select().from(Forum.class).where("forumid = ?", forumid).executeSingle();
         if (existingForum != null) {
             // found and return existing
             UpdateForum(existingForum,new_forum);
             return existingForum;
         } else {
             // create and return new user
-            MoodleForum forum = new_forum;
+            Forum forum = new_forum;
             forum.save();
             return forum;
         }
     }
 
-    private static void UpdateForum(MoodleForum old_forum,MoodleForum new_forum)
+    private static void UpdateForum(Forum old_forum, Forum new_forum)
     {
         old_forum.setCoursename(new_forum.getCoursename());
         old_forum.setIntro(new_forum.getIntro());

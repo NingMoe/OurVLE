@@ -19,17 +19,14 @@
 
 package com.stoneapp.ourvlemoodle2.models;
 
-import android.graphics.PorterDuff;
-
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 
-@Table(name="MoodleEvent")
-public class MoodleEvent extends Model{
+@Table(name="Event")
+public class Event extends Model{
 
     @Column(name="eventid")
     @SerializedName("id")
@@ -92,6 +89,11 @@ public class MoodleEvent extends Model{
     int subscriptionid;
 
     String coursename;
+
+    public Event()
+    {
+        super();
+    }
 
     public void setCoursename(String coursename) {
         this.coursename = coursename;
@@ -174,23 +176,23 @@ public class MoodleEvent extends Model{
         return subscriptionid;
     }
 
-    public static MoodleEvent findOrCreateFromJson(MoodleEvent new_event) {
+    public static Event findOrCreateFromJson(Event new_event) {
         int eventid = new_event.getEventid();
-        MoodleEvent existingEvent =
-                new Select().from(MoodleEvent.class).where("eventid = ?", eventid).executeSingle();
+        Event existingEvent =
+                new Select().from(Event.class).where("eventid = ?", eventid).executeSingle();
         if (existingEvent != null) {
             // found and return existing
            // UpdateEvent(existingEvent,new_event);
             return existingEvent;
         } else {
             // create and return new user
-            MoodleEvent event = new_event;
+            Event event = new_event;
             event.save();
             return event;
         }
     }
 
-    private static void UpdateEvent(MoodleEvent old_event,MoodleEvent new_event)
+    private static void UpdateEvent(Event old_event, Event new_event)
     {
         old_event = new_event;
         old_event.save();

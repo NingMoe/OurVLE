@@ -19,7 +19,7 @@
 
 package com.stoneapp.ourvlemoodle2.models;
 
-public class MoodleToken {
+public class Token {
 
     String token;
 

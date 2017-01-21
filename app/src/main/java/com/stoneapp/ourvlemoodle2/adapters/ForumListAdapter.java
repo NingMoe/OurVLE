@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -36,9 +35,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.activities.DiscussionActivity;
-import com.stoneapp.ourvlemoodle2.models.MoodleForum;
-
-import org.w3c.dom.Text;
+import com.stoneapp.ourvlemoodle2.models.Forum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +56,10 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
     }
 
     Context ctxt;
-    List<MoodleForum> forums;
+    List<Forum> forums;
     String token;
 
-    public ForumListAdapter(Context ctxt, List<MoodleForum> forums, String token) {
+    public ForumListAdapter(Context ctxt, List<Forum> forums, String token) {
         this.ctxt = ctxt;
         this.forums = new ArrayList<>(forums);
         this.token = token;
@@ -78,7 +75,7 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
                 int position = forumViewHolder.getAdapterPosition();
                 if(position>=0)
                 {
-                    MoodleForum forum = forums.get(position);
+                    Forum forum = forums.get(position);
                     String forumname = forum.getName();
                     String forumid = forum.getForumid() + "";
                     Intent intent = new Intent(ctxt, DiscussionActivity.class);
@@ -95,7 +92,7 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
 
     @Override
     public void onBindViewHolder(ForumViewHolder holder, int position) {
-        final MoodleForum forum = forums.get(position);
+        final Forum forum = forums.get(position);
 
         if (forum.getName() == null)
             holder.forum_name.setText("");
@@ -122,7 +119,7 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
         holder.forum_img.setImageDrawable(drawable2);
     }
 
-    public void updateForumList(List<MoodleForum> newForums) {
+    public void updateForumList(List<Forum> newForums) {
         this.forums = new ArrayList<>(newForums);
         notifyDataSetChanged();
     }

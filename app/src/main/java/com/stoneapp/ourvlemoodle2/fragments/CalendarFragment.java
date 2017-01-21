@@ -20,14 +20,11 @@
 package com.stoneapp.ourvlemoodle2.fragments;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,14 +32,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.EventListAdapter;
-import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
-import com.stoneapp.ourvlemoodle2.tasks.EventSync;
+import com.stoneapp.ourvlemoodle2.models.Event;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
+import com.stoneapp.ourvlemoodle2.sync.EventSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
@@ -54,8 +50,8 @@ import java.util.List;
 public class CalendarFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener {
 
-    private List<MoodleEvent> mEvents = new ArrayList<>();
-    private List<MoodleCourse> mCourses;
+    private List<Event> mEvents = new ArrayList<>();
+    private List<Course> mCourses;
     private EventListAdapter mEventListAdapter;
     private List<String> mCourseids = new ArrayList<>();
     private String mToken;
@@ -85,8 +81,8 @@ public class CalendarFragment extends Fragment
             mImgPlaceHolder.setVisibility(View.GONE);
         }
 
-        mCourses = new Select().all().from(MoodleCourse.class).execute();
-        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        mCourses = new Select().all().from(Course.class).execute();
+        List<SiteInfo> sites = new Select().all().from(SiteInfo.class).execute();
         mToken = sites.get(0).getToken(); // url token
 
         initCourseIds();
@@ -140,7 +136,7 @@ public class CalendarFragment extends Fragment
 
     private void getEventsFromDatabase()
     {
-        mEvents = new Select().all().from(MoodleEvent.class).execute();
+        mEvents = new Select().all().from(Event.class).execute();
     }
 
     private boolean isConnected() {

@@ -17,21 +17,21 @@
  * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.stoneapp.ourvlemoodle2.tasks;
+package com.stoneapp.ourvlemoodle2.sync;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
-import com.stoneapp.ourvlemoodle2.models.MoodleForum;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.rest.MoodleRestForum;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.models.Forum;
+import com.stoneapp.ourvlemoodle2.rest.RestForum;
 
 public class ForumSync {
 
     private String token; //url token
-    List<MoodleForum> forums;
+    List<Forum> forums;
 
     public ForumSync(String token){
         this.token = token;
@@ -39,7 +39,7 @@ public class ForumSync {
 
     public boolean syncForums(ArrayList<String> courseids){
 
-        MoodleRestForum mrforum = new MoodleRestForum(token);
+        RestForum mrforum = new RestForum(token);
 
         forums = mrforum.getForums(courseids); // gets forums from api call
 
@@ -55,15 +55,15 @@ public class ForumSync {
         try {
            // deleteStaleData();
             for (int i = 0; i < forums.size(); i++) {
-                final MoodleForum forum = forums.get(i);
+                final Forum forum = forums.get(i);
 
-                MoodleCourse forumCourse = new Select().from(MoodleCourse.class).where("courseid = ?",forum.getCourseid()).executeSingle();
+                Course forumCourse = new Select().from(Course.class).where("courseid = ?",forum.getCourseid()).executeSingle();
                 if(forumCourse!=null)
                 {
                     forum.setCoursename(forumCourse.getShortname());
                 }
 
-                MoodleForum.findOrCreateFromJson(forum); // saves contact to database
+                Forum.findOrCreateFromJson(forum); // saves contact to database
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
@@ -76,17 +76,17 @@ public class ForumSync {
     private void deleteStaleData()
     {
 
-        List<MoodleForum> stale_forums = new Select().all().from(MoodleForum.class).execute();
+        List<Forum> stale_forums = new Select().all().from(Forum.class).execute();
         for(int i=0;i<stale_forums.size();i++)
         {
             if(!doesForumExistInJson(stale_forums.get(i)))
             {
-                MoodleForum.delete(MoodleForum.class,stale_forums.get(i).getId());
+                Forum.delete(Forum.class,stale_forums.get(i).getId());
             }
         }
     }
 
-    private boolean doesForumExistInJson(MoodleForum forum)
+    private boolean doesForumExistInJson(Forum forum)
     {
         return forums.contains(forum);
     }

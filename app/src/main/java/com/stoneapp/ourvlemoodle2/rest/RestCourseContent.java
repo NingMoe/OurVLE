@@ -30,14 +30,14 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.stoneapp.ourvlemoodle2.models.MoodleSection;
+import com.stoneapp.ourvlemoodle2.models.Section;
 import com.stoneapp.ourvlemoodle2.util.GsonExclude;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-public class MoodleRestCourseContent {
+public class RestCourseContent {
 
 
     private final String format = MoodleConstants.format;
@@ -45,13 +45,13 @@ public class MoodleRestCourseContent {
     private String URL = MoodleConstants.URL;
     private String token;
 
-    public MoodleRestCourseContent(String token){
+    public RestCourseContent(String token){
         this.token = token;
     }
 
-    public ArrayList<MoodleSection> getSections(String courseid){
+    public ArrayList<Section> getSections(String courseid){
 
-        ArrayList<MoodleSection> sections = null;
+        ArrayList<Section> sections = null;
 
         try {
 
@@ -78,7 +78,7 @@ public class MoodleRestCourseContent {
                 Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                         .addSerializationExclusionStrategy(exclude).create();
 
-                sections = gson.fromJson(reader, new TypeToken<List<MoodleSection>>(){}.getType());
+                sections = gson.fromJson(reader, new TypeToken<List<Section>>(){}.getType());
                 reader.close();
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
@@ -96,9 +96,9 @@ public class MoodleRestCourseContent {
         return sections;
     }
 
-   /* public ArrayList<MoodleSection> getSections(String courseid){
+   /* public ArrayList<Section> getSections(String courseid){
 
-        ArrayList<MoodleSection> sections = null;
+        ArrayList<Section> sections = null;
 
         try {
 
@@ -119,7 +119,7 @@ public class MoodleRestCourseContent {
             Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                     .addSerializationExclusionStrategy(exclude).create();
 
-            sections = gson.fromJson(reader, new TypeToken<List<MoodleSection>>(){}.getType()); //converts json to java objects
+            sections = gson.fromJson(reader, new TypeToken<List<Section>>(){}.getType()); //converts json to java objects
             reader.close();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block

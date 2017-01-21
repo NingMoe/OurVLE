@@ -24,21 +24,17 @@ import java.util.List;
 
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.EventListAdapter;
-import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.tasks.EventSync;
+import com.stoneapp.ourvlemoodle2.models.Event;
+import com.stoneapp.ourvlemoodle2.sync.EventSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,7 +45,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class EventFragment extends Fragment
@@ -57,7 +52,7 @@ public class EventFragment extends Fragment
 
     private EventListAdapter mEventAdapter;
     private Context mContext;
-    private List<MoodleEvent> mEvents;
+    private List<Event> mEvents;
     private String mToken;
     private String mCourseid;
     private View mRootView;
@@ -122,7 +117,7 @@ public class EventFragment extends Fragment
 
     private void getEventsFromDatabase()
     {
-        mEvents = new Select().from(MoodleEvent.class).where("courseid = ?", mCourseid).execute();
+        mEvents = new Select().from(Event.class).where("courseid = ?", mCourseid).execute();
     }
 
     private void setUpSwipeRefresh()

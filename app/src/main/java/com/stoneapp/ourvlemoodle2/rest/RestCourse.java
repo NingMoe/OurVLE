@@ -25,57 +25,43 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URL;
 
-import com.stoneapp.ourvlemoodle2.models.MoodleEvents;
 import com.stoneapp.ourvlemoodle2.util.GsonExclude;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
+import com.stoneapp.ourvlemoodle2.models.Course;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
-public class MoodleRestEvent {
+public class RestCourse {
+    private String token;
+    private final String format = MoodleConstants.format; // format of output eg json/xml
+    private final String function  = MoodleConstants.COURSES_FUNCTION; // api function call
+    private String url = MoodleConstants.URL; // domain url
 
-    String token;
-    String url = MoodleConstants.URL; //website url
-    String function = MoodleConstants.EVENTS_FUNCTION; //rest api function
-    String format = MoodleConstants.format; //format of output
+    public RestCourse(String token) { this.token = token; }
 
-    public MoodleRestEvent(String token){
-        this.token = token;
-    }
-
-    public MoodleEvents getEvents(List<String> courseids) {
-        long today_millis = System.currentTimeMillis();
-        Timestamp timestamp = new Timestamp(today_millis);
-        long timestart = timestamp.getTime() / 1000;
-        MoodleEvents events = null;
-        String url = MoodleConstants.URL;
-        String function = MoodleConstants.EVENTS_FUNCTION;
-        String format = MoodleConstants.format;
-        String params = "";
+    public ArrayList<Course> getCourses(String userid) {
+        ArrayList<Course> courses = new ArrayList<>();
         try {
-            params+="&options[timeend]="+URLEncoder.encode(today_millis+"","UTF-8");
-            params+="&options[timestart]="+URLEncoder.encode(timestart+"","UTF-8");
+            String params = "&"+ URLEncoder.encode("userid", "UTF-8")+ "=" + userid;
+            String rest_url = url + "/webservice/rest/server.php" + "?wstoken=" + token
+                    + "&wsfunction="+function+"&moodlewsrestformat=" + format;
 
-            for(int i = 0; i < courseids.size();i++){
-                params+="&events[courseids]["+i+"]=" + URLEncoder.encode(courseids.get(i),"UTF-8");
-            }
-            String url_rest = url + "/webservice/rest/server.php" + "?wstoken="
-                    + token + "&wsfunction=" + function
-                    + "&moodlewsrestformat=" + format;
             HttpURLConnection con;
             try {
-                con = (HttpURLConnection) new URL(url_rest + params).openConnection();
+                con = (HttpURLConnection) new URL(rest_url+params).openConnection();
                 con.setRequestMethod("POST");
-                con.setRequestProperty("Accept","application/xml");
-                con.setRequestProperty("Content-Language", "en-Us");
+                con.setRequestProperty("Accept", "application/xml");
+                con.setRequestProperty("Content-Language", "en-US");
                 con.setDoOutput(true);
 
                 OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream());
+
                 writer.write("");
                 writer.flush();
                 writer.close();
@@ -86,7 +72,8 @@ public class MoodleRestEvent {
                 Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                         .addSerializationExclusionStrategy(exclude).create();
 
-                events = gson.fromJson(reader, MoodleEvents.class);
+                courses = gson.fromJson(reader, new TypeToken<List<Course>>(){}.getType());
+
                 reader.close();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -98,6 +85,6 @@ public class MoodleRestEvent {
             return null;
         }
 
-        return events;
+        return courses;
     }
 }

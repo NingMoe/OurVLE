@@ -22,22 +22,48 @@ package com.stoneapp.ourvlemoodle2.models;
 import java.util.ArrayList;
 
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 
-public class MoodleEvents{
+public class DiscussionPosts {
 
-    @SerializedName("events")
-    ArrayList<MoodleEvent>events;
+    @SerializedName("posts")
+    ArrayList<Post>posts;
 
-    @SerializedName("warnings")
+    @SerializedName("warning")
     ArrayList<MoodleWarning>warnings;
 
-    public ArrayList<MoodleEvent> getEvents() {
-        return events;
+    @SerializedName("exception")
+    String exception;
+
+    @SerializedName("errorcode")
+    String errorcode;
+
+    @SerializedName("message")
+    String message;
+
+    public String getException() {
+        return exception;
+    }
+
+    public String getErrorcode() {
+        return errorcode;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getDebuginfo() {
+        return debuginfo;
+    }
+
+    @SerializedName("debuginfo")
+    String debuginfo;
+
+    public ArrayList<Post> getPosts() {
+        return posts;
     }
 
     public ArrayList<MoodleWarning> getWarnings() {
         return warnings;
     }
-
 }

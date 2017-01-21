@@ -21,41 +21,49 @@ package com.stoneapp.ourvlemoodle2.models;
 
 
 
-import android.graphics.PorterDuff;
-
 import java.util.ArrayList;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
-import com.orm.SugarRecord;
+import com.google.gson.annotations.SerializedName;
 import com.orm.dsl.Ignore;
 
-public class MoodleSiteInfo extends Model {
+@Table(name="SiteInfo")
+public class SiteInfo extends Model {
 
     @Column(name="sitename")
+    @SerializedName("sitename")
     String sitename;
 
     @Column(name="username")
+    @SerializedName("username")
     String username;
 
     @Column(name="firstname")
+    @SerializedName("firstname")
     String firstname;
 
     @Column(name="lastname")
+    @SerializedName("lastname")
     String lastname;
 
     @Column(name="fullname")
+    @SerializedName("fullname")
     String fullname;
 
     String lang;
 
     @Column(name="userid")
+    @SerializedName("userid")
     int userid;
 
     String siteurl;
 
+
     @Column(name="userpictureurl")
+    @SerializedName("userpictureurl")
     String userpictureurl;
 
     @Ignore
@@ -83,11 +91,12 @@ public class MoodleSiteInfo extends Model {
     @Column(name="token")
     String token;
 
-    public MoodleSiteInfo() {
+    public SiteInfo() {
+        super();
     }
 
-    public MoodleSiteInfo(String token) {
-        this.token = token;
+    public SiteInfo(String token) {
+       this.token = token;
     }
 
     /**
@@ -250,26 +259,19 @@ public class MoodleSiteInfo extends Model {
         this.message += message + "\n";
     }
 
-    public static MoodleSiteInfo findOrCreateFromJson(MoodleSiteInfo new_site) {
+    public static SiteInfo findOrCreateFromJson(SiteInfo new_site) {
         int siteid = new_site.getUserid();
-        MoodleSiteInfo existingSiteInfo =
-                new Select().from(MoodlePost.class).where("userid = ?", siteid).executeSingle();
+        SiteInfo existingSiteInfo =
+                new Select().from(Post.class).where("userid = ?", siteid).executeSingle();
         if (existingSiteInfo != null) {
             // found and return existing
            // UpdatePost(existingPost,new_post);
             return existingSiteInfo;
         } else {
             // create and return new user
-            MoodleSiteInfo siteInfo = new_site;
+            SiteInfo siteInfo = new_site;
             siteInfo.save();
             return siteInfo;
         }
-    }
-
-    private static void UpdatePost(MoodlePost old_post,MoodlePost new_post)
-    {
-        old_post = new_post;
-        old_post.save();
-
     }
 }

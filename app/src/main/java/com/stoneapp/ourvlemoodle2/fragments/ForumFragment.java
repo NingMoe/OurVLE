@@ -24,8 +24,8 @@ import java.util.List;
 
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.ForumListAdapter;
-import com.stoneapp.ourvlemoodle2.models.MoodleForum;
-import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
+import com.stoneapp.ourvlemoodle2.models.Forum;
+import com.stoneapp.ourvlemoodle2.sync.ForumSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
@@ -36,7 +36,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,12 +46,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class ForumFragment extends Fragment implements OnRefreshListener {
 
-    private List<MoodleForum> mForums;
+    private List<Forum> mForums;
     private int mCourseId = 0;
     private ArrayList<String> mCourseids = new ArrayList<>(); // list of course ids
     private String mToken; // url token
@@ -136,7 +134,7 @@ public class ForumFragment extends Fragment implements OnRefreshListener {
 
     private void getForumsFromDatabase()
     {
-        mForums = new Select().from(MoodleForum.class).where("courseid = ?", mCourseId).execute(); // gets all forums related to the course
+        mForums = new Select().from(Forum.class).where("courseid = ?", mCourseId).execute(); // gets all forums related to the course
     }
 
     private void setUpProgressBar()

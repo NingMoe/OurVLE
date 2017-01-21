@@ -23,13 +23,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.CourseContentListAdapter;
 import com.stoneapp.ourvlemoodle2.models.ContentListItem;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleModule;
-import com.stoneapp.ourvlemoodle2.models.MoodleSection;
-import com.stoneapp.ourvlemoodle2.tasks.ContentSync;
+import com.stoneapp.ourvlemoodle2.models.Module;
+import com.stoneapp.ourvlemoodle2.models.Section;
+import com.stoneapp.ourvlemoodle2.sync.ContentSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.util.FileUtils;
@@ -43,8 +41,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,7 +50,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -81,7 +76,7 @@ public class CourseContentFragment extends Fragment
     private String mToken;
     private CourseContentListAdapter mContentListAdapter;
     private ArrayList<ContentListItem> mItems = new ArrayList<>();
-    private ArrayList<MoodleSection>mSections;
+    private ArrayList<Section>mSections;
     public File mFile;
     private MenuItem searchitem;
     private static int TYPE_HEADER = 1;
@@ -273,7 +268,7 @@ public class CourseContentFragment extends Fragment
             }
     };
 
-    public void sectionsToListItems(ArrayList<MoodleSection> sections) { // maps courses contents to list items
+    public void sectionsToListItems(ArrayList<Section> sections) { // maps courses contents to list items
         if (sections == null)
             return;
 
@@ -281,8 +276,8 @@ public class CourseContentFragment extends Fragment
 
         mItems.clear(); // clears list
         for (int i = 0; i < sectionslen; i++) {
-            MoodleSection section =sections.get(i); // gets current section
-            ArrayList<MoodleModule> modules = section.getModules(); // gets modules from section
+            Section section =sections.get(i); // gets current section
+            ArrayList<Module> modules = section.getModules(); // gets modules from section
             if (modules.size() > 0) {
                 ContentListItem secitem = new ContentListItem();
                 secitem.section = sections.get(i);

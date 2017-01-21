@@ -24,11 +24,10 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 
 
-@Table(name="MoodleDiscussion")
-public class MoodleDiscussion extends Model{
+@Table(name="Discussion")
+public class Discussion extends Model{
 
     @Column(name="discussionid")
     @SerializedName("id")
@@ -114,6 +113,11 @@ public class MoodleDiscussion extends Model{
     String lastuseremail;   //The last person to posts email
 
     //String coursename;
+
+    public Discussion()
+    {
+        super();
+    }
 
     public int getDiscussionid() {
         return discussionid;
@@ -216,23 +220,23 @@ public class MoodleDiscussion extends Model{
     }
 
 
-    public static MoodleDiscussion findOrCreateFromJson(MoodleDiscussion new_discussion) {
+    public static Discussion findOrCreateFromJson(Discussion new_discussion) {
         int discussionid = new_discussion.getDiscussionid();
-        MoodleDiscussion existingDiscussion =
-                new Select().from(MoodleDiscussion.class).where("discussionid = ?", discussionid).executeSingle();
+        Discussion existingDiscussion =
+                new Select().from(Discussion.class).where("discussionid = ?", discussionid).executeSingle();
         if (existingDiscussion != null) {
             // found and return existing
             //UpdateDiscussion(existingDiscussion,new_discussion);
             return existingDiscussion;
         } else {
             // create and return new user
-            MoodleDiscussion discussion = new_discussion;
+            Discussion discussion = new_discussion;
             discussion.save();
             return discussion;
         }
     }
 
-    private static void UpdateDiscussion(MoodleDiscussion old_discussion,MoodleDiscussion new_discussion)
+    private static void UpdateDiscussion(Discussion old_discussion, Discussion new_discussion)
     {
         old_discussion = new_discussion;
         old_discussion.save();

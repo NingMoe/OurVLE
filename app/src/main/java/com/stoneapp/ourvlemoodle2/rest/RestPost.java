@@ -19,8 +19,6 @@
 
 package com.stoneapp.ourvlemoodle2.rest;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -30,47 +28,43 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import com.stoneapp.ourvlemoodle2.models.MoodleForum;
+import com.stoneapp.ourvlemoodle2.models.DiscussionPosts;
 import com.stoneapp.ourvlemoodle2.util.GsonExclude;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
-public class MoodleRestForum {
+public class RestPost {
 
-    private final String format= MoodleConstants.format;
-    private final String function= MoodleConstants.FORUM_FUNCTION; //rest api function
-    private String url = MoodleConstants.URL; //domain url
     private String token;
+    private String url = MoodleConstants.URL;
+    private String function = MoodleConstants.POSTS_FUNCTION;
+    private String format = MoodleConstants.format;
 
-    public MoodleRestForum(String token){
+    public RestPost(String token){
         this.token = token;
     }
 
-    public ArrayList<MoodleForum> getForums(ArrayList<String> courseids){
-        ArrayList<MoodleForum>forums = new ArrayList<MoodleForum>();
-        try{
-            String url_params = "";
-            for(int i=0; i<courseids.size();i++){
+    public DiscussionPosts getDiscussionPosts(String discussionid){
+        String url = MoodleConstants.URL;
+        String function = MoodleConstants.POSTS_FUNCTION;
+        String format = MoodleConstants.format;
+        DiscussionPosts dposts = null;
 
-                url_params += "&courseids[" + i + "]=" + URLEncoder.encode(courseids.get(i), "UTF-8");
-
-            }
-            String rest_url = url + "/webservice/rest/server.php"+"?wstoken="+token
-                    +"&wsfunction="+function+"&moodlewsrestformat="+format;
-
+        try {
+            String url_params = "&discussionid=" +URLEncoder.encode(discussionid,"UTF-8");
+            String rest_url = url +"/webservice/rest/server.php" + "?wstoken="
+                    + token + "&wsfunction=" + function
+                    + "&moodlewsrestformat=" + format;
             HttpURLConnection con;
             try {
-                //Handler handle =new Handler();
-                con = (HttpURLConnection) new URL(rest_url+url_params).openConnection();
+                con = (HttpURLConnection) new URL(rest_url + url_params).openConnection();
                 con.setRequestMethod("POST");
-                con.setRequestProperty("Accept", "application/xml");
-                con.setRequestProperty("Content-Language", "en-US");
+                con.setRequestProperty("Accept","application/xml");
+                con.setRequestProperty("Content-Language", "en-Us");
                 con.setDoOutput(true);
 
                 OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream());
-
                 writer.write("");
                 writer.flush();
                 writer.close();
@@ -80,8 +74,8 @@ public class MoodleRestForum {
 
                 Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                         .addSerializationExclusionStrategy(exclude).create();
-                forums = gson.fromJson(reader, new TypeToken<List<MoodleForum>>(){}.getType());
 
+                dposts= gson.fromJson(reader, DiscussionPosts.class);
                 reader.close();
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
@@ -95,44 +89,37 @@ public class MoodleRestForum {
             e.printStackTrace();
             return null;
         }
-
-        return forums;
-
-
-
+        return dposts;
 
     }
 
-    /*public ArrayList<MoodleForum> getForums(ArrayList<String> courseids){
 
-        ArrayList<MoodleForum>forums = new ArrayList<MoodleForum>();
+    /*public DiscussionPosts getDiscussionPosts(String discussionid){
 
-        try{
 
-            String url_params = "";
-            for(int i=0; i<courseids.size();i++){
+        DiscussionPosts dposts = null;
 
-                url_params += "&courseids[" + i + "]=" + URLEncoder.encode(courseids.get(i), "UTF-8"); //appends url params
+        try {
+                String url_params = "&discussionid=" +URLEncoder.encode(discussionid,"UTF-8"); //appends params to url
+                String rest_url = url +"/webservice/rest/server.php" + "?wstoken="
+                        + token + "&wsfunction=" + function
+                        + "&moodlewsrestformat=" + format; //constructs rest api url
 
-            }
+                BasicRestCall basicRestCall = new BasicRestCall(rest_url + url_params);
+                InputStreamReader inputStreamReader = basicRestCall.getInputStream(); //get input stream
 
-            String rest_url = url + "/webservice/rest/server.php"+"?wstoken="+token
-                +"&wsfunction="+function+"&moodlewsrestformat="+format; //constructs rest api url
+                if(inputStreamReader == null)
+                    return null;
 
-            BasicRestCall basicRestCall = new BasicRestCall(rest_url+url_params);
-            InputStreamReader inputStreamReader = basicRestCall.getInputStream(); //get input stream from server
+                Reader reader = inputStreamReader;
+                GsonExclude exclude = new GsonExclude();
 
-            if(inputStreamReader == null)
-                return null;
+                Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
+                        .addSerializationExclusionStrategy(exclude).create();
 
-            Reader reader = inputStreamReader;
-            GsonExclude exclude = new GsonExclude();
+                dposts= gson.fromJson(reader, DiscussionPosts.class); //converts gson to java object
+                reader.close();
 
-            Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
-                                        .addSerializationExclusionStrategy(exclude).create();
-            forums = gson.fromJson(reader, new TypeToken<List<MoodleForum>>(){}.getType()); //converts json to java objects
-
-            reader.close();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -144,14 +131,9 @@ public class MoodleRestForum {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            return null; //to avoid app crashing
+            return null;
         }
-
-        return forums;
-
-
-
+        return dposts;
 
     }*/
-
 }

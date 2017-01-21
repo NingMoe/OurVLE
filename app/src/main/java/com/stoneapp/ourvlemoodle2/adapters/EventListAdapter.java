@@ -30,8 +30,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.stoneapp.ourvlemoodle2.models.Event;
 import com.stoneapp.ourvlemoodle2.util.TimeUtils;
-import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
 import com.stoneapp.ourvlemoodle2.R;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.EventViewHolder> {
-    private List<MoodleEvent> events;
+    private List<Event> events;
     private Context context;
 
     public static class EventViewHolder extends RecyclerView.ViewHolder{
@@ -80,7 +80,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         }
     }
 
-    public EventListAdapter(Context context, List<MoodleEvent> events){
+    public EventListAdapter(Context context, List<Event> events){
         this.events = new ArrayList<>(events);
         this.context = context;
     }
@@ -97,7 +97,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
     public void onBindViewHolder(EventViewHolder eventViewHolder, int position) {
         if(position>=0)
         {
-            final MoodleEvent event  = events.get(position);
+            final Event event  = events.get(position);
 
             String eventname = event.getName();
 
@@ -142,7 +142,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         return events.size();
     }
 
-    public void updateEventList(List<MoodleEvent> events){
+    public void updateEventList(List<Event> events){
         this.events = new ArrayList<>(events);
         notifyDataSetChanged();
     }

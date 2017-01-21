@@ -32,8 +32,8 @@ import android.support.v7.widget.Toolbar;
 
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.PostListAdapter;
-import com.stoneapp.ourvlemoodle2.models.MoodlePost;
-import com.stoneapp.ourvlemoodle2.tasks.PostSync;
+import com.stoneapp.ourvlemoodle2.models.Post;
+import com.stoneapp.ourvlemoodle2.sync.PostSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 
@@ -48,13 +48,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class PostActivity  extends AppCompatActivity
         implements OnRefreshListener {
     private String mDiscussionId;
-    private List<MoodlePost> mPosts;
+    private List<Post> mPosts;
     private PostListAdapter mPostListAdapter;
     private String mDiscussionName;
     private String mToken;
@@ -102,7 +101,7 @@ public class PostActivity  extends AppCompatActivity
 
     private void getPostsFromDatabase()
     {
-        mPosts = new Select().from(MoodlePost.class).where("discussionid = ?",mDiscussionId).execute();
+        mPosts = new Select().from(Post.class).where("discussionid = ?",mDiscussionId).execute();
     }
 
 
@@ -151,9 +150,9 @@ public class PostActivity  extends AppCompatActivity
     private void sortPosts()
     {
         //Order posts by time created
-        Collections.sort(mPosts, new Comparator<MoodlePost>() {
+        Collections.sort(mPosts, new Comparator<Post>() {
             @Override
-            public int compare(MoodlePost lhs, MoodlePost rhs) {
+            public int compare(Post lhs, Post rhs) {
                 if (lhs.getCreated() > rhs.getCreated())
                     return 1;
                 else

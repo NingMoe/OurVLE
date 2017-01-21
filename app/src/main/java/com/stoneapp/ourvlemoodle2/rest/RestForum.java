@@ -19,13 +19,8 @@
 
 package com.stoneapp.ourvlemoodle2.rest;
 
-import com.stoneapp.ourvlemoodle2.models.MoodleMember;
-import com.stoneapp.ourvlemoodle2.util.GsonExclude;
-import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -34,31 +29,34 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 
-public class MoodleRestMembers {
+import com.stoneapp.ourvlemoodle2.models.Forum;
+import com.stoneapp.ourvlemoodle2.util.GsonExclude;
+import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
-    private String token;
-    private String format = MoodleConstants.format;
+public class RestForum {
+
+    private final String format= MoodleConstants.format;
+    private final String function= MoodleConstants.FORUM_FUNCTION; //rest api function
     private String url = MoodleConstants.URL; //domain url
-    private String function = MoodleConstants.MEMBERS_FUNCTION; //rest api function
+    private String token;
 
-
-    public MoodleRestMembers(String token){
+    public RestForum(String token){
         this.token = token;
-
     }
 
-    public ArrayList<MoodleMember> getMembers(String courseid){
-        String format = MoodleConstants.format;
-        String url = MoodleConstants.URL;
-        String function = MoodleConstants.MEMBERS_FUNCTION;
-        ArrayList<MoodleMember>members = null;
-
-        String url_params="";
+    public ArrayList<Forum> getForums(ArrayList<String> courseids){
+        ArrayList<Forum>forums = new ArrayList<Forum>();
         try{
-            url_params+="&courseid="+ URLEncoder.encode(courseid,"UTF-8");
+            String url_params = "";
+            for(int i=0; i<courseids.size();i++){
+
+                url_params += "&courseids[" + i + "]=" + URLEncoder.encode(courseids.get(i), "UTF-8");
+
+            }
             String rest_url = url + "/webservice/rest/server.php"+"?wstoken="+token
                     +"&wsfunction="+function+"&moodlewsrestformat="+format;
 
@@ -82,7 +80,7 @@ public class MoodleRestMembers {
 
                 Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                         .addSerializationExclusionStrategy(exclude).create();
-                members = gson.fromJson(reader, new TypeToken<List<MoodleMember>>(){}.getType());
+                forums = gson.fromJson(reader, new TypeToken<List<Forum>>(){}.getType());
 
                 reader.close();
             } catch (MalformedURLException e) {
@@ -92,29 +90,37 @@ public class MoodleRestMembers {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }catch(Exception e){
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }
 
-        return members;
+        return forums;
+
+
+
 
     }
 
-    /*public ArrayList<MoodleMember> getMembers(String courseid){
+    /*public ArrayList<Forum> getForums(ArrayList<String> courseids){
 
-        ArrayList<MoodleMember>members = null;
+        ArrayList<Forum>forums = new ArrayList<Forum>();
 
-        String url_params="";
         try{
 
-            url_params+="&courseid="+ URLEncoder.encode(courseid,"UTF-8"); //appends params to url
+            String url_params = "";
+            for(int i=0; i<courseids.size();i++){
+
+                url_params += "&courseids[" + i + "]=" + URLEncoder.encode(courseids.get(i), "UTF-8"); //appends url params
+
+            }
 
             String rest_url = url + "/webservice/rest/server.php"+"?wstoken="+token
-                    +"&wsfunction="+function+"&moodlewsrestformat="+format; //constructs rest api url
+                +"&wsfunction="+function+"&moodlewsrestformat="+format; //constructs rest api url
 
             BasicRestCall basicRestCall = new BasicRestCall(rest_url+url_params);
-            InputStreamReader inputStreamReader = basicRestCall.getInputStream(); //get input stream
+            InputStreamReader inputStreamReader = basicRestCall.getInputStream(); //get input stream from server
 
             if(inputStreamReader == null)
                 return null;
@@ -123,8 +129,8 @@ public class MoodleRestMembers {
             GsonExclude exclude = new GsonExclude();
 
             Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
-                    .addSerializationExclusionStrategy(exclude).create();
-            members = gson.fromJson(reader, new TypeToken<List<MoodleMember>>(){}.getType()); //covert json to java objects
+                                        .addSerializationExclusionStrategy(exclude).create();
+            forums = gson.fromJson(reader, new TypeToken<List<Forum>>(){}.getType()); //converts json to java objects
 
             reader.close();
         } catch (MalformedURLException e) {
@@ -135,14 +141,17 @@ public class MoodleRestMembers {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
-        } catch(Exception e){
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
             return null; //to avoid app crashing
         }
 
-        return members;
+        return forums;
+
+
+
 
     }*/
-
 
 }

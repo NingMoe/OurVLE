@@ -17,32 +17,19 @@
  * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.stoneapp.ourvlemoodle2.tasks;
+package com.stoneapp.ourvlemoodle2.sync;
 
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.ContextCompat;
-import android.text.Html;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
-import com.stoneapp.ourvlemoodle2.activities.CourseViewActivity;
-import com.stoneapp.ourvlemoodle2.models.MoodleModule;
-import com.stoneapp.ourvlemoodle2.models.MoodleModuleContent;
-import com.stoneapp.ourvlemoodle2.models.MoodleSection;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.rest.MoodleRestCourseContent;
-import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
-import com.stoneapp.ourvlemoodle2.R;
-import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
+import com.stoneapp.ourvlemoodle2.models.Module;
+import com.stoneapp.ourvlemoodle2.models.ModuleContent;
+import com.stoneapp.ourvlemoodle2.models.Section;
+import com.stoneapp.ourvlemoodle2.rest.RestCourseContent;
 
 public class ContentSync {
 
@@ -52,7 +39,7 @@ public class ContentSync {
     private Context context;
     private boolean first_update; // flag to check whether its a first sync
     private String token; // url token
-    List<MoodleSection> sections;
+    List<Section> sections;
 
     public ContentSync(int courseid, long coursepid, long siteid, String token, Context context) {
         this.courseid = courseid;
@@ -66,7 +53,7 @@ public class ContentSync {
 
     public boolean syncContent() {
 
-        MoodleRestCourseContent mcontent = new MoodleRestCourseContent(token);
+        RestCourseContent mcontent = new RestCourseContent(token);
         sections = mcontent.getSections(courseid + ""); // gets the sections from api call
 
         if (sections == null) // check if there are no sections
@@ -80,11 +67,11 @@ public class ContentSync {
         try {
             //deleteStaleSections();
             for (int i = 0; i < sections.size(); i++) {
-                final MoodleSection section = sections.get(i);
+                final Section section = sections.get(i);
                 section.setCourseid(courseid);
                 section.setParentid(coursepid);
 
-                MoodleSection db_section = MoodleSection.findOrCreateFromJson(section); // saves contact to database
+                Section db_section = Section.findOrCreateFromJson(section); // saves contact to database
                 syncModules(db_section.getModules(),db_section.getSectionid(),db_section.getId());
             }
             ActiveAndroid.setTransactionSuccessful();
@@ -98,44 +85,44 @@ public class ContentSync {
 
 
 
-    private void syncModules(ArrayList<MoodleModule>modules, int sectionid, long sectionpid) {
+    private void syncModules(ArrayList<Module>modules, int sectionid, long sectionpid) {
         if (modules == null) // checks if there are no modules
             return;
 
       //  deleteStaleModules(modules);
         for(int i = 0; i < modules.size(); i++) {
-            final MoodleModule module = modules.get(i);
+            final Module module = modules.get(i);
             module.setCourseid(courseid); // set course id of module
             module.setParentid(sectionpid); // set section database id
             module.setSiteid(siteid);
             module.setSectionid(sectionid); // set section id
-            MoodleModule db_module = MoodleModule.findOrCreateFromJson(module);
+            Module db_module = Module.findOrCreateFromJson(module);
 
             syncModuleContents(db_module.getContents(), db_module.getModuleid(), db_module.getId(), sectionid); //sync module contents
         }
     }
 
-    private void syncModuleContents(ArrayList<MoodleModuleContent> contents, int moduleid, long modulepid, int sectionid) {
+    private void syncModuleContents(ArrayList<ModuleContent> contents, int moduleid, long modulepid, int sectionid) {
         if (contents == null) // checks if there are no contents
             return;
 
       //  deleteStaleContent(contents);
 
         for (int i = 0; i < contents.size(); i++) {
-            final MoodleModuleContent content = contents.get(i);
+            final ModuleContent content = contents.get(i);
             content.setParentid(modulepid);
             content.setModuleid(moduleid);
             content.setSectionid(sectionid);
             content.setCourseid(courseid); // set course id
             content.setSiteid(siteid);
-            MoodleModuleContent.findOrCreateFromJson(content);
+            ModuleContent.findOrCreateFromJson(content);
         }
     }
 
-    public ArrayList<MoodleSection> getContents() {
-        List<MoodleSection>sections = getSectionsFromDatabase();
-        List<MoodleModule>modules;
-        List<MoodleModuleContent>contents ;
+    public ArrayList<Section> getContents() {
+        List<Section>sections = getSectionsFromDatabase();
+        List<Module>modules;
+        List<ModuleContent>contents ;
 
         for (int i = 0; i < sections.size(); i++) {
 
@@ -152,19 +139,19 @@ public class ContentSync {
         return new ArrayList<>(sections); // returns a list of sections
     }
 
-    private List<MoodleSection> getSectionsFromDatabase()
+    private List<Section> getSectionsFromDatabase()
     {
-        return new Select().from(MoodleSection.class).where("courseid = ?",courseid).execute();
+        return new Select().from(Section.class).where("courseid = ?",courseid).execute();
     }
 
-    private List<MoodleModule> getModulesFromDatabase(MoodleSection section)
+    private List<Module> getModulesFromDatabase(Section section)
     {
-        return new Select().from(MoodleModule.class).where("parentid = ?",section.getId()).execute();
+        return new Select().from(Module.class).where("parentid = ?",section.getId()).execute();
     }
 
-    private List<MoodleModuleContent> getContentsFromDatabase(MoodleModule module)
+    private List<ModuleContent> getContentsFromDatabase(Module module)
     {
-        return new Select().from(MoodleModuleContent.class).where("parentid = ?",module.getId()).execute();
+        return new Select().from(ModuleContent.class).where("parentid = ?",module.getId()).execute();
     }
 
 
@@ -172,61 +159,61 @@ public class ContentSync {
     private void deleteStaleSections()
     {
 
-        List<MoodleSection> stale_sections = new Select().from(MoodleSection.class).where("courseid = ?",courseid).execute();
+        List<Section> stale_sections = new Select().from(Section.class).where("courseid = ?",courseid).execute();
         for(int i=0;i<stale_sections.size();i++)
         {
             if(!doesSectionExistInJson(stale_sections.get(i)))
             {
-                MoodleSection.delete(MoodleSection.class,stale_sections.get(i).getId());
+                Section.delete(Section.class,stale_sections.get(i).getId());
             }
         }
     }
 
-    private boolean doesSectionExistInJson(MoodleSection section)
+    private boolean doesSectionExistInJson(Section section)
     {
         return sections.contains(section);
     }
 
-    private void deleteStaleModules(List<MoodleModule> modules)
+    private void deleteStaleModules(List<Module> modules)
     {
 
-        List<MoodleModule> stale_modules = new Select().from(MoodleModule.class).where("courseid = ?",courseid).execute();
+        List<Module> stale_modules = new Select().from(Module.class).where("courseid = ?",courseid).execute();
         for(int i=0;i<stale_modules.size();i++)
         {
             if(!doesModuleExistInJson(modules,stale_modules.get(i)))
             {
-                MoodleModule.delete(MoodleModule.class,stale_modules.get(i).getId());
+                Module.delete(Module.class,stale_modules.get(i).getId());
             }
         }
     }
 
-    private boolean doesModuleExistInJson(List<MoodleModule> modules,MoodleModule module)
+    private boolean doesModuleExistInJson(List<Module> modules, Module module)
     {
         return modules.contains(module);
     }
 
-    private void deleteStaleContent(List<MoodleModuleContent> contents)
+    private void deleteStaleContent(List<ModuleContent> contents)
     {
 
-        List<MoodleModuleContent> stale_contents = new Select().from(MoodleModuleContent.class).where("courseid = ?",courseid).execute();
+        List<ModuleContent> stale_contents = new Select().from(ModuleContent.class).where("courseid = ?",courseid).execute();
         for(int i=0;i<stale_contents.size();i++)
         {
             if(!doesContentExistInJson(contents,stale_contents.get(i)))
             {
-                MoodleModuleContent.delete(MoodleModuleContent.class,stale_contents.get(i).getId());
+                ModuleContent.delete(ModuleContent.class,stale_contents.get(i).getId());
             }
         }
     }
 
-    private boolean doesContentExistInJson(List<MoodleModuleContent> contents,MoodleModuleContent content)
+    private boolean doesContentExistInJson(List<ModuleContent> contents, ModuleContent content)
     {
         return contents.contains(content);
     }
 
 
 
-   /* public void addNotification (MoodleModule module) {
-        MoodleCourse course =  new Select().from(MoodleCourse.class).where("courseid = ?", courseid).executeSingle();
+   /* public void addNotification (Module module) {
+        Course course =  new Select().from(Course.class).where("courseid = ?", courseid).executeSingle();
 
         Intent resultIntent = new Intent(context, CourseViewActivity.class);
         resultIntent.putExtra("coursename", course.getShortname());

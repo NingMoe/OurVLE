@@ -28,7 +28,7 @@ import com.stoneapp.ourvlemoodle2.fragments.EventFragment;
 import com.stoneapp.ourvlemoodle2.fragments.ForumFragment;
 import com.stoneapp.ourvlemoodle2.fragments.MembersFragment;
 
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
 
 import com.stoneapp.ourvlemoodle2.R;
 
@@ -107,7 +107,7 @@ public class CourseViewActivity extends AppCompatActivity
         viewPager.setAdapter(new TabsPagerAdapter(getSupportFragmentManager()));
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
-        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        List<SiteInfo> sites = new Select().all().from(SiteInfo.class).execute();
         token = sites.get(0).getToken();
         name = sites.get(0).getFullname();
         userid = sites.get(0).getUserid();

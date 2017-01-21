@@ -21,11 +21,12 @@ package com.stoneapp.ourvlemoodle2.models;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 
-public class MoodleModuleContent extends Model{
+@Table(name="ModuleContent")
+public class ModuleContent extends Model{
 
 
     @Column(name="type")
@@ -82,6 +83,12 @@ public class MoodleModuleContent extends Model{
 
     @Column(name="siteid")
     Long siteid;
+
+
+    public ModuleContent()
+    {
+        super();
+    }
 
     /**
      * Get content type
@@ -261,23 +268,23 @@ public class MoodleModuleContent extends Model{
         this.siteid = siteid;
     }
 
-    public static MoodleModuleContent findOrCreateFromJson(MoodleModuleContent new_content) {
+    public static ModuleContent findOrCreateFromJson(ModuleContent new_content) {
 
-        MoodleModuleContent existingContent =
-                new Select().from(MoodleModuleContent.class).where("moduleid = ?",new_content.getModuleid()).executeSingle();
+        ModuleContent existingContent =
+                new Select().from(ModuleContent.class).where("moduleid = ?",new_content.getModuleid()).executeSingle();
         if (existingContent != null) {
             // found and return existing
         //    UpdateContent(existingContent,new_content);
             return existingContent;
         } else {
             // create and return new user
-            MoodleModuleContent content = new_content;
+            ModuleContent content = new_content;
             content.save();
             return content;
         }
     }
 
-    private static void UpdateContent(MoodleModuleContent old_content,MoodleModuleContent new_contnent)
+    private static void UpdateContent(ModuleContent old_content, ModuleContent new_contnent)
     {
         old_content = new_contnent;
         old_content.save();

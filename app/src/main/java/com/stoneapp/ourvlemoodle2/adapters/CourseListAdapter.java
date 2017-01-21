@@ -37,14 +37,14 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.stoneapp.ourvlemoodle2.activities.CourseViewActivity;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
+import com.stoneapp.ourvlemoodle2.models.Course;
 import com.stoneapp.ourvlemoodle2.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.CourseViewHolder> {
-    private List<MoodleCourse> courses;
+    private List<Course> courses;
     private Context context;
     private String token;
     private long siteid;
@@ -54,7 +54,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
         private final TextView course_fullname;
         private final ImageView courseIcon;
 
-        public CourseViewHolder(View v, final List<MoodleCourse> courses, final String token, final long siteid) {
+        public CourseViewHolder(View v, final List<Course> courses, final String token, final long siteid) {
             super(v);
 
             v.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +97,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
         }
     }
 
-    public CourseListAdapter(Context context, List<MoodleCourse> courses, String token, long siteid) {
+    public CourseListAdapter(Context context, List<Course> courses, String token, long siteid) {
         this.courses = new ArrayList<>(courses);
         this.context = context;
         this.token = token;
@@ -114,7 +114,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
 
     @Override
     public void onBindViewHolder(CourseViewHolder courseViewHolder, int position) {
-        MoodleCourse course = courses.get(position);
+        Course course = courses.get(position);
 
         String course_fullname = course.getFullname();
 
@@ -151,7 +151,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Co
         return courses.size();
     }
 
-    public void updateList(List<MoodleCourse> courses) {
+    public void updateList(List<Course> courses) {
         this.courses = new ArrayList<>(courses);
         notifyDataSetChanged();
     }

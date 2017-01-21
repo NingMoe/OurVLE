@@ -21,17 +21,11 @@ package com.stoneapp.ourvlemoodle2.fragments;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -40,22 +34,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.activeandroid.query.Select;
-import com.amulyakhare.textdrawable.TextDrawable;
 import com.stoneapp.ourvlemoodle2.adapters.MemberListAdapter;
-import com.stoneapp.ourvlemoodle2.models.MoodleMember;
-import com.stoneapp.ourvlemoodle2.tasks.MemberSync;
-import com.stoneapp.ourvlemoodle2.activities.ProfileActivity;
+import com.stoneapp.ourvlemoodle2.models.Member;
+import com.stoneapp.ourvlemoodle2.sync.MemberSync;
 
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
@@ -72,7 +59,7 @@ public class MembersFragment extends Fragment
     private String mCourseid;
     private String mToken;
     private Context mContext;
-    private List<MoodleMember> mMembers;
+    private List<Member> mMembers;
     private MemberListAdapter mMeberListAdapter;
     private MenuItem searchitem;
     private View mRootView;
@@ -81,7 +68,7 @@ public class MembersFragment extends Fragment
     private SearchView searchView;
     private TextView mTvPlaceHolder;
     private ImageView mImgPlaceHolder;
-    private List<MoodleMember> filteredMemList;
+    private List<Member> filteredMemList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -130,7 +117,7 @@ public class MembersFragment extends Fragment
 
     private void getMembersFromDatabase()
     {
-        mMembers = new Select().from(MoodleMember.class).where("courseid = ?", mCourseid).execute();
+        mMembers = new Select().from(Member.class).where("courseid = ?", mCourseid).execute();
     }
 
     private void initViews()
@@ -150,9 +137,9 @@ public class MembersFragment extends Fragment
 
     private void sortMembers()
     {
-        Collections.sort(mMembers, new Comparator<MoodleMember>() {
+        Collections.sort(mMembers, new Comparator<Member>() {
             @Override
-            public int compare(MoodleMember lhs, MoodleMember rhs) {
+            public int compare(Member lhs, Member rhs) {
                 return lhs.getFullname().toLowerCase().trim().compareTo(rhs.getFullname().toLowerCase().trim());
             }
         });
@@ -207,18 +194,18 @@ public class MembersFragment extends Fragment
 
     @Override
     public boolean onQueryTextChange(String query) {
-        final List<MoodleMember> filteredModelList = filter(mMembers,query );
+        final List<Member> filteredModelList = filter(mMembers,query );
         mMeberListAdapter.animateTo(filteredModelList,query);
         mMemberListView.scrollToPosition(0);
         return true;
 
     }
 
-    private List<MoodleMember> filter(List<MoodleMember> models, String query) {
+    private List<Member> filter(List<Member> models, String query) {
         query = query.toLowerCase();
-        final List<MoodleMember> filteredModelList = new ArrayList<>();
-        List<MoodleMember> startModelList = new ArrayList<>();
-        for (MoodleMember model : models) {
+        final List<Member> filteredModelList = new ArrayList<>();
+        List<Member> startModelList = new ArrayList<>();
+        for (Member model : models) {
             final String text = model.getFullname().toLowerCase();
             if(text.startsWith(query)){
                 startModelList.add(model);

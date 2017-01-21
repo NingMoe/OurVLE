@@ -17,19 +17,19 @@
  * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.stoneapp.ourvlemoodle2.tasks;
+package com.stoneapp.ourvlemoodle2.sync;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.rest.MoodleRestCourse;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.rest.RestCourse;
 
 public class CourseSync {
     String token;
-    ArrayList<MoodleCourse> courses;
+    ArrayList<Course> courses;
 
     public CourseSync(String token){
         this.token = token;
@@ -38,7 +38,7 @@ public class CourseSync {
     public boolean syncCourses(String userid) {
 
 
-        MoodleRestCourse mcourse = new MoodleRestCourse(token);
+        RestCourse mcourse = new RestCourse(token);
 
         courses = mcourse.getCourses(userid); // gets a list of courses from api call
 
@@ -53,9 +53,9 @@ public class CourseSync {
         try {
             //deleteStaleData();
             for (int i = 0; i < courses.size(); i++) {
-                final MoodleCourse course = courses.get(i);
+                final Course course = courses.get(i);
 
-                MoodleCourse.findOrCreateFromJson(course); // saves contact to database
+                Course.findOrCreateFromJson(course); // saves contact to database
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
@@ -68,17 +68,17 @@ public class CourseSync {
     private void deleteStaleData()
     {
 
-        List<MoodleCourse> stale_course = new Select().all().from(MoodleCourse.class).execute();
+        List<Course> stale_course = new Select().all().from(Course.class).execute();
         for(int i=0;i<stale_course.size();i++)
         {
             if(!doesCourseExistInJson(stale_course.get(i)))
             {
-                MoodleCourse.delete(MoodleCourse.class,stale_course.get(i).getId());
+                Course.delete(Course.class,stale_course.get(i).getId());
             }
         }
     }
 
-    private boolean doesCourseExistInJson(MoodleCourse course)
+    private boolean doesCourseExistInJson(Course course)
     {
         return courses.contains(course);
     }

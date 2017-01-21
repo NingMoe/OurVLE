@@ -31,7 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.stoneapp.ourvlemoodle2.R;
-import com.stoneapp.ourvlemoodle2.tasks.LogoutTask;
+import com.stoneapp.ourvlemoodle2.task.LogoutTask;
 
 public class SettingsActivity extends AppCompatActivity {
     @Override

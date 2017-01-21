@@ -22,9 +22,6 @@ package com.stoneapp.ourvlemoodle2.adapters;
 import android.content.Context;
 import android.content.Intent;
 
-import android.graphics.Color;
-import android.graphics.Typeface;
-
 import android.support.v7.widget.RecyclerView;
 
 import android.text.TextUtils;
@@ -36,11 +33,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
-import com.amulyakhare.textdrawable.TextDrawable;
 import com.stoneapp.ourvlemoodle2.activities.PostActivity;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.models.Discussion;
 import com.stoneapp.ourvlemoodle2.util.TimeUtils;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
 import com.stoneapp.ourvlemoodle2.R;
 
 import java.util.ArrayList;
@@ -48,7 +44,7 @@ import java.util.List;
 
 public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAdapter.DiscussionViewHolder> {
     private Context context;
-    private List<MoodleDiscussion> discussionList;
+    private List<Discussion> discussionList;
     private String token;
 
     public static class DiscussionViewHolder extends RecyclerView.ViewHolder {
@@ -60,7 +56,7 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
         private final ImageView icon;
 
         public DiscussionViewHolder(View v, final Context context,
-                                    final List<MoodleDiscussion> mDataSet, final String token) {
+                                    final List<Discussion> mDataSet, final String token) {
             super(v);
 
             v.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +109,7 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
         }
     }
 
-    public DiscussionListAdapter(Context context, List<MoodleDiscussion> discussionList, String token){
+    public DiscussionListAdapter(Context context, List<Discussion> discussionList, String token){
         this.context = context;
         this.discussionList = new ArrayList<>(discussionList);
         this.token = token;
@@ -130,13 +126,13 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
     @Override
     public void onBindViewHolder(DiscussionViewHolder holder, int position) {
 
-        final MoodleDiscussion discussion = discussionList.get(position);
+        final Discussion discussion = discussionList.get(position);
 
         String topic_name = discussion.getName();
         if (!TextUtils.isEmpty(topic_name))
             holder.getTopicNameView().setText(topic_name);
 
-        MoodleCourse course = new Select().from(MoodleCourse.class).where("courseid = ?", discussion.getCourseid()).executeSingle();
+        Course course = new Select().from(Course.class).where("courseid = ?", discussion.getCourseid()).executeSingle();
         if(course!=null)
         {
             String coursename = course.getShortname();
@@ -167,7 +163,7 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
         return discussionList.size();
     }
 
-    public void updateDiscussionList(List<MoodleDiscussion> newDiscussions) {
+    public void updateDiscussionList(List<Discussion> newDiscussions) {
         this.discussionList = new ArrayList<>(newDiscussions);
         notifyDataSetChanged();
     }

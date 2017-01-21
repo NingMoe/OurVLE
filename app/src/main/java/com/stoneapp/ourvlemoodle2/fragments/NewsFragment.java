@@ -20,14 +20,11 @@
 package com.stoneapp.ourvlemoodle2.fragments;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -39,14 +36,13 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.DiscussionListAdapter;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
-import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
-import com.stoneapp.ourvlemoodle2.models.MoodleForum;
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
-import com.stoneapp.ourvlemoodle2.tasks.DiscussionSync;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.models.Discussion;
+import com.stoneapp.ourvlemoodle2.models.Forum;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
+import com.stoneapp.ourvlemoodle2.sync.DiscussionSync;
 import com.stoneapp.ourvlemoodle2.R;
-import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
+import com.stoneapp.ourvlemoodle2.sync.ForumSync;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 import com.stoneapp.ourvlemoodle2.view.NpaLinearLayoutManager;
 
@@ -60,7 +56,7 @@ public class NewsFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener{
 
 
-    private List<MoodleDiscussion> mDiscussions;
+    private List<Discussion> mDiscussions;
     private DiscussionListAdapter mDiscussionListAdapter;
     private String mToken;
     private ArrayList<String> mForumIds;
@@ -82,7 +78,7 @@ public class NewsFragment extends Fragment
 
         setUpSwipeRefresh();
 
-        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        List<SiteInfo> sites = new Select().all().from(SiteInfo.class).execute();
         mToken = sites.get(0).getToken(); // url token
 
         getDiscussionsFromDatabase();
@@ -109,7 +105,7 @@ public class NewsFragment extends Fragment
 
     private void getDiscussionsFromDatabase()
     {
-        mDiscussions = new Select().all().from(MoodleDiscussion.class).execute();
+        mDiscussions = new Select().all().from(Discussion.class).execute();
     }
 
     private void initViews()
@@ -124,9 +120,9 @@ public class NewsFragment extends Fragment
     private void sortDiscussions()
     {
         // Order discussion by time modified
-        Collections.sort(mDiscussions,new Comparator<MoodleDiscussion>() {
+        Collections.sort(mDiscussions,new Comparator<Discussion>() {
             @Override
-            public int compare(MoodleDiscussion lhs, MoodleDiscussion rhs) {
+            public int compare(Discussion lhs, Discussion rhs) {
                 if (lhs.getTimemodified() < rhs.getTimemodified())
                     return 1;
                 else
@@ -163,7 +159,7 @@ public class NewsFragment extends Fragment
 
     private void initCourseIds()
     {
-        List<MoodleCourse> courses = new Select().all().from(MoodleCourse.class).execute();
+        List<Course> courses = new Select().all().from(Course.class).execute();
         for(int i=0;i<courses.size();i++)
         {
             mCourseIds.add(courses.get(i).getCourseid()+"");
@@ -172,8 +168,8 @@ public class NewsFragment extends Fragment
 
     private void initForumIds()
     {
-        List<MoodleForum>forums  = new Select().all().from(MoodleForum.class).execute(); // all forums
-        ArrayList<MoodleForum> news_forums = new ArrayList<>();
+        List<Forum>forums  = new Select().all().from(Forum.class).execute(); // all forums
+        ArrayList<Forum> news_forums = new ArrayList<>();
 
         int len = forums.size();
 

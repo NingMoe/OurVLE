@@ -24,12 +24,13 @@ import java.util.List;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
-public class MoodleSection extends Model{
+@Table(name="Section")
+public class Section extends Model{
 
     @Column(name="sectionid")
     @SerializedName("id")
@@ -51,7 +52,7 @@ public class MoodleSection extends Model{
 
     @Ignore
     @SerializedName("modules")
-    ArrayList<MoodleModule> modules;
+    ArrayList<Module> modules;
 
     // Relational parameters
     @Column(name="parentid")
@@ -62,6 +63,12 @@ public class MoodleSection extends Model{
 
     @Column(name="siteid")
     Long siteid;
+
+
+    public Section()
+    {
+        super();
+    }
 
     /**
      * Section ID
@@ -113,7 +120,7 @@ public class MoodleSection extends Model{
      *
      * @return
      */
-    public ArrayList<MoodleModule> getModules() {
+    public ArrayList<Module> getModules() {
         return modules;
     }
 
@@ -123,8 +130,8 @@ public class MoodleSection extends Model{
      *
      * @return
      */
-    public void setModules(List<MoodleModule> modules) {
-        this.modules = new ArrayList<MoodleModule>(modules);
+    public void setModules(List<Module> modules) {
+        this.modules = new ArrayList<Module>(modules);
     }
 
     /**
@@ -185,23 +192,23 @@ public class MoodleSection extends Model{
         this.siteid = siteid;
     }
 
-    public static MoodleSection findOrCreateFromJson(MoodleSection new_section) {
+    public static Section findOrCreateFromJson(Section new_section) {
         int sectionid = new_section.getSectionid();
-        MoodleSection existingSection =
-                new Select().from(MoodleSection.class).where("sectionid = ?", sectionid).executeSingle();
+        Section existingSection =
+                new Select().from(Section.class).where("sectionid = ?", sectionid).executeSingle();
         if (existingSection != null) {
             // found and return existing
            // UpdateSection(existingSection,new_section);
             return existingSection;
         } else {
             // create and return new user
-            MoodleSection section = new_section;
+            Section section = new_section;
             section.save();
             return section;
         }
     }
 
-    private static void UpdateSection(MoodleSection old_section,MoodleSection new_section)
+    private static void UpdateSection(Section old_section, Section new_section)
     {
         old_section = new_section;
         old_section.save();

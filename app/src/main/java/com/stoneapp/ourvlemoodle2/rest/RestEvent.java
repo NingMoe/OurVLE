@@ -25,43 +25,56 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.sql.Timestamp;
+import java.util.List;
 
+import com.stoneapp.ourvlemoodle2.models.Events;
 import com.stoneapp.ourvlemoodle2.util.GsonExclude;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
-public class MoodleRestCourse  {
-    private String token;
-    private final String format = MoodleConstants.format; // format of output eg json/xml
-    private final String function  = MoodleConstants.COURSES_FUNCTION; // api function call
-    private String url = MoodleConstants.URL; // domain url
+public class RestEvent {
 
-    public MoodleRestCourse(String token) { this.token = token; }
+    String token;
+    String url = MoodleConstants.URL; //website url
+    String function = MoodleConstants.EVENTS_FUNCTION; //rest api function
+    String format = MoodleConstants.format; //format of output
 
-    public ArrayList<MoodleCourse> getCourses(String userid) {
-        ArrayList<MoodleCourse> courses = new ArrayList<>();
+    public RestEvent(String token){
+        this.token = token;
+    }
+
+    public Events getEvents(List<String> courseids) {
+        long today_millis = System.currentTimeMillis();
+        Timestamp timestamp = new Timestamp(today_millis);
+        long timestart = timestamp.getTime() / 1000;
+        Events events = null;
+        String url = MoodleConstants.URL;
+        String function = MoodleConstants.EVENTS_FUNCTION;
+        String format = MoodleConstants.format;
+        String params = "";
         try {
-            String params = "&"+ URLEncoder.encode("userid", "UTF-8")+ "=" + userid;
-            String rest_url = url + "/webservice/rest/server.php" + "?wstoken=" + token
-                    + "&wsfunction="+function+"&moodlewsrestformat=" + format;
+            params+="&options[timeend]="+URLEncoder.encode(today_millis+"","UTF-8");
+            params+="&options[timestart]="+URLEncoder.encode(timestart+"","UTF-8");
 
+            for(int i = 0; i < courseids.size();i++){
+                params+="&events[courseids]["+i+"]=" + URLEncoder.encode(courseids.get(i),"UTF-8");
+            }
+            String url_rest = url + "/webservice/rest/server.php" + "?wstoken="
+                    + token + "&wsfunction=" + function
+                    + "&moodlewsrestformat=" + format;
             HttpURLConnection con;
             try {
-                con = (HttpURLConnection) new URL(rest_url+params).openConnection();
+                con = (HttpURLConnection) new URL(url_rest + params).openConnection();
                 con.setRequestMethod("POST");
-                con.setRequestProperty("Accept", "application/xml");
-                con.setRequestProperty("Content-Language", "en-US");
+                con.setRequestProperty("Accept","application/xml");
+                con.setRequestProperty("Content-Language", "en-Us");
                 con.setDoOutput(true);
 
                 OutputStreamWriter writer = new OutputStreamWriter(con.getOutputStream());
-
                 writer.write("");
                 writer.flush();
                 writer.close();
@@ -72,8 +85,7 @@ public class MoodleRestCourse  {
                 Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                         .addSerializationExclusionStrategy(exclude).create();
 
-                courses = gson.fromJson(reader, new TypeToken<List<MoodleCourse>>(){}.getType());
-
+                events = gson.fromJson(reader, Events.class);
                 reader.close();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -85,6 +97,6 @@ public class MoodleRestCourse  {
             return null;
         }
 
-        return courses;
+        return events;
     }
 }

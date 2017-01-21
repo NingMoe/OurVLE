@@ -36,14 +36,14 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.stoneapp.ourvlemoodle2.R;
-import com.stoneapp.ourvlemoodle2.models.MoodlePost;
+import com.stoneapp.ourvlemoodle2.models.Post;
 import com.stoneapp.ourvlemoodle2.util.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostListViewHolder> {
-    private List<MoodlePost> postList;
+    private List<Post> postList;
     private Context context;
 
     public static class PostListViewHolder extends RecyclerView.ViewHolder {
@@ -84,7 +84,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
         }
     }
 
-    public PostListAdapter(Context context, List<MoodlePost> postList) {
+    public PostListAdapter(Context context, List<Post> postList) {
         this.postList = new ArrayList<>(postList);
         this.context = context;
     }
@@ -102,7 +102,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
 
         if(position>=0)
         {
-            MoodlePost post = postList.get(position);
+            Post post = postList.get(position);
 
             String subject = post.getSubject();
             if (!TextUtils.isEmpty(subject))
@@ -169,7 +169,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
         return postList.size();
     }
 
-    public void updatePosts(List<MoodlePost> newPosts) {
+    public void updatePosts(List<Post> newPosts) {
         postList = new ArrayList<>(newPosts);
         notifyDataSetChanged();
     }

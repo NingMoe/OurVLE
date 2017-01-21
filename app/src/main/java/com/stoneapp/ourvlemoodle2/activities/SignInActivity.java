@@ -19,15 +19,13 @@
 
 package com.stoneapp.ourvlemoodle2.activities;
 
-import com.stoneapp.ourvlemoodle2.util.ImageDownloader;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
+import com.stoneapp.ourvlemoodle2.models.Token;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
-import com.stoneapp.ourvlemoodle2.models.MoodleToken;
-import com.stoneapp.ourvlemoodle2.rest.MoodleLogin;
-import com.stoneapp.ourvlemoodle2.rest.MoodleRestCourse;
-import com.stoneapp.ourvlemoodle2.rest.MoodleRestSiteInfo;
-import com.stoneapp.ourvlemoodle2.tasks.ForumSync;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.rest.RestToken;
+import com.stoneapp.ourvlemoodle2.rest.RestCourse;
+import com.stoneapp.ourvlemoodle2.rest.RestSiteInfo;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -81,41 +79,17 @@ public class SignInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final List<String> permissions = new ArrayList<String>();
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR)
-                != PackageManager.PERMISSION_GRANTED)
-            permissions.add(Manifest.permission.WRITE_CALENDAR);
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED)
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permissions.size() > 0) {
-            ActivityCompat.requestPermissions(this, permissions.toArray(new String[permissions.size()]),
-                    MY_PERMISSIONS_REQUEST_MULTIPLE);
-        }
+        requestPermissions();
 
         setContentView(R.layout.activity_sign_in);
 
-        mBtn = (Button) findViewById(R.id.button);
-        mUserId = (EditText) findViewById(R.id.editTextUser);
-        mUserPass = (EditText) findViewById(R.id.editPassword);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBarSignIn);
-        mTvLoginHelp = (TextView) findViewById(R.id.login_help);
-        mTvUserLabel = (TextInputLayout) findViewById(R.id.idnum_float_label);
-        mTvUserPassLabel = (TextInputLayout) findViewById(R.id.password_float_label);
-        mImageIcon = (ImageView) findViewById(R.id.imgView);
-        mProgressBar.setIndeterminate(true);
+        initViews();
 
         mUserPass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                    InputMethodManager inputManager = (InputMethodManager) SignInActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
                     signin(v);
                     handled = true;
                 }
@@ -156,6 +130,37 @@ public class SignInActivity extends AppCompatActivity {
         }
     }
 
+    private void requestPermissions()
+    {
+        final List<String> permissions = new ArrayList();
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR)
+                != PackageManager.PERMISSION_GRANTED)
+            permissions.add(Manifest.permission.WRITE_CALENDAR);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permissions.size() > 0) {
+            ActivityCompat.requestPermissions(this, permissions.toArray(new String[permissions.size()]),
+                    MY_PERMISSIONS_REQUEST_MULTIPLE);
+        }
+    }
+
+    private void initViews()
+    {
+        mBtn = (Button) findViewById(R.id.button);
+        mUserId = (EditText) findViewById(R.id.editTextUser);
+        mUserPass = (EditText) findViewById(R.id.editPassword);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBarSignIn);
+        mTvLoginHelp = (TextView) findViewById(R.id.login_help);
+        mTvUserLabel = (TextInputLayout) findViewById(R.id.idnum_float_label);
+        mTvUserPassLabel = (TextInputLayout) findViewById(R.id.password_float_label);
+        mImageIcon = (ImageView) findViewById(R.id.imgView);
+        mProgressBar.setIndeterminate(true);
+    }
+
     public void signin(View v) {
         InputMethodManager inputManager = (InputMethodManager) SignInActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -172,12 +177,14 @@ public class SignInActivity extends AppCompatActivity {
             mUserId.setError("This field is required");
             focusView = mUserId;
             focusView.requestFocus();
+            return;
         }
 
         if (TextUtils.isEmpty(password)) {
             mUserPass.setError("Enter password");
             focusView = mUserPass;
             focusView.requestFocus();
+            return;
         }
 
         mUserPass.setText("");
@@ -215,8 +222,8 @@ public class SignInActivity extends AppCompatActivity {
         private String token;
         private String error = "";
         private String name = "";
-        private MoodleSiteInfo siteInfo;
-        private ArrayList<MoodleCourse> courses;
+        private SiteInfo siteInfo;
+        private ArrayList<Course> courses;
 
         public LoginTask(String user_name, String user_passwd) {
             this.user_name = user_name;
@@ -256,8 +263,10 @@ public class SignInActivity extends AppCompatActivity {
         }
 
         private boolean getToken() {
-            MoodleLogin login = new MoodleLogin(user_name, user_passwd); // logs into the database using the api and gets the user token
-            MoodleToken mtoken = login.getToken();
+            RestToken restToken = new RestToken(user_name, user_passwd); // logs into the database using the api and gets the user token
+            Token mtoken = restToken.getToken();
+
+            if(mtoken == null) return false;
 
             // if there is no token
             // usually occurs if the user is not a valid user or lack of internet connectivity
@@ -267,23 +276,30 @@ public class SignInActivity extends AppCompatActivity {
                 return false;
             }
 
-
             this.token = mtoken.getToken(); // gets the string of characters that represent the token
 
             return true;
         }
 
         private boolean getSiteInfo(){
-            MoodleRestSiteInfo sInfo = new MoodleRestSiteInfo(token);
-            siteInfo = sInfo.getSiteInfo();
+            RestSiteInfo restSiteInfo = new RestSiteInfo(token);
+            siteInfo = restSiteInfo.getSiteInfo();
+
+            if(siteInfo==null)
+            {
+                error = "Unable to get site information";
+                return false;
+            }
 
             if (siteInfo.getFullname() == null) // if no site info is present
+            {
+                error = "Unable to get site information";
                 return false;
+            }
 
             siteInfo.setToken(token); // sets the token for the site info model
             siteInfo.save(); // save the user profile data
 
-            this.name = siteInfo.getFullname();
 
             return true;
         }
@@ -291,7 +307,7 @@ public class SignInActivity extends AppCompatActivity {
 
 
         private boolean getCourses() {
-            MoodleRestCourse mcourse= new MoodleRestCourse(token);
+            RestCourse mcourse = new RestCourse(token);
             courses  = mcourse.getCourses(siteInfo.getUserid()+  ""); // gets courses from api call
 
             if (courses == null) // if there are no courses
@@ -308,7 +324,7 @@ public class SignInActivity extends AppCompatActivity {
             }
 
 
-            MoodleCourse course;
+            Course course;
             for (int i = 0; i < courses.size(); i++) {
                 course = courses.get(i);
                 course.setSiteid(siteInfo.getId());

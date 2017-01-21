@@ -17,7 +17,7 @@
  * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.stoneapp.ourvlemoodle2.tasks;
+package com.stoneapp.ourvlemoodle2.sync;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -25,7 +25,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
@@ -34,7 +33,6 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -42,19 +40,16 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.BuildConfig;
 import com.stoneapp.ourvlemoodle2.activities.MainActivity;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
-import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
-import com.stoneapp.ourvlemoodle2.models.MoodleEvents;
-import com.stoneapp.ourvlemoodle2.rest.MoodleRestEvent;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.models.Event;
+import com.stoneapp.ourvlemoodle2.models.Events;
+import com.stoneapp.ourvlemoodle2.rest.RestEvent;
 import com.stoneapp.ourvlemoodle2.R;
-import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
-import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 public class EventSync {
     String token;
     Context context;
-    List<MoodleEvent> mevents;
+    List<Event> mevents;
 
     public EventSync(Context context, String token) {
         this.token = token;
@@ -62,8 +57,8 @@ public class EventSync {
     }
 
     public boolean syncEvents(List<String> courseids) {
-        MoodleRestEvent mrevent  = new MoodleRestEvent(token);
-        MoodleEvents events = mrevent.getEvents(courseids); // get events from api call
+        RestEvent mrevent  = new RestEvent(token);
+        Events events = mrevent.getEvents(courseids); // get events from api call
 
         // check if events present
         if (events == null)
@@ -82,14 +77,14 @@ public class EventSync {
         try {
             deleteStaleData();
             for (int i = 0; i < mevents.size(); i++) {
-                final MoodleEvent event = mevents.get(i);
-                MoodleCourse eventCourse = new Select().from(MoodleEvent.class).where("courseid = ?",event.getCourseid()).executeSingle();
+                final Event event = mevents.get(i);
+                Course eventCourse = new Select().from(Event.class).where("courseid = ?",event.getCourseid()).executeSingle();
                 if(eventCourse!=null)
                 {
                     event.setCoursename(eventCourse.getShortname());
                 }
 
-                MoodleEvent.findOrCreateFromJson(event); // saves contact to database
+                Event.findOrCreateFromJson(event); // saves contact to database
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
@@ -102,17 +97,17 @@ public class EventSync {
     private void deleteStaleData()
     {
 
-        List<MoodleEvent> stale_events = new Select().all().from(MoodleEvent.class).execute();
+        List<Event> stale_events = new Select().all().from(Event.class).execute();
         for(int i=0;i<stale_events.size();i++)
         {
             if(!doesEventExistInJson(stale_events.get(i)))
             {
-                MoodleEvent.delete(MoodleEvent.class,stale_events.get(i).getId());
+                Event.delete(Event.class,stale_events.get(i).getId());
             }
         }
     }
 
-    private boolean doesEventExistInJson(MoodleEvent event)
+    private boolean doesEventExistInJson(Event event)
     {
         return mevents.contains(event);
     }
@@ -129,7 +124,7 @@ public class EventSync {
         return false;
     }
 
-    public void addCalendarEvent(MoodleEvent event) {
+    public void addCalendarEvent(Event event) {
         Calendar cal = Calendar.getInstance();
         Uri EVENTS_URI = Uri.parse("content://com.android.calendar/" + "events"); //creates a new uri for calendar
         ContentResolver cr = context.getContentResolver();
@@ -193,7 +188,7 @@ public class EventSync {
         return calendarUriBase;
     }
 
-    public void addNotification (MoodleEvent event) {
+    public void addNotification (Event event) {
         TaskStackBuilder stackBuilder =  TaskStackBuilder.create(context);
         stackBuilder.addParentStack(MainActivity.class);
 

@@ -26,12 +26,11 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 
-@Table(name="MoodleCourse")
-public class MoodleCourse extends Model{
+@Table(name="Course")
+public class Course extends Model{
 
 
     @SerializedName("id")
@@ -143,7 +142,7 @@ public class MoodleCourse extends Model{
     Boolean isUserCourse = false;
     Boolean isFavCourse = false;
 
-    public MoodleCourse() {
+    public Course() {
         super();
 
     }
@@ -154,7 +153,7 @@ public class MoodleCourse extends Model{
      * @param siteid
      *            siteid of the Moodle account to which this course belongs to.
      */
-    public MoodleCourse(long siteid) {
+    public Course(long siteid) {
         super();
         this.siteid = siteid;
     }
@@ -476,23 +475,23 @@ public class MoodleCourse extends Model{
         this.courseid = courseid;
     }
 
-    public static MoodleCourse findOrCreateFromJson(MoodleCourse new_course) {
+    public static Course findOrCreateFromJson(Course new_course) {
         int courseid = new_course.getCourseid();
-        MoodleCourse existingCourse =
-                new Select().from(MoodleCourse.class).where("courseid = ?", courseid).executeSingle();
+        Course existingCourse =
+                new Select().from(Course.class).where("courseid = ?", courseid).executeSingle();
         if (existingCourse != null) {
             // found and return existing
             UpdateCourse(existingCourse,new_course);
             return existingCourse;
         } else {
             // create and return new user
-            MoodleCourse course = new_course;
+            Course course = new_course;
             course.save();
             return course;
         }
     }
 
-    private static void UpdateCourse(MoodleCourse old_course,MoodleCourse new_course)
+    private static void UpdateCourse(Course old_course, Course new_course)
     {
         old_course.setFullname(new_course.getFullname());
         old_course.setShortname(new_course.getShortname());

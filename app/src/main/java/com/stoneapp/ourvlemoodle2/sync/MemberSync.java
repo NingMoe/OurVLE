@@ -17,21 +17,19 @@
  * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.stoneapp.ourvlemoodle2.tasks;
+package com.stoneapp.ourvlemoodle2.sync;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleMember;
-import com.stoneapp.ourvlemoodle2.rest.MoodleRestMembers;
+import com.stoneapp.ourvlemoodle2.models.Member;
+import com.stoneapp.ourvlemoodle2.rest.RestMembers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MemberSync {
 
     private String token;
-    private List<MoodleMember> members;
+    private List<Member> members;
 
     public MemberSync(String token) {
         this.token = token;
@@ -39,7 +37,7 @@ public class MemberSync {
 
     public boolean syncMembers(String courseid) {
 
-        MoodleRestMembers mrmembers = new MoodleRestMembers(token);
+        RestMembers mrmembers = new RestMembers(token);
 
         members = mrmembers.getMembers(courseid); // gets a list of members from api call
 
@@ -52,10 +50,10 @@ public class MemberSync {
         try {
             deleteStaleData();
             for (int i = 0; i < members.size(); i++) {
-                final MoodleMember member = members.get(i);
+                final Member member = members.get(i);
                 member.setCourseid(courseid);
 
-                MoodleMember.findOrCreateFromJson(member); // saves contact to database
+                Member.findOrCreateFromJson(member); // saves contact to database
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
@@ -68,17 +66,17 @@ public class MemberSync {
     private void deleteStaleData()
     {
 
-        List<MoodleMember> stale_members = new Select().all().from(MoodleMember.class).execute();
+        List<Member> stale_members = new Select().all().from(Member.class).execute();
         for(int i=0;i<stale_members.size();i++)
         {
             if(!doesMemberExistInJson(stale_members.get(i)))
             {
-                MoodleMember.delete(MoodleMember.class,stale_members.get(i).getId());
+                Member.delete(Member.class,stale_members.get(i).getId());
             }
         }
     }
 
-    private boolean doesMemberExistInJson(MoodleMember member)
+    private boolean doesMemberExistInJson(Member member)
     {
         return members.contains(member);
     }

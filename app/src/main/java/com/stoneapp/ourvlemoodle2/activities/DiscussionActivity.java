@@ -26,8 +26,8 @@ import java.util.List;
 
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.adapters.DiscussionListAdapter;
-import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
-import com.stoneapp.ourvlemoodle2.tasks.DiscussionSync;
+import com.stoneapp.ourvlemoodle2.models.Discussion;
+import com.stoneapp.ourvlemoodle2.sync.DiscussionSync;
 import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.util.ConnectUtils;
 
@@ -47,12 +47,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class DiscussionActivity extends AppCompatActivity
         implements OnRefreshListener {
-    private List<MoodleDiscussion> mDiscussions;
+    private List<Discussion> mDiscussions;
     private int mForumId;
     private DiscussionListAdapter mDiscussionListAdapter;
     private String mForumName;
@@ -135,9 +134,9 @@ public class DiscussionActivity extends AppCompatActivity
 
     private void sortDiscussions()
     {
-        Collections.sort(mDiscussions, new Comparator<MoodleDiscussion>() {
+        Collections.sort(mDiscussions, new Comparator<Discussion>() {
             @Override
-            public int compare(MoodleDiscussion moodleDiscussion1, MoodleDiscussion moodleDiscussion2) {
+            public int compare(Discussion moodleDiscussion1, Discussion moodleDiscussion2) {
                 if (moodleDiscussion1.getTimemodified() < moodleDiscussion2.getTimemodified())
                     return 1;
 
@@ -182,7 +181,7 @@ public class DiscussionActivity extends AppCompatActivity
 
     private void getDiscussionsFromDatabase()
     {
-        mDiscussions = new Select().from(MoodleDiscussion.class).where("forumid = ?",mForumId).execute();
+        mDiscussions = new Select().from(Discussion.class).where("forumid = ?",mForumId).execute();
     }
 
     private boolean isConnected() {

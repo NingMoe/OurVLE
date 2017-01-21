@@ -22,8 +22,8 @@ package com.stoneapp.ourvlemoodle2.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.stoneapp.ourvlemoodle2.models.MoodleModule;
-import com.stoneapp.ourvlemoodle2.models.MoodleModuleContent;
+import com.stoneapp.ourvlemoodle2.models.Module;
+import com.stoneapp.ourvlemoodle2.models.ModuleContent;
 import com.stoneapp.ourvlemoodle2.R;
 
 public class ImageChooser {
@@ -32,7 +32,7 @@ public class ImageChooser {
      * @param module
      * @return image
      */
-    public static int getImage(MoodleModule module) {
+    public static int getImage(Module module) {
         String modname = module.getModname();
 
         switch (modname) {
@@ -61,7 +61,7 @@ public class ImageChooser {
                 return R.drawable.ic_feedback_24dp;
 
             case "resource":
-                ArrayList<MoodleModuleContent>contents = module.getContents();
+                ArrayList<ModuleContent>contents = module.getContents();
                 if (contents == null)
                     return R.drawable.ic_insert_drive_file_24dp;
 

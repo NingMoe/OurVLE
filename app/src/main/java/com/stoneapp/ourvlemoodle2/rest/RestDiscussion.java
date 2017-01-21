@@ -30,31 +30,31 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
+import com.stoneapp.ourvlemoodle2.models.Discussion;
 import com.stoneapp.ourvlemoodle2.util.GsonExclude;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-public class MoodleRestDiscussion {
+public class RestDiscussion {
 
     String token;
     String url = MoodleConstants.URL;
     String format = MoodleConstants.format;
     String function = MoodleConstants.DISCUSSION_FUNCTION;
 
-    public MoodleRestDiscussion(String token){
+    public RestDiscussion(String token){
         this.token =token;
     }
 
-    public ArrayList<MoodleDiscussion> getDiscussions(List<String> forumids){
+    public ArrayList<Discussion> getDiscussions(List<String> forumids){
 
         String url = MoodleConstants.URL;
         String format = MoodleConstants.format;
         String function = MoodleConstants.DISCUSSION_FUNCTION;
-        ArrayList<MoodleDiscussion> discussions = null;
-        MoodleDiscussion discussion;
+        ArrayList<Discussion> discussions = null;
+        Discussion discussion;
         //Toast.makeText(context, forumids.get(0), Toast.LENGTH_SHORT).show();
         //Toast.makeText(context, "Hello", Toast.LENGTH_SHORT).show();
         try {
@@ -86,8 +86,8 @@ public class MoodleRestDiscussion {
                 Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                         .addSerializationExclusionStrategy(exclude).create();
 
-                discussions = gson.fromJson(reader, new TypeToken<List<MoodleDiscussion>>(){}.getType());
-                // discussion = gson.fromJson(reader,MoodleDiscussion.class);
+                discussions = gson.fromJson(reader, new TypeToken<List<Discussion>>(){}.getType());
+                // discussion = gson.fromJson(reader,Discussion.class);
                 reader.close();
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
@@ -108,10 +108,10 @@ public class MoodleRestDiscussion {
         return discussions;
     }
 
-    /*public ArrayList<MoodleDiscussion> getDiscussions(List<String> forumids){
+    /*public ArrayList<Discussion> getDiscussions(List<String> forumids){
 
 
-        ArrayList<MoodleDiscussion> discussions = null;
+        ArrayList<Discussion> discussions = null;
         try {
             String url_params="";
 
@@ -135,7 +135,7 @@ public class MoodleRestDiscussion {
             Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                     .addSerializationExclusionStrategy(exclude).create();
 
-            discussions = gson.fromJson(reader, new TypeToken<List<MoodleDiscussion>>(){}.getType()); //converts json to java objects
+            discussions = gson.fromJson(reader, new TypeToken<List<Discussion>>(){}.getType()); //converts json to java objects
             reader.close();
 
         } catch (MalformedURLException e) {

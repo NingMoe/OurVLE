@@ -132,6 +132,13 @@
 
         <meta-data android:name="AA_DB_NAME" android:value="ourvlenew.db" />
         <meta-data android:name="AA_DB_VERSION" android:value="5" />
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="com.stoneapp.ourvlemoodle2.models.SiteInfo,com.stoneapp.ourvlemoodle2.models.Course,com.stoneapp.ourvlemoodle2.models.Event,com.stoneapp.ourvlemoodle2.models.Forum,
+            com.stoneapp.ourvlemoodle2.models.Discussion,com.stoneapp.ourvlemoodle2.models.Post,com.stoneapp.ourvlemoodle2.models.Section,
+            com.stoneapp.ourvlemoodle2.models.Module,com.stoneapp.ourvlemoodle2.models.ModuleContent,com.stoneapp.ourvlemoodle2.models.Post,
+            com.stoneapp.ourvlemoodle2.models.Member"/>
+
     </application>
 
 </manifest>

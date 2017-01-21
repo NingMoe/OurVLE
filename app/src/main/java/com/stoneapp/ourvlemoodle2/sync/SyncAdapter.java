@@ -28,16 +28,11 @@ import android.content.SyncResult;
 import android.os.Bundle;
 
 import com.activeandroid.query.Select;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.models.Discussion;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
-import com.stoneapp.ourvlemoodle2.models.MoodleForum;
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
-import com.stoneapp.ourvlemoodle2.tasks.ContentSync;
-import com.stoneapp.ourvlemoodle2.tasks.DiscussionSync;
-import com.stoneapp.ourvlemoodle2.tasks.EventSync;
-import com.stoneapp.ourvlemoodle2.tasks.MemberSync;
-import com.stoneapp.ourvlemoodle2.tasks.PostSync;
+import com.stoneapp.ourvlemoodle2.models.Forum;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +40,9 @@ import java.util.List;
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     int first_update;
     private String token;
-    private List<MoodleCourse> courses;
+    private List<Course> courses;
     private SharedPreferences sharedPrefs;
-    List<MoodleSiteInfo> mSites;
+    List<SiteInfo> mSites;
 
     /**
      * Set up the sync adapter
@@ -83,10 +78,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         first_update = sharedPrefs.getInt(MoodleConstants.FIRST_UPDATE, 404); // flag to check whether this is the first update
 
-        mSites = new Select().all().from(MoodleSiteInfo.class).execute();
+        mSites = new Select().all().from(SiteInfo.class).execute();
         token = mSites.get(0).getToken(); // gets the url token
 
-        courses = new Select().all().from(MoodleCourse.class).execute(); // gets all the courses
+        courses = new Select().all().from(Course.class).execute(); // gets all the courses
 
         updateLatestEvents();
         updateLatestForumPosts();
@@ -109,8 +104,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void updateLatestForumPosts() {
         ArrayList<String>forumids;
-        List<MoodleForum> forums  = new Select().all().from(MoodleForum.class).execute(); // gets a list of all the forums
-        ArrayList<MoodleForum>news_forums = new ArrayList<>();
+        List<Forum> forums  = new Select().all().from(Forum.class).execute(); // gets a list of all the forums
+        ArrayList<Forum>news_forums = new ArrayList<>();
 
         if(forums != null && forums.size() > 0) { // checks if there are no forums
             for(int i = 0; i < forums.size(); i++) {
@@ -136,7 +131,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void updateLatestDiscussionPots() {
         ArrayList<String> discussionids = new ArrayList<>();
-        List<MoodleDiscussion> discussions = new Select().all().from(MoodleDiscussion.class).execute(); // gets a list of all the forum discussions
+        List<Discussion> discussions = new Select().all().from(Discussion.class).execute(); // gets a list of all the forum discussions
 
         if(discussions != null && discussions.size() > 0) { // checks if there are no discussions
             for(int i = 0; i < discussions.size(); i++)

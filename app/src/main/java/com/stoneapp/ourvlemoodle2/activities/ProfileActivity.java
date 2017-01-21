@@ -47,10 +47,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
-import com.stoneapp.ourvlemoodle2.models.MemberCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleMember;
+import com.stoneapp.ourvlemoodle2.models.Member;
 import com.stoneapp.ourvlemoodle2.models.MoodleMessage;
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
 import com.stoneapp.ourvlemoodle2.rest.RestMessageCall;
 import com.stoneapp.ourvlemoodle2.R;
 
@@ -88,13 +87,13 @@ public class ProfileActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        MoodleMember member =
-                new Select().from(MoodleMember.class).where("memberid = ?", memberid).executeSingle();
+        Member member =
+                new Select().from(Member.class).where("memberid = ?", memberid).executeSingle();
 
 
 
 
-        List<MoodleSiteInfo> sites = new Select().all().from(MoodleSiteInfo.class).execute();
+        List<SiteInfo> sites = new Select().all().from(SiteInfo.class).execute();
         clientid = sites.get(0).getUserid();
 
         fab.setOnClickListener(new View.OnClickListener() {

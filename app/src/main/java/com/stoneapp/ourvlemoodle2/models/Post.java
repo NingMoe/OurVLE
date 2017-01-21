@@ -21,64 +21,77 @@ package com.stoneapp.ourvlemoodle2.models;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 
-public class MoodlePost extends Model {
+@Table(name="Post")
+public class Post extends Model {
+
+    @Column(name="postid")
+    @SerializedName("id")
+    int  postid; //Post id
+
+    @Column(name="discussionid")
+    @SerializedName("discussion")
+    int  discussionid; //Discussion id
+
+    @SerializedName("parentid")
+    int parentid;  //Parent id
+    @SerializedName("userid")
+    int  userid ; //User id
+
+    @Column(name="created")
+    @SerializedName("created")
+    int created;  //Creation time
+
+    @Column(name="modified")
+    @SerializedName("modified")
+    int  modified; //Time modified
+
+    @SerializedName("mailed")
+    int mailed ;   //Mailed?
+
+    @Column(name="subject")
+    @SerializedName("subject")
+    String  subject;  //The post subject
+
+    @Column(name="message")
+    @SerializedName("message")
+    String message ;  //The post message
+
+    @SerializedName("messageformat")
+    int messageformat ;   //The post message format
+
+    @SerializedName("messagetrust")
+    int messagetrust;    //Can we trust?
+
+    @SerializedName("attachment")
+    String  attachment;   //Attachments
+
+    @SerializedName("totalscore")
+    int totalscore;  //The post message total score
+
+    @SerializedName("mailnow")
+    int  mailnow ;
+
+    @SerializedName("cantreply")
+    boolean canreply;    //The user can reply to posts?
+
+    @SerializedName("postread")
+    boolean postread;   //The post was read
+
+    @Column(name="userfullname")
+    @SerializedName("userfullname")
+    String userfullname;
 
 
-     @Column(name="postid")
-     @SerializedName("id")
-     int  postid; //Post id
 
-     @Column(name="discussionid")
-     @SerializedName("discussion")
-     int  discussionid; //Discussion id
+    public Post()
+    {
+        super();
+    }
 
-     @SerializedName("parentid")
-     int parentid;  //Parent id
-     @SerializedName("userid")
-     int  userid ; //User id
-
-     @Column(name="created")
-     @SerializedName("created")
-     int created;  //Creation time
-
-     @Column(name="modified")
-     @SerializedName("modified")
-     int  modified; //Time modified
-     @SerializedName("mailed")
-     int mailed ;   //Mailed?
-
-     @Column(name="subject")
-     @SerializedName("subject")
-     String  subject;  //The post subject
-
-     @Column(name="message")
-     @SerializedName("message")
-     String message ;  //The post message
-
-
-     @SerializedName("messageformat")
-     int messageformat ;   //The post message format
-     @SerializedName("messagetrust")
-     int messagetrust;    //Can we trust?
-     @SerializedName("attachment")
-     String  attachment;   //Attachments
-     @SerializedName("totalscore")
-     int totalscore;  //The post message total score
-     @SerializedName("mailnow")
-     int  mailnow ;
-
-     @SerializedName("cantreply")
-     boolean canreply;    //The user can reply to posts?
-     @SerializedName("postread")
-     boolean postread;   //The post was read
-
-     @Column(name="userfullname")
-     @SerializedName("userfullname")
-     String userfullname;
 
     public int getPostid() {
         return postid;
@@ -216,23 +229,23 @@ public class MoodlePost extends Model {
         this.userfullname = userfullname;
     }
 
-    public static MoodlePost findOrCreateFromJson(MoodlePost new_post) {
+    public static Post findOrCreateFromJson(Post new_post) {
         int postid = new_post.getPostid();
-        MoodlePost existingPost =
-                new Select().from(MoodlePost.class).where("postid = ?", postid).executeSingle();
+        Post existingPost =
+                new Select().from(Post.class).where("postid = ?", postid).executeSingle();
         if (existingPost != null) {
             // found and return existing
             //UpdatePost(existingPost,new_post);
             return existingPost;
         } else {
             // create and return new user
-            MoodlePost post = new_post;
+            Post post = new_post;
             post.save();
             return post;
         }
     }
 
-    private static void UpdatePost(MoodlePost old_post,MoodlePost new_post)
+    private static void UpdatePost(Post old_post, Post new_post)
     {
         old_post = new_post;
         old_post.save();

@@ -21,14 +21,15 @@ package com.stoneapp.ourvlemoodle2.models;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import java.util.List;
 
-public class MoodleMember extends Model{
+@Table(name="Member")
+public class Member extends Model{
 
     @Column(name="memberid")
     @SerializedName("id")
@@ -246,23 +247,23 @@ public class MoodleMember extends Model{
     }
 
 
-    public static MoodleMember findOrCreateFromJson(MoodleMember new_member) {
+    public static Member findOrCreateFromJson(Member new_member) {
         int memberid = new_member.getMemberid();
-        MoodleMember existingMember =
-                new Select().from(MoodleMember.class).where("memberid = ? ", memberid).executeSingle();
+        Member existingMember =
+                new Select().from(Member.class).where("memberid = ? ", memberid).executeSingle();
         if (existingMember != null) {
             // found and return existing
             //UpdateMember(existingMember,new_member);
             return existingMember;
         } else {
             // create and return new user
-            MoodleMember member = new_member;
+            Member member = new_member;
             member.save();
             return member;
         }
     }
 
-    private static void UpdateMember(MoodleMember old_member,MoodleMember new_member)
+    private static void UpdateMember(Member old_member, Member new_member)
     {
         old_member = new_member;
         old_member.save();

@@ -17,7 +17,7 @@
  * along with OurVLE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.stoneapp.ourvlemoodle2.tasks;
+package com.stoneapp.ourvlemoodle2.task;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,16 +27,16 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.activeandroid.query.Delete;
-import com.stoneapp.ourvlemoodle2.models.MoodleDiscussion;
-import com.stoneapp.ourvlemoodle2.models.MoodleEvent;
-import com.stoneapp.ourvlemoodle2.models.MoodleForum;
-import com.stoneapp.ourvlemoodle2.models.MoodleMember;
-import com.stoneapp.ourvlemoodle2.models.MoodleModule;
-import com.stoneapp.ourvlemoodle2.models.MoodleModuleContent;
-import com.stoneapp.ourvlemoodle2.models.MoodlePost;
-import com.stoneapp.ourvlemoodle2.models.MoodleSection;
-import com.stoneapp.ourvlemoodle2.models.MoodleCourse;
-import com.stoneapp.ourvlemoodle2.models.MoodleSiteInfo;
+import com.stoneapp.ourvlemoodle2.models.Course;
+import com.stoneapp.ourvlemoodle2.models.Discussion;
+import com.stoneapp.ourvlemoodle2.models.Event;
+import com.stoneapp.ourvlemoodle2.models.Forum;
+import com.stoneapp.ourvlemoodle2.models.Member;
+import com.stoneapp.ourvlemoodle2.models.Module;
+import com.stoneapp.ourvlemoodle2.models.ModuleContent;
+import com.stoneapp.ourvlemoodle2.models.Post;
+import com.stoneapp.ourvlemoodle2.models.Section;
+import com.stoneapp.ourvlemoodle2.models.SiteInfo;
 import com.stoneapp.ourvlemoodle2.activities.SignInActivity;
 import com.stoneapp.ourvlemoodle2.util.MoodleConstants;
 import com.stoneapp.ourvlemoodle2.R;
@@ -74,15 +74,15 @@ public class LogoutTask {
         sharedPrefs.edit().clear().commit();
         PreferenceManager.getDefaultSharedPreferences(context).edit().clear().commit();
 
-        new Delete().from(MoodleSection.class).execute();
-        new Delete().from(MoodleModule.class).execute();
-        new Delete().from(MoodleModuleContent.class).execute();
-        new Delete().from(MoodleSiteInfo.class).execute();
-        new Delete().from(MoodleCourse.class).execute();
-        new Delete().from(MoodleEvent.class).execute();
-        new Delete().from(MoodleMember.class).execute();
-        new Delete().from(MoodleForum.class).execute();
-        new Delete().from(MoodlePost.class).execute();
-        new Delete().from(MoodleDiscussion.class).execute();
+        new Delete().from(Section.class).execute();
+        new Delete().from(Module.class).execute();
+        new Delete().from(ModuleContent.class).execute();
+        new Delete().from(SiteInfo.class).execute();
+        new Delete().from(Course.class).execute();
+        new Delete().from(Event.class).execute();
+        new Delete().from(Member.class).execute();
+        new Delete().from(Forum.class).execute();
+        new Delete().from(Post.class).execute();
+        new Delete().from(Discussion.class).execute();
     }
 }
