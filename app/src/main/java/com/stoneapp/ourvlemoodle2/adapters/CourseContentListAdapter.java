@@ -54,18 +54,21 @@ import java.util.List;
 
 public class CourseContentListAdapter
         extends RecyclerView.Adapter<CourseContentListAdapter.CourseContentViewHolder> {
-    private static List<ContentListItem> list_items;
-    private static Context context;
-    private static final int TYPE_HEADER = 1 ;
-    private static long courseid;
-    private static String token;
-    private static String coursename;
-    private static File file;
-    private static CourseContentFragment cfrag;
+
+
+    private List<ContentListItem> mListItems;
+    private Context mContext;
+    private final int TYPE_HEADER = 1 ;
+    private long mCourseId;
+    private String mToken;
+    private String mCourseName;
+    private File mFile;
+    private CourseContentFragment mCFrag;
     private String filter = "";
-    private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0x1;
+    private final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0x1;
 
     public static class CourseContentViewHolder extends RecyclerView.ViewHolder {
+
         private final TextView section_name;
         private final TextView module_name;
         private final TextView module_description;
@@ -74,38 +77,14 @@ public class CourseContentListAdapter
         public CourseContentViewHolder(View v) {
             super(v);
 
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = CourseContentViewHolder.this.getAdapterPosition();
-                    if(position>=0)
-                    {
-                        Module module = list_items.get(position).module;
-                        if (module == null)
-                            return;
-
-                        switch (module.getModname()) {
-                            case "label": /* do nothing */
-                                break;
-
-                            case "resource":
-                                downloadResource(module);
-                                break;
-
-                            default:
-                                openWebpage(module);
-                                break;
-                        }
-                    }
-
-
-                }
-            });
-
             section_name = (TextView) v.findViewById(R.id.section_heading);
             module_name = (TextView) v.findViewById(R.id.module_name);
             module_description = (TextView) v.findViewById(R.id.module_summary);
             modimage = (ImageView) v.findViewById(R.id.module_img);
+
+
+
+
         }
 
         public TextView getSectionNameView() {
@@ -124,75 +103,17 @@ public class CourseContentListAdapter
             return modimage;
         }
 
-        private static void openWebpage(Module module) {
-            String url = module.getUrl();
-            if (TextUtils.isEmpty(url))
-                // course container webpage
-                url = MoodleConstants.URL + "/course/view.php?id=" + courseid;
 
-            Intent intent;
-
-            if (SettingsUtils.shouldOpenLinksExternally(context)) {
-                Uri webpage = Uri.parse(url);
-                intent = new Intent(Intent.ACTION_VIEW, webpage);
-                if (intent.resolveActivity(context.getPackageManager()) != null) {
-                    context.startActivity(intent);
-
-                    return;
-                }
-            }
-            else {
-                intent = new Intent(context, BrowserActivity.class);
-                intent.putExtra("url", url);
-            }
-
-            context.startActivity(intent);
-        }
-
-        private static void downloadResource(Module module) {
-            if (module.getContents() == null) {
-                openWebpage(module);
-                return;
-            }
-
-            if (module.getContents().size() == 0) {
-                openWebpage(module);
-                return;
-            }
-
-            if (ContextCompat.checkSelfPermission(context,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                ModuleContent content = module.getContents().get(0); // gets the content/file
-                String file_path = "/" + coursename + "/"; // place file in course folder
-                String filename = content.getFilename().replace("#", ""); // to fix file opening issues
-                file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
-                        + file_path + filename); //creates a new file and store it in the directory
-                cfrag.setFile(file);
-
-                if (file.exists()) {
-                    Toast.makeText(context, "Opening file", Toast.LENGTH_SHORT).show();
-                    FileUtils.openFile(context, file);
-                } else {
-                    String file_url = content.getFileurl() + "&token=" + token;
-
-                    Toast.makeText(context, "Downloading file", Toast.LENGTH_SHORT).show();
-                    FileUtils.downloadFile(context, file_url, file_path, content.getFilename());
-                }
-            } else
-                cfrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-        }
     }
 
     public CourseContentListAdapter(Context context, List<ContentListItem> list_items, String token,
                                     long courseid, String coursename, CourseContentFragment cfrag) {
-        CourseContentListAdapter.list_items = new ArrayList<>(list_items);
-        CourseContentListAdapter.context = context;
-        CourseContentListAdapter.token = token;
-        CourseContentListAdapter.courseid = courseid;
-        CourseContentListAdapter.coursename = coursename;
-        CourseContentListAdapter.cfrag = cfrag;
+        this.mListItems = new ArrayList<>(list_items);
+        this.mContext = context;
+        this.mToken = token;
+        this.mCourseId = courseid;
+        this.mCourseName = coursename;
+        this.mCFrag = cfrag;
     }
 
     @Override
@@ -202,14 +123,44 @@ public class CourseContentListAdapter
 
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(layout, viewGroup, false);
 
-        return new CourseContentViewHolder(v);
+        final CourseContentViewHolder courseContentViewHolder = new CourseContentViewHolder(v);
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = courseContentViewHolder.getAdapterPosition();
+                if(position>=0)
+                {
+                    Module module = mListItems.get(position).module;
+                    if (module == null)
+                        return;
+
+                    switch (module.getModname()) {
+                        case "label": /* do nothing */
+                            break;
+
+                        case "resource":
+                            downloadResource(module);
+                            break;
+
+                        default:
+                            openWebpage(module);
+                            break;
+                    }
+                }
+
+
+            }
+        });
+
+        return courseContentViewHolder;
     }
 
     @Override
     public void onBindViewHolder(CourseContentViewHolder viewHolder, int position) {
         int type = getItemViewType(position);
 
-        ContentListItem item = list_items.get(position);
+        ContentListItem item = mListItems.get(position);
 
         if (type == TYPE_HEADER) {
             // checks if the section name is not empty and doesn't contain a long line
@@ -228,8 +179,9 @@ public class CourseContentListAdapter
                     viewHolder.getModuleNameView().setTextColor(Color.parseColor("#009900")); // change color to green
                     if (modulename.contains("_____"))
                         viewHolder.getModuleNameView().setText("");
-                } else
+                } else {
                     viewHolder.getModuleNameView().setTextColor(Color.BLACK);
+                }
             }
 
             if (!TextUtils.isEmpty(moduledesc)) {
@@ -244,14 +196,74 @@ public class CourseContentListAdapter
     }
 
     @Override
-    public int getItemCount() { return list_items.size(); }
+    public int getItemCount() { return mListItems.size(); }
 
     @Override
-    public int getItemViewType(int position) { return list_items.get(position).type; }
+    public int getItemViewType(int position) { return mListItems.get(position).type; }
 
     public void updateContentList(List<ContentListItem> newlist_items) {
-        list_items = new ArrayList<>(newlist_items);
+        this.mListItems = new ArrayList<>(newlist_items);
         notifyDataSetChanged();
+    }
+
+    private void openWebpage(Module module) {
+        String url = module.getUrl();
+        if (TextUtils.isEmpty(url))
+            // course container webpage
+            url = MoodleConstants.URL + "/course/view.php?id=" + mCourseId;
+
+        Intent intent;
+
+        if (SettingsUtils.shouldOpenLinksExternally(mContext)) {
+            Uri webpage = Uri.parse(url);
+            intent = new Intent(Intent.ACTION_VIEW, webpage);
+            if (intent.resolveActivity(mContext.getPackageManager()) != null) {
+                mContext.startActivity(intent);
+
+                return;
+            }
+        }
+        else {
+            intent = new Intent(mContext, BrowserActivity.class);
+            intent.putExtra("url", url);
+        }
+
+        mContext.startActivity(intent);
+    }
+
+    private void downloadResource(Module module) {
+        if (module.getContents() == null) {
+            openWebpage(module);
+            return;
+        }
+
+        if (module.getContents().size() == 0) {
+            openWebpage(module);
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(mContext,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            ModuleContent content = module.getContents().get(0); // gets the content/file
+            String file_path = "/" + mCourseName + "/"; // place file in course folder
+            String filename = content.getFilename().replace("#", ""); // to fix file opening issues
+            mFile = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
+                    + file_path + filename); //creates a new file and store it in the directory
+            mCFrag.setFile(mFile);
+
+            if (mFile.exists()) {
+                Toast.makeText(mContext, "Opening file", Toast.LENGTH_SHORT).show();
+                FileUtils.openFile(mContext, mFile);
+            } else {
+                String file_url = content.getFileurl() + "&token=" + mToken;
+
+                Toast.makeText(mContext, "Downloading file", Toast.LENGTH_SHORT).show();
+                FileUtils.downloadFile(mContext, file_url, file_path, content.getFilename());
+            }
+        } else
+            mCFrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
     }
 
     public void animateTo(List<ContentListItem> models,String filter) {
@@ -262,8 +274,8 @@ public class CourseContentListAdapter
     }
 
     private void applyAndAnimateRemovals(List<ContentListItem> newModels) {
-        for (int i = list_items.size() - 1; i >= 0; i--) {
-            final ContentListItem model = list_items.get(i);
+        for (int i = mListItems.size() - 1; i >= 0; i--) {
+            final ContentListItem model = mListItems.get(i);
             if (!newModels.contains(model)) {
                 removeItem(i);
             }
@@ -273,7 +285,7 @@ public class CourseContentListAdapter
     private void applyAndAnimateAdditions(List<ContentListItem> newModels) {
         for (int i = 0, count = newModels.size(); i < count; i++) {
             final ContentListItem model = newModels.get(i);
-            if (!list_items.contains(model)) {
+            if (!mListItems.contains(model)) {
                 addItem(i, model);
             }
         }
@@ -282,7 +294,7 @@ public class CourseContentListAdapter
     private void applyAndAnimateMovedItems(List<ContentListItem> newModels) {
         for (int toPosition = newModels.size() - 1; toPosition >= 0; toPosition--) {
             final ContentListItem model = newModels.get(toPosition);
-            final int fromPosition = list_items.indexOf(model);
+            final int fromPosition = mListItems.indexOf(model);
             if (fromPosition >= 0 && fromPosition != toPosition) {
                 moveItem(fromPosition, toPosition);
             }
@@ -290,19 +302,21 @@ public class CourseContentListAdapter
     }
 
     public ContentListItem removeItem(int position) {
-        final ContentListItem model = list_items.remove(position);
+        final ContentListItem model = mListItems.remove(position);
         notifyItemRemoved(position);
         return model;
     }
 
     public void addItem(int position, ContentListItem model) {
-        list_items.add(position, model);
+        mListItems.add(position, model);
         notifyItemInserted(position);
     }
 
     public void moveItem(int fromPosition, int toPosition) {
-        final ContentListItem model = list_items.remove(fromPosition);
-        list_items.add(toPosition, model);
+        final ContentListItem model = mListItems.remove(fromPosition);
+        mListItems.add(toPosition, model);
         notifyItemMoved(fromPosition, toPosition);
     }
+
+
 }
