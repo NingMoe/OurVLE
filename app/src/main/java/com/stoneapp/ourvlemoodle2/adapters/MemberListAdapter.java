@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,68 +42,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.MemberViewHolder> {
-    private List<Member> memberList;
-    private Context context;
-    private String token;
-    private String filter = "";
+
+    private List<Member> mMembers;
+    private Context mContext;
+    private String mToken;
+    private String mFilter = "";
+
+
 
     public static class MemberViewHolder extends RecyclerView.ViewHolder {
-        private final TextView name;
-        private final ImageView memberpic;
+        TextView name;
+        ImageView memberpic;
 
-        public MemberViewHolder(View v, final Context context, final List<Member> mDataSet,
-                                final String token) {
+        public MemberViewHolder(View v) {
             super(v);
-
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = MemberViewHolder.this.getAdapterPosition();
-                    if(pos>=0)
-                    {
-                        Member member = mDataSet.get(pos);
-
-                        Intent intent = new Intent(v.getContext(), ProfileActivity.class);
-                        intent.putExtra("username", member.getFullname());
-                        intent.putExtra("email", member.getEmail());
-                        intent.putExtra("description", member.getDescription());
-                        intent.putExtra("memberid", member.getMemberid());
-                        intent.putExtra("token", token);
-
-                        v.getContext().startActivity(intent);
-                    }
-
-                }
-            });
-
             name = (TextView) v.findViewById(R.id.member_name);
             memberpic = (ImageView) v.findViewById(R.id.member_img);
+
         }
 
-        public TextView getTextView() {
-            return name;
-        }
-
-        public ImageView getImageView() {
-            return memberpic;
-        }
     }
 
-    public MemberListAdapter(Context context, List<Member> memberList, String token) {
-        this.memberList = new ArrayList<>(memberList);
-        this.context = context;
-        this.token = token;
+    public MemberListAdapter(Context context, List<Member> mMembers, String token) {
+        this.mMembers = new ArrayList<>(mMembers);
+        this.mContext = context;
+        this.mToken = token;
     }
 
     @Override
     public void onBindViewHolder(MemberViewHolder holder, int position) {
-        holder.getTextView().setText(memberList.get(position).getFullname());
+
+        String name =  mMembers.get(position).getFullname();
+        if(!TextUtils.isEmpty(name)) {
+            holder.name.setText(mMembers.get(position).getFullname());
+        }
 
         ColorGenerator generator = ColorGenerator.MATERIAL;
-        int color2 = generator.getColor(memberList.get(position).getFullname());
-        //char firstLetter = memberList.get(position).getFirstname().charAt(0);
-
-        String name = memberList.get(position).getFullname();
+        int color2 = generator.getColor(name);
 
         char firstLetter = name.toUpperCase().charAt(0);
 
@@ -114,7 +90,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
                 .endConfig()
                 .buildRound(firstLetter + "", color2);
 
-        holder.getImageView().setImageDrawable(drawable2);
+        holder.memberpic.setImageDrawable(drawable2);
     }
 
     @Override
@@ -122,16 +98,37 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_item_member, viewGroup, false);
 
-        return new MemberViewHolder(v, context, memberList, token);
+        final MemberViewHolder memberViewHolder = new MemberViewHolder(v);
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int pos = memberViewHolder.getAdapterPosition();
+                if(pos>=0)
+                {
+                    Member member = mMembers.get(pos);
+                    Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+                    intent.putExtra("username", member.getFullname());
+                    intent.putExtra("email", member.getEmail());
+                    intent.putExtra("description", member.getDescription());
+                    intent.putExtra("memberid", member.getMemberid());
+                    intent.putExtra("token", mToken);
+
+                    v.getContext().startActivity(intent);
+                }
+            }
+        });
+
+        return memberViewHolder;
     }
 
     @Override
     public int getItemCount() {
-        return memberList.size();
+        return mMembers.size();
     }
 
     public void updateMemberList(List<Member> memberList){
-        this.memberList = new ArrayList<>(memberList);
+        this.mMembers = new ArrayList<>(memberList);
         notifyDataSetChanged();
     }
 
@@ -139,12 +136,12 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
         applyAndAnimateRemovals(models);
         applyAndAnimateAdditions(models);
         applyAndAnimateMovedItems(models);
-        this.filter = filter;
+        this.mFilter = filter;
     }
 
     private void applyAndAnimateRemovals(List<Member> newModels) {
-        for (int i = memberList.size() - 1; i >= 0; i--) {
-            final Member model = memberList.get(i);
+        for (int i = mMembers.size() - 1; i >= 0; i--) {
+            final Member model = mMembers.get(i);
             if (!newModels.contains(model)) {
                 removeItem(i);
             }
@@ -154,7 +151,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
     private void applyAndAnimateAdditions(List<Member> newModels) {
         for (int i = 0, count = newModels.size(); i < count; i++) {
             final Member model = newModels.get(i);
-            if (!memberList.contains(model)) {
+            if (!mMembers.contains(model)) {
                 addItem(i, model);
             }
         }
@@ -163,7 +160,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
     private void applyAndAnimateMovedItems(List<Member> newModels) {
         for (int toPosition = newModels.size() - 1; toPosition >= 0; toPosition--) {
             final Member model = newModels.get(toPosition);
-            final int fromPosition = memberList.indexOf(model);
+            final int fromPosition = mMembers.indexOf(model);
             if (fromPosition >= 0 && fromPosition != toPosition) {
                 moveItem(fromPosition, toPosition);
             }
@@ -171,19 +168,19 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Me
     }
 
     public Member removeItem(int position) {
-        final Member model = memberList.remove(position);
+        final Member model = mMembers.remove(position);
         notifyItemRemoved(position);
         return model;
     }
 
     public void addItem(int pos, Member model) {
-        memberList.add(pos, model);
+        mMembers.add(pos, model);
         notifyItemInserted(pos);
     }
 
     public void moveItem(int fromPos, int toPos) {
-        final Member model = memberList.remove(fromPos);
-        memberList.add(toPos, model);
+        final Member model = mMembers.remove(fromPos);
+        mMembers.add(toPos, model);
         notifyItemMoved(fromPos, toPos);
     }
 }

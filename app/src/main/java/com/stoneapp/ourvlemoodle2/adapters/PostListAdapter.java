@@ -43,58 +43,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostListViewHolder> {
-    private List<Post> postList;
-    private Context context;
+
+    private List<Post> mPosts;
+    private Context mContext;
 
     public static class PostListViewHolder extends RecyclerView.ViewHolder {
-        private final TextView username;
-        private final TextView subject;
-        private final TextView message;
-        private final TextView posttime;
-        private final ImageView postImage;
+        TextView tvAuthor;
+        TextView tvSubject;
+        TextView tvMessage;
+        TextView tvPostTime;
+        ImageView postImage;
 
         public PostListViewHolder(View v) {
             super(v);
 
-            username = (TextView) v.findViewById(R.id.postUser);
-            subject = (TextView) v.findViewById(R.id.postTitle);
-            message = (TextView) v.findViewById(R.id.postMessage);
-            posttime = (TextView) v.findViewById(R.id.postDate);
+            tvAuthor = (TextView) v.findViewById(R.id.postUser);
+            tvSubject = (TextView) v.findViewById(R.id.postTitle);
+            tvMessage = (TextView) v.findViewById(R.id.postMessage);
+            tvPostTime = (TextView) v.findViewById(R.id.postDate);
             postImage = (ImageView) v.findViewById(R.id.postImage);
-        }
-
-        public TextView getUserNameView() {
-            return username;
-        }
-
-        public TextView getSubjectView() {
-            return subject;
-        }
-
-        public TextView getMessageView() {
-            return message;
-        }
-
-        public ImageView getPostImageView() {
-            return postImage;
-        }
-
-        public TextView getPostTimeView() {
-            return posttime;
         }
     }
 
-    public PostListAdapter(Context context, List<Post> postList) {
-        this.postList = new ArrayList<>(postList);
-        this.context = context;
+    public PostListAdapter(Context context, List<Post> posts) {
+        this.mPosts = new ArrayList<>(posts);
+        this.mContext = context;
     }
 
     @Override
     public PostListViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_post_item, viewGroup, false);
+        PostListViewHolder postListViewHolder = new PostListViewHolder(v);
 
-        return new PostListViewHolder(v);
+        return postListViewHolder;
     }
 
     @Override
@@ -102,50 +84,29 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
 
         if(position>=0)
         {
-            Post post = postList.get(position);
+            Post post = mPosts.get(position);
 
             String subject = post.getSubject();
-            if (!TextUtils.isEmpty(subject))
-                holder.getSubjectView().setText(subject);
-
+            if (!TextUtils.isEmpty(subject)) {
+                holder.tvSubject.setText(subject);
+            }
 
             String username = post.getUserfullname();
-            if (!TextUtils.isEmpty(username))
-                holder.getUserNameView().setText(username);
+            if (!TextUtils.isEmpty(username)) {
+                holder.tvAuthor.setText(username);
+            }
 
             String message = post.getMessage();
-            if (!TextUtils.isEmpty(message))
-                holder.getMessageView().setText(message);
+            if (!TextUtils.isEmpty(message)) {
+                holder.tvMessage.setText(message);
+            }
 
-            //Extracts image from string to show in text view
-            CharSequence format_message = Html.fromHtml(message, new Html.ImageGetter() {
-                @Override
-                public Drawable getDrawable(String source) {
-                    try {
-                        //InputStream is = (InputStream) new URL(source).getContent();
-                        //Drawable d = Drawable.createFromStream(is, "sc name");
-                        //d.setBounds(0,0,50,50);
-                        //return d;
-                        Drawable drawFromPath;
-                        int path =
-                                context.getResources().getIdentifier(source, "drawable",
-                                        context.getPackageName());
-                        drawFromPath = ContextCompat.getDrawable(context, path);
-                        drawFromPath.setBounds(0, 0, drawFromPath.getIntrinsicWidth(),
-                                drawFromPath.getIntrinsicHeight());
-                        return drawFromPath;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
-            }, null);
-
-            if (!TextUtils.isEmpty(message))
-                holder.getMessageView().setText(format_message);
+            if (!TextUtils.isEmpty(message)) {
+                holder.tvMessage.setText(Html.fromHtml(message));
+            }
 
             int time = post.getModified();
-            holder.getPostTimeView().setText(TimeUtils.getTime(time));
+            holder.tvPostTime.setText(TimeUtils.getTime(time));
 
             char firstLetter = username.toUpperCase().charAt(0);
             ColorGenerator generator = ColorGenerator.MATERIAL;
@@ -158,7 +119,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
                     .endConfig()
                     .buildRound(firstLetter + "", color2);
 
-            holder.getPostImageView().setImageDrawable(drawable2);
+            holder.postImage.setImageDrawable(drawable2);
         }
 
 
@@ -166,11 +127,11 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostLi
 
     @Override
     public int getItemCount() {
-        return postList.size();
+        return mPosts.size();
     }
 
     public void updatePosts(List<Post> newPosts) {
-        postList = new ArrayList<>(newPosts);
+        mPosts = new ArrayList<>(newPosts);
         notifyDataSetChanged();
     }
 }

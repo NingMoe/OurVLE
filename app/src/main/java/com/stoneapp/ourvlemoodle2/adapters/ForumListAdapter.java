@@ -41,48 +41,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.ForumViewHolder> {
+
+    private Context mContext;
+    private List<Forum> mForums;
+    private String mToken;
+
+
     public static class ForumViewHolder extends RecyclerView.ViewHolder{
-        TextView forum_name;
-        TextView forum_description;
+        TextView tvName;
+        TextView tvDesc;
         ImageView forum_img;
 
 
         public ForumViewHolder(View itemView) {
             super(itemView);
-            forum_name = (TextView)itemView.findViewById(R.id.forum_name);
-            forum_description = (TextView)itemView.findViewById(R.id.forum_desc);
+            tvName = (TextView)itemView.findViewById(R.id.forum_name);
+            tvDesc = (TextView)itemView.findViewById(R.id.forum_desc);
             forum_img = (ImageView)itemView.findViewById(R.id.forum_img);
         }
     }
 
-    Context ctxt;
-    List<Forum> forums;
-    String token;
+
 
     public ForumListAdapter(Context ctxt, List<Forum> forums, String token) {
-        this.ctxt = ctxt;
-        this.forums = new ArrayList<>(forums);
-        this.token = token;
+        this.mContext = ctxt;
+        this.mForums = new ArrayList<>(forums);
+        this.mToken = token;
     }
 
     @Override
     public ForumViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_forum_item, parent, false);
         final ForumViewHolder forumViewHolder = new ForumViewHolder(view);
+
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int position = forumViewHolder.getAdapterPosition();
                 if(position>=0)
                 {
-                    Forum forum = forums.get(position);
-                    String forumname = forum.getName();
-                    String forumid = forum.getForumid() + "";
-                    Intent intent = new Intent(ctxt, DiscussionActivity.class);
-                    intent.putExtra("forumid", forums.get(position).getForumid());
-                    intent.putExtra("forumname", forums.get(position).getName());
-                    intent.putExtra("token", token);
-                    ctxt.startActivity(intent);
+                    Forum forum = mForums.get(position);
+                    Intent intent = new Intent(mContext, DiscussionActivity.class);
+                    intent.putExtra("forumid", forum.getForumid());
+                    intent.putExtra("forumname", forum.getName());
+                    intent.putExtra("token", mToken);
+                    mContext.startActivity(intent);
                 }
 
             }
@@ -92,17 +96,14 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
 
     @Override
     public void onBindViewHolder(ForumViewHolder holder, int position) {
-        final Forum forum = forums.get(position);
 
-        if (forum.getName() == null)
-            holder.forum_name.setText("");
-        else
-            holder.forum_name.setText(forum.getName());
+        final Forum forum = mForums.get(position);
 
-        if (forum.getIntro() == null)
-            holder.forum_description.setText("");
-        else
-            holder.forum_description.setText(Html.fromHtml(forum.getIntro()).toString().trim()); // converts html to normal string
+        if (forum.getName() != null) holder.tvName.setText(forum.getName());
+
+        if (forum.getIntro() != null) {
+            holder.tvDesc.setText(Html.fromHtml(forum.getIntro()).toString().trim()); // converts html to normal string
+        }
 
         String forumname = forum.getName();
         char firstLetter = forumname.toUpperCase().charAt(0);
@@ -120,12 +121,12 @@ public class ForumListAdapter extends RecyclerView.Adapter<ForumListAdapter.Foru
     }
 
     public void updateForumList(List<Forum> newForums) {
-        this.forums = new ArrayList<>(newForums);
+        this.mForums = new ArrayList<>(newForums);
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return forums.size();
+        return mForums.size();
     }
 }

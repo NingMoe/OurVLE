@@ -43,76 +43,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAdapter.DiscussionViewHolder> {
-    private Context context;
-    private List<Discussion> discussionList;
-    private String token;
+
+    private Context mContext;
+    private List<Discussion> mDiscussions;
+    private String mToken;
 
     public static class DiscussionViewHolder extends RecyclerView.ViewHolder {
-        private final TextView course_name;
-        private final TextView topic_name;
-        private final TextView lastposttime;
-        private final TextView startname;
-        private final TextView lastpostname;
-        private final ImageView icon;
 
-        public DiscussionViewHolder(View v, final Context context,
-                                    final List<Discussion> mDataSet, final String token) {
-            super(v);
+        TextView tvCourseName;
+        TextView tvTopic;
+        TextView tvLastPostTime;
+        TextView tvStartName;
+        TextView tvLastPostName;
+        ImageView icon;
 
-            v.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    int pos = DiscussionViewHolder.this.getAdapterPosition();
-
-                    Intent intent = new Intent(context, PostActivity.class);
-
-                    intent.putExtra("discussionid", mDataSet.get(pos).getDiscussionid() + "");
-                    intent.putExtra("discussionname", mDataSet.get(pos).getName());
-                    intent.putExtra("token", token);
-
-                    context.startActivity(intent);
-                }
-
-            });
-
-            course_name = (TextView) v.findViewById(R.id.coursename);
-            topic_name = (TextView) v.findViewById(R.id.discussion_topicname);
-            lastposttime = (TextView) v.findViewById(R.id.lastpostime);
-            startname = (TextView) v.findViewById(R.id.startname);
-            lastpostname = (TextView) v.findViewById(R.id.lastpostname);
-            icon = (ImageView) v.findViewById(R.id.imageView1);
-        }
-
-        public TextView getCourseNameView() {
-            return course_name;
-        }
-
-        public TextView getTopicNameView() {
-            return topic_name;
-        }
-
-        public TextView getLastPostTimeView() {
-            return lastposttime;
-        }
-
-        public TextView getStartNameView() {
-            return startname;
-        }
-
-        public TextView getLastPostNameView() {
-            return lastpostname;
-        }
-
-        public ImageView getIconView() {
-            return icon;
+        public DiscussionViewHolder(View view) {
+            super(view);
+            tvCourseName = (TextView) view.findViewById(R.id.coursename);
+            tvTopic = (TextView) view.findViewById(R.id.discussion_topicname);
+            tvLastPostTime = (TextView) view.findViewById(R.id.lastpostime);
+            tvStartName = (TextView) view.findViewById(R.id.startname);
+            tvLastPostName = (TextView) view.findViewById(R.id.lastpostname);
+            icon = (ImageView) view.findViewById(R.id.imageView1);
         }
     }
 
     public DiscussionListAdapter(Context context, List<Discussion> discussionList, String token){
-        this.context = context;
-        this.discussionList = new ArrayList<>(discussionList);
-        this.token = token;
+        this.mContext = context;
+        this.mDiscussions = new ArrayList<>(discussionList);
+        this.mToken = token;
     }
 
     @Override
@@ -120,51 +79,70 @@ public class DiscussionListAdapter extends RecyclerView.Adapter<DiscussionListAd
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_discussion_item, viewGroup, false);
 
-        return new DiscussionViewHolder(v, context, discussionList, token);
+        final DiscussionViewHolder discussionViewHolder = new DiscussionViewHolder(v);
+
+        v.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                int pos = discussionViewHolder.getAdapterPosition();
+
+                Intent intent = new Intent(mContext, PostActivity.class);
+                intent.putExtra("discussionid", mDiscussions.get(pos).getDiscussionid() + "");
+                intent.putExtra("discussionname", mDiscussions.get(pos).getName());
+                intent.putExtra("token", mToken);
+
+                mContext.startActivity(intent);
+            }
+
+        });
+
+        return discussionViewHolder;
     }
 
     @Override
     public void onBindViewHolder(DiscussionViewHolder holder, int position) {
 
-        final Discussion discussion = discussionList.get(position);
+        final Discussion discussion = mDiscussions.get(position);
 
         String topic_name = discussion.getName();
-        if (!TextUtils.isEmpty(topic_name))
-            holder.getTopicNameView().setText(topic_name);
 
-        Course course = new Select().from(Course.class).where("courseid = ?", discussion.getCourseid()).executeSingle();
+        if (!TextUtils.isEmpty(topic_name)) holder.tvTopic.setText(topic_name);
+
+        Course course = new Select().from(Course.class).where("courseid = ?",
+                discussion.getCourseid()).executeSingle();
+
         if(course!=null)
         {
             String coursename = course.getShortname();
             if (TextUtils.isEmpty(coursename))
-                holder.getCourseNameView().setText("N/A");
+                holder.tvCourseName.setText("N/A");
             else
-                holder.getCourseNameView().setText(coursename);
+                holder.tvCourseName.setText(coursename);
         }else{
-            holder.getCourseNameView().setText("N/A");
+            holder.tvCourseName.setText("N/A");
         }
 
 
         String startname = discussion.getFirstuserfullname();
-        if (!TextUtils.isEmpty(startname))
-            holder.getStartNameView().setText(startname);
+        if (!TextUtils.isEmpty(startname)) holder.tvStartName.setText(startname);
 
         String lastpostname = discussion.getLastuserfullname();
-        if (!TextUtils.isEmpty(lastpostname))
-            holder.getLastPostNameView().setText(lastpostname);
+        if (!TextUtils.isEmpty(lastpostname)) holder.tvLastPostName.setText(lastpostname);
 
         int lastposttime = discussion.getTimemodified();
 
-        holder.getLastPostTimeView().setText(TimeUtils.getTime(lastposttime));
+
+        holder.tvLastPostTime.setText(TimeUtils.getTime(lastposttime));
     }
 
     @Override
     public int getItemCount() {
-        return discussionList.size();
+        return mDiscussions.size();
     }
 
     public void updateDiscussionList(List<Discussion> newDiscussions) {
-        this.discussionList = new ArrayList<>(newDiscussions);
+        this.mDiscussions = new ArrayList<>(newDiscussions);
         notifyDataSetChanged();
     }
 }

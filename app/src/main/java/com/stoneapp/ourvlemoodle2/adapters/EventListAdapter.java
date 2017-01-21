@@ -39,50 +39,31 @@ import java.util.Calendar;
 import java.util.List;
 
 public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.EventViewHolder> {
-    private List<Event> events;
-    private Context context;
+
+    private List<Event> mEvents;
+    private Context mContext;
 
     public static class EventViewHolder extends RecyclerView.ViewHolder{
-        private final TextView event_name;
-        private final TextView event_desc;
-        private final TextView event_course;
-        private final TextView event_date;
-        private final ImageView icon;
+
+        TextView tvName;
+        TextView tvDesc;
+        TextView tvCourseName;
+        TextView tvDate;
+        ImageView icon;
 
         public EventViewHolder(View v) {
             super(v);
-
-            event_name = (TextView) v.findViewById(R.id.eventname);
-            event_desc = (TextView) v.findViewById(R.id.eventdesc);
-            event_course = (TextView) v.findViewById(R.id.eventcourse);
-            event_date = (TextView) v.findViewById(R.id.eventdate);
+            tvName = (TextView) v.findViewById(R.id.eventname);
+            tvDesc = (TextView) v.findViewById(R.id.eventdesc);
+            tvCourseName = (TextView) v.findViewById(R.id.eventcourse);
+            tvDate = (TextView) v.findViewById(R.id.eventdate);
             icon = (ImageView) v.findViewById(R.id.calImg);
-        }
-
-        public TextView getEventNameView() {
-            return event_name;
-        }
-
-        public TextView getEventDescView() {
-            return event_desc;
-        }
-
-        public TextView getEventCourseView() {
-            return event_course;
-        }
-
-        public TextView getEventDateView() {
-            return event_date;
-        }
-
-        public ImageView getIconView() {
-            return icon;
         }
     }
 
     public EventListAdapter(Context context, List<Event> events){
-        this.events = new ArrayList<>(events);
-        this.context = context;
+        this.mEvents = new ArrayList<>(events);
+        this.mContext = context;
     }
 
     @Override
@@ -90,26 +71,36 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.list_item_event, viewGroup, false);
 
-        return new EventViewHolder(v);
+        final EventViewHolder eventViewHolder = new EventViewHolder(v);
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Add to calendar
+            }
+        });
+
+        return eventViewHolder;
     }
 
     @Override
     public void onBindViewHolder(EventViewHolder eventViewHolder, int position) {
         if(position>=0)
         {
-            final Event event  = events.get(position);
+            final Event event  = mEvents.get(position);
 
             String eventname = event.getName();
 
-            if (!TextUtils.isEmpty(eventname))
-                eventViewHolder.getEventNameView().setText(eventname);
+            if (!TextUtils.isEmpty(eventname)) eventViewHolder.tvName.setText(eventname);
 
             String eventdesc = event.getDescription();
-            if (!TextUtils.isEmpty(eventdesc))
-                eventViewHolder.getEventDescView().setText(Html.fromHtml(eventdesc).toString().trim()); //convert html to string
+            if (!TextUtils.isEmpty(eventdesc)) {
+                eventViewHolder.tvDesc.setText(Html.fromHtml(eventdesc).toString().trim()); //convert html to string
+            }
 
-            if(!TextUtils.isEmpty(event.getCoursename()))
-                eventViewHolder.getEventCourseView().setText(event.getCoursename());
+
+            if(!TextUtils.isEmpty(event.getCoursename())) {
+                eventViewHolder.tvCourseName.setText(event.getCoursename());
+            }
 
             final int eventdate = event.getTimestart();
 
@@ -128,22 +119,24 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
 
             final int month = cal.get(Calendar.MONTH);
             if (day_now == day_date && event_month== now_month && event_year == now_year) //if the event date is the current date
-                eventViewHolder.getEventDateView().setTextColor(Color.RED);
-            else
-                eventViewHolder.getEventDateView().setTextColor(Color.BLACK);
+            {
+                eventViewHolder.tvDate.setTextColor(Color.RED);
+            }else {
+                eventViewHolder.tvDate.setTextColor(Color.BLACK);
+            }
 
-            eventViewHolder.getEventDateView().setText(TimeUtils.getTime(eventdate));
+            eventViewHolder.tvDate.setText(TimeUtils.getTime(eventdate));
         }
 
     }
 
     @Override
     public int getItemCount() {
-        return events.size();
+        return mEvents.size();
     }
 
     public void updateEventList(List<Event> events){
-        this.events = new ArrayList<>(events);
+        this.mEvents = new ArrayList<>(events);
         notifyDataSetChanged();
     }
 }
