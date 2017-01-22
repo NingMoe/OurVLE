@@ -41,6 +41,7 @@ import com.stoneapp.ourvlemoodle2.R;
 import com.stoneapp.ourvlemoodle2.activities.BrowserActivity;
 import com.stoneapp.ourvlemoodle2.fragments.CourseContentFragment;
 import com.stoneapp.ourvlemoodle2.models.ContentListItem;
+import com.stoneapp.ourvlemoodle2.models.FileObject;
 import com.stoneapp.ourvlemoodle2.models.Module;
 import com.stoneapp.ourvlemoodle2.models.ModuleContent;
 import com.stoneapp.ourvlemoodle2.util.FileUtils;
@@ -62,7 +63,7 @@ public class CourseContentListAdapter
     private long mCourseId;
     private String mToken;
     private String mCourseName;
-    private File mFile;
+    private FileObject mFile;
     private CourseContentFragment mCFrag;
     private String filter = "";
     private final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0x1;
@@ -242,28 +243,35 @@ public class CourseContentListAdapter
             return;
         }
 
+        ModuleContent content = module.getContents().get(0); // gets the content/file
+        String file_path = "/" + mCourseName + "/"; // place file in course folder
+        String filename = content.getFilename().replace("#", ""); // to fix file opening issues
+        String file_url = content.getFileurl() + "&token=" + mToken;
+
         if (ContextCompat.checkSelfPermission(mContext,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
-            ModuleContent content = module.getContents().get(0); // gets the content/file
-            String file_path = "/" + mCourseName + "/"; // place file in course folder
-            String filename = content.getFilename().replace("#", ""); // to fix file opening issues
-            mFile = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
+
+            File file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
                     + file_path + filename); //creates a new file and store it in the directory
+            mFile = new FileObject(file,file_path,file_url,content.getFilename());
             mCFrag.setFile(mFile);
 
-            if (mFile.exists()) {
+
+            if (file.exists()) {
                 Toast.makeText(mContext, "Opening file", Toast.LENGTH_SHORT).show();
-                FileUtils.openFile(mContext, mFile);
+                FileUtils.openFile(mContext, file);
             } else {
-                String file_url = content.getFileurl() + "&token=" + mToken;
 
                 Toast.makeText(mContext, "Downloading file", Toast.LENGTH_SHORT).show();
                 FileUtils.downloadFile(mContext, file_url, file_path, content.getFilename());
             }
-        } else
-            mCFrag.requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+        } else {
+            mFile = new FileObject(file_path,file_url,content.getFilename());
+            mCFrag.setFile(mFile);
+            mCFrag.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
     }
 
     public void animateTo(List<ContentListItem> models,String filter) {

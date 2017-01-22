@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.stoneapp.ourvlemoodle2.adapters.CourseContentListAdapter;
 import com.stoneapp.ourvlemoodle2.models.ContentListItem;
+import com.stoneapp.ourvlemoodle2.models.FileObject;
 import com.stoneapp.ourvlemoodle2.models.Module;
 import com.stoneapp.ourvlemoodle2.models.Section;
 import com.stoneapp.ourvlemoodle2.sync.ContentSync;
@@ -44,6 +45,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -77,7 +79,7 @@ public class CourseContentFragment extends Fragment
     private CourseContentListAdapter mContentListAdapter;
     private ArrayList<ContentListItem> mItems = new ArrayList<>();
     private ArrayList<Section>mSections;
-    public File mFile;
+    public FileObject mFile;
     private MenuItem searchitem;
     private static int TYPE_HEADER = 1;
     private static int TYPE_MODULE = 0;
@@ -260,9 +262,9 @@ public class CourseContentFragment extends Fragment
                 Toast.makeText(getActivity(), "Download completed", Toast.LENGTH_SHORT).show();
                 if (ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    if (mFile.exists()) {
+                    if (mFile.getFile().exists()) {
                         Toast.makeText(getActivity(), "Opening file", Toast.LENGTH_SHORT).show();
-                        FileUtils.openFile(getActivity(), mFile);
+                        FileUtils.openFile(getActivity(), mFile.getFile());
                     }
                 }
             }
@@ -360,7 +362,7 @@ public class CourseContentFragment extends Fragment
         new LoadContentTask(getActivity()).execute(); // refresh content
     }
 
-    public void setFile(File file) {
+    public void setFile(FileObject file) {
         this.mFile = file;
     }
 
@@ -408,6 +410,17 @@ public class CourseContentFragment extends Fragment
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    if(mFile!=null)
+                    {
+                        File file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
+                                + mFile.getPath() + mFile.getFilename());
+                        mFile.setFile(file);
+                        Toast.makeText(getActivity(), "Downloading file", Toast.LENGTH_SHORT).show();
+                        FileUtils.downloadFile(getActivity(),
+                                mFile.getDownloadUrl(), mFile.getPath(),mFile.getFilename());
+                    }
+
 
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
