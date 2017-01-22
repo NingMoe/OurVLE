@@ -33,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.support.annotation.NonNull;
@@ -189,7 +190,7 @@ public class SignInActivity extends AppCompatActivity {
 
         mUserPass.setText("");
 
-        new LoginTask(id, password).execute("");
+        new LoginTask(this,id, password).execute("");
     }
 
     private void showHelpDialog(Context context) {
@@ -224,10 +225,12 @@ public class SignInActivity extends AppCompatActivity {
         private String name = "";
         private SiteInfo siteInfo;
         private ArrayList<Course> courses;
+        Context context;
 
-        public LoginTask(String user_name, String user_passwd) {
+        public LoginTask(Context context,String user_name, String user_passwd) {
             this.user_name = user_name;
             this.user_passwd = user_passwd;
+            this.context = context;
         }
 
         @Override
@@ -350,8 +353,27 @@ public class SignInActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 getApplicationContext().startActivity(intent);
             } else {
+
                 Toast toast = Toast.makeText(getApplicationContext(),"Failed "+error, Toast.LENGTH_SHORT);
                 toast.show();
+
+                if(error.contains("expired"))
+                {
+                    AlertDialog dialog = new AlertDialog.Builder(context)
+                            .setTitle("Password Expired").setMessage("Your password seems to be expired. If you press" +
+                                    ("okay you will be carried to a MITS Live support portal where you can request for" +
+                                            "your password to be reset, after which you can log in"))
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://support.mona.uwi.edu/visitor/index.php?/LiveChat/Chat/Request/_sessionID=mc2fvd9fw9rs1e1eirxlgetf31xc1flu/_proactive=0/_filterDepartmentID=5/_randomNumber=4/_fullName=/_email=/_promptType=chat"));
+                                    startActivity(browserIntent);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) { return; } })
+                            .create();
+                    dialog.show();
+                }
 
                 mProgressBar.setVisibility(View.GONE);
 
