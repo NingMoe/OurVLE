@@ -46,7 +46,7 @@ public class ImageChooser {
                 return R.drawable.ic_label_24dp;
 
             case "page":
-                return R.drawable.page_img;
+                return R.drawable.ic_web_asset_black_24dp;
 
             case "url":
                 return R.drawable.ic_link_24dp;

@@ -33,9 +33,11 @@ import com.stoneapp.ourvlemoodle2.models.SiteInfo;
 import com.stoneapp.ourvlemoodle2.R;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -44,6 +46,7 @@ import android.support.v4.view.ViewPager;
 
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatDrawableManager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
@@ -87,10 +90,21 @@ public class CourseViewActivity extends AppCompatActivity
         }
 
         // first tab inserted so it is set as currently selected by default
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_tab_contents));
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_tab_forum));
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_tab_events));
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_tab_members));
+
+        Drawable  contents = AppCompatDrawableManager.get().getDrawable(this,R.drawable.ic_tab_contents );
+        Drawable  forum = AppCompatDrawableManager.get().getDrawable(this,R.drawable.ic_tab_forum );
+        Drawable  event = AppCompatDrawableManager.get().getDrawable(this,R.drawable.ic_tab_events );
+        Drawable  member = AppCompatDrawableManager.get().getDrawable(this,R.drawable.ic_tab_members );
+
+        tabLayout.addTab(tabLayout.newTab().
+                setIcon(contents));
+
+        tabLayout.addTab(tabLayout.newTab().setIcon(forum));
+
+        tabLayout.addTab(tabLayout.newTab().setIcon(event));
+
+        tabLayout.addTab(tabLayout.newTab().setIcon(member));
+
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
