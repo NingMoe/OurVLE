@@ -78,7 +78,7 @@ public class EventSync {
             deleteStaleData();
             for (int i = 0; i < mevents.size(); i++) {
                 final Event event = mevents.get(i);
-                Course eventCourse = new Select().from(Event.class).where("courseid = ?",event.getCourseid()).executeSingle();
+                Course eventCourse = new Select().from(Course.class).where("courseid = ?",event.getCourseid()).executeSingle();
                 if(eventCourse!=null)
                 {
                     event.setCoursename(eventCourse.getShortname());

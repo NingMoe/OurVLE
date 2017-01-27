@@ -79,6 +79,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         first_update = sharedPrefs.getInt(MoodleConstants.FIRST_UPDATE, 404); // flag to check whether this is the first update
 
         mSites = new Select().all().from(SiteInfo.class).execute();
+
+        if(mSites==null)
+            return;
+        if(mSites.size()<=0)
+            return;
+
         token = mSites.get(0).getToken(); // gets the url token
 
         courses = new Select().all().from(Course.class).execute(); // gets all the courses

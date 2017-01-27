@@ -29,7 +29,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.activeandroid.query.Select;
+import com.stoneapp.ourvlemoodle2.models.Course;
 import com.stoneapp.ourvlemoodle2.models.Event;
 import com.stoneapp.ourvlemoodle2.util.TimeUtils;
 import com.stoneapp.ourvlemoodle2.R;
@@ -76,6 +79,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
             @Override
             public void onClick(View view) {
                 //Add to calendar
+
             }
         });
 
@@ -97,10 +101,15 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
                 eventViewHolder.tvDesc.setText(Html.fromHtml(eventdesc).toString().trim()); //convert html to string
             }
 
+            Course eventCourse = new Select().from(Course.class).where("courseid = ?",event.getCourseid()).executeSingle();
 
-            if(!TextUtils.isEmpty(event.getCoursename())) {
-                eventViewHolder.tvCourseName.setText(event.getCoursename());
+            if(eventCourse!=null)
+            {
+                if(!TextUtils.isEmpty(eventCourse.getShortname())){
+                    eventViewHolder.tvCourseName.setText(eventCourse.getShortname());
+                }
             }
+
 
             final int eventdate = event.getTimestart();
 

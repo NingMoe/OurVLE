@@ -20,6 +20,7 @@
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:layout_margin="10dp"
     android:layout_height="wrap_content"
@@ -28,12 +29,14 @@
     android:clickable="true"
     android:foreground="?android:selectableItemBackground">
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:id="@+id/topView"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -41,55 +44,38 @@
                 android:id="@+id/imageView1"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="5dp"
-                android:src="@drawable/ic_people_24dp"
-                android:paddingTop="5dp"/>
+                app:srcCompat="@drawable/ic_people_24dp" />
 
             <TextView
-                android:paddingTop="5dp"
                 android:id="@+id/discussion_topicname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/imageView1"
-                android:paddingRight="20dp"
-                android:paddingLeft="5dp"
-                android:alpha="0.75"
                 tools:text="My Programming Lab"
-                android:textColor="#000000"
-                android:textSize="16sp" />
+                android:textSize="20sp"
+                android:paddingLeft="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                />
 
             <!--<ImageView
                 android:id="@+id/numreplies"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />!-->
+                android:layout_width="24dp"
+                android:background="#ff0000"
+                android:layout_height="24dp"
+                />!-->
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <TextView
+            android:paddingTop="16dp"
             android:id="@+id/coursename"
-            android:layout_below="@+id/topView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:alpha="0.57"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             tools:text="COMP1161"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp"
-            android:textColor="@android:color/black"
-            android:textSize="12sp" />
+             />
 
         <RelativeLayout
-            android:id="@+id/timeView"
-            android:layout_below="@+id/coursename"
+            android:paddingTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -99,26 +85,23 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:alpha="0.57"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:text="Started By"
-                android:paddingLeft="5dp"
-                android:paddingTop="10dp"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                 />
 
             <TextView
                 android:id="@+id/lastpostime"
-                android:paddingTop="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:paddingRight="5dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 tools:text="17,Sep 10:28pm" />
 
         </RelativeLayout>
 
+
         <RelativeLayout
-            android:layout_below="@+id/timeView"
+            android:paddingTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -126,33 +109,23 @@
                 android:id="@+id/startname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:paddingBottom="5dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:paddingTop="10dp"
-                android:alpha="0.65"
                 tools:text="Matthew Stone"
-                android:textColor="@android:color/black"
-                android:layout_toLeftOf="@+id/lastpostname"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/lastpostname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                android:paddingRight="5dp"
-                android:layout_alignBaseline="@+id/startname"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:alpha="0.7"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 tools:text="John Doe" />
 
         </RelativeLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </android.support.v7.widget.CardView>

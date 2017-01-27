@@ -51,7 +51,7 @@ public class CourseSync {
 
         ActiveAndroid.beginTransaction();
         try {
-            //deleteStaleData();
+            deleteStaleData();
             for (int i = 0; i < courses.size(); i++) {
                 final Course course = courses.get(i);
 
