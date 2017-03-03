@@ -20,11 +20,13 @@
 package com.stoneapp.ourvlemoodle2.sync;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.stoneapp.ourvlemoodle2.models.Module;
 import com.stoneapp.ourvlemoodle2.models.ModuleContent;
@@ -39,7 +41,7 @@ public class ContentSync {
     private Context context;
     private boolean first_update; // flag to check whether its a first sync
     private String token; // url token
-    List<Section> sections;
+    List<Section> mSections;
 
     public ContentSync(int courseid, long coursepid, long siteid, String token, Context context) {
         this.courseid = courseid;
@@ -53,21 +55,79 @@ public class ContentSync {
 
     public boolean syncContent() {
 
+
         RestCourseContent mcontent = new RestCourseContent(token);
-        sections = mcontent.getSections(courseid + ""); // gets the sections from api call
 
-        if (sections == null) // check if there are no sections
+        mSections = mcontent.getSections(courseid + ""); // gets the sections from api call
+
+
+
+        if (mSections == null) // check if there are no sections
             return false;
 
-        if (sections.size() == 0)
+        if (mSections.size() == 0)
             return false;
 
+        List<Section> oldSections = new Select().all().from(Section.class).execute();
+
+        //clear old data only if new data is present
+        ActiveAndroid.beginTransaction();
+        try{
+            if(oldSections!=null)
+            {
+                for(int i=0;i<oldSections.size();i++)
+                {
+                    Section section = oldSections.get(i);
+
+                    if(section!=null)
+                    {
+                        Section.delete(Section.class,section.getId());
+
+                        List<Module> modules = section.getModules();
+                        if(modules!=null)
+                        {
+                            for(int j=0;j<modules.size();j++)
+                            {
+                                Module module = modules.get(j);
+                                if(module!=null)
+                                {
+                                    Module.delete(Module.class,module.getId());
+                                    List<ModuleContent> contents = module.getContents();
+                                    if(contents!=null)
+                                    {
+                                        for(int k=0;k<contents.size();k++)
+                                        {
+                                            ModuleContent moduleContent = contents.get(k);
+                                            if(moduleContent!=null)
+                                            {
+                                                ModuleContent.delete(ModuleContent.class,moduleContent.getId());
+                                            }
+
+                                        }
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+
+
+
+
+                }
+            }
+
+            ActiveAndroid.setTransactionSuccessful();
+        }finally {
+            ActiveAndroid.endTransaction();
+        }
 
         ActiveAndroid.beginTransaction();
         try {
             //deleteStaleSections();
-            for (int i = 0; i < sections.size(); i++) {
-                final Section section = sections.get(i);
+            for (int i = 0; i < mSections.size(); i++) {
+                final Section section = mSections.get(i);
                 section.setCourseid(courseid);
                 section.setParentid(coursepid);
 
@@ -100,6 +160,7 @@ public class ContentSync {
 
             syncModuleContents(db_module.getContents(), db_module.getModuleid(), db_module.getId(), sectionid); //sync module contents
         }
+
     }
 
     private void syncModuleContents(ArrayList<ModuleContent> contents, int moduleid, long modulepid, int sectionid) {
@@ -171,7 +232,7 @@ public class ContentSync {
 
     private boolean doesSectionExistInJson(Section section)
     {
-        return sections.contains(section);
+        return mSections.contains(section);
     }
 
     private void deleteStaleModules(List<Module> modules)
@@ -212,38 +273,5 @@ public class ContentSync {
 
 
 
-   /* public void addNotification (Module module) {
-        Course course =  new Select().from(Course.class).where("courseid = ?", courseid).executeSingle();
 
-        Intent resultIntent = new Intent(context, CourseViewActivity.class);
-        resultIntent.putExtra("coursename", course.getShortname());
-        resultIntent.putExtra("coursefname", course.getFullname());
-        resultIntent.putExtra("courseid", course.getCourseid());
-        resultIntent.putExtra("coursepid", course.getId());
-
-        TaskStackBuilder stackBuilder =  TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(CourseViewActivity.class);
-
-        stackBuilder.addNextIntent(resultIntent);
-
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_school_24dp)
-                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                .setContentTitle("New Content")
-                .setContentText(Html.fromHtml(module.getName()).toString().trim())
-                .setContentIntent(resultPendingIntent)
-                .setAutoCancel(true)
-                .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(Html.fromHtml(module.getName()).toString().trim()))
-                .addAction(R.drawable.ic_clear_24dp, "Dismiss", null)
-                .addAction(R.drawable.ic_add_24dp, "Download", null);
-
-        NotificationManagerCompat mNotificationManager =
-                NotificationManagerCompat.from(context);
-        mNotificationManager.notify(module.getModuleid(), mBuilder.build());
-    }*/
 }

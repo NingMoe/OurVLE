@@ -111,8 +111,15 @@ public class FileUtils {
             }
         }
 
-        Uri fileUri = FileProvider.getUriForFile(context,context.
-                getApplicationContext().getPackageName() + ".provider",file);
+        Uri fileUri;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            // Do something for lollipop and above versions
+            fileUri = FileProvider.getUriForFile(context,context.
+                    getApplicationContext().getPackageName() + ".provider",file);
+        } else{
+            fileUri = Uri.fromFile(file);
+            // do something for phones running an SDK before lollipop
+        }
 
         intent.setDataAndType(fileUri, mtype);
         try {

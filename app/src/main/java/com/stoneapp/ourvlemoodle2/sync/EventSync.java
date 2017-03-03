@@ -20,6 +20,7 @@
 package com.stoneapp.ourvlemoodle2.sync;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -32,7 +33,9 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -48,12 +51,12 @@ import com.stoneapp.ourvlemoodle2.R;
 
 public class EventSync {
     String token;
-    Context context;
+    Context mContext;
     List<Event> mevents;
 
     public EventSync(Context context, String token) {
         this.token = token;
-        this.context = context;
+        this.mContext = context;
     }
 
     public boolean syncEvents(List<String> courseids) {
@@ -72,7 +75,7 @@ public class EventSync {
             return false;
         }
 
-
+        List<Event> notifEvents = new ArrayList<>();
         ActiveAndroid.beginTransaction();
         try {
             deleteStaleData();
@@ -83,15 +86,76 @@ public class EventSync {
                 {
                     event.setCoursename(eventCourse.getShortname());
                 }
-
-                Event.findOrCreateFromJson(event); // saves contact to database
+                int result = findOrCreateFromJson(event);
+                if(result==1) // saves event to database
+                {
+                    //new event so add event to list of notifications
+                    notifEvents.add(event);
+                    //Toast.makeText(mContext,"New Event",Toast.LENGTH_SHORT).show();
+                }
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
             ActiveAndroid.endTransaction();
         }
 
+       // if(notifEvents.size()>0)
+           // notifyEvents(notifEvents);
+
         return true;
+    }
+
+    private int findOrCreateFromJson(Event new_event) {
+        int eventid = new_event.getEventid();
+        Event existingEvent =
+                new Select().from(Event.class).where("eventid = ?", eventid).executeSingle();
+        if (existingEvent != null) {
+            // found and return existing
+            // UpdateEvent(existingEvent,new_event);
+            return 0;
+        } else {
+            // create and return new user
+            Event event = new_event;
+            event.save();
+            return 1;
+        }
+    }
+    void notifyEvents(List<Event> notifEvents)
+    {
+        TaskStackBuilder stackBuilder =  TaskStackBuilder.create(mContext);
+        stackBuilder.addParentStack(MainActivity.class);
+
+        Intent resultIntent = new Intent(mContext, MainActivity.class);
+        resultIntent.setAction(BuildConfig.APPLICATION_ID + ".ACTION_OPEN_EVENTS");
+
+        stackBuilder.addNextIntent(resultIntent);
+
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(mContext)
+                        .setSmallIcon(R.drawable.ic_event_available_24dp)
+                        .setColor(ContextCompat.getColor(mContext, R.color.colorPrimary))
+                        .setContentTitle(notifEvents.size() + "New Events")
+                        .setContentIntent(resultPendingIntent)
+                        .setAutoCancel(true)
+                        .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND);
+
+
+        NotificationCompat.InboxStyle inboxStyle =
+                new NotificationCompat.InboxStyle();
+        String endTitle = notifEvents.size()>1? " New Events":" New Event";
+        inboxStyle.setBigContentTitle(notifEvents.size() + endTitle);
+        for (int i=0; i < notifEvents.size(); i++) {
+
+            inboxStyle.addLine(notifEvents.get(i).getCoursename()+" " + notifEvents.get(i).getName());
+        }
+        mBuilder.setStyle(inboxStyle);
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+// mId allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
     }
 
     private void deleteStaleData()
@@ -127,7 +191,7 @@ public class EventSync {
     public void addCalendarEvent(Event event) {
         Calendar cal = Calendar.getInstance();
         Uri EVENTS_URI = Uri.parse("content://com.android.calendar/" + "events"); //creates a new uri for calendar
-        ContentResolver cr = context.getContentResolver();
+        ContentResolver cr = mContext.getContentResolver();
 
         // event insert
         ContentValues values = new ContentValues();
@@ -188,7 +252,7 @@ public class EventSync {
         return calendarUriBase;
     }
 
-    public void addNotification (Event event) {
+    /*public void addNotification (Event event) {
         TaskStackBuilder stackBuilder =  TaskStackBuilder.create(context);
         stackBuilder.addParentStack(MainActivity.class);
 
@@ -218,6 +282,6 @@ public class EventSync {
                 NotificationManagerCompat.from(context);
 
         mNotificationManager.notify(event.getEventid(), mBuilder.build());
-    }
+    }*/
 }
 

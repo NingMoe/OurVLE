@@ -52,8 +52,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -138,6 +140,7 @@ public class CourseContentFragment extends Fragment
 
         setUpProgressBar();
 
+
         new LoadContentTask(context).execute();
 
         return mRootView;
@@ -167,7 +170,8 @@ public class CourseContentFragment extends Fragment
     private void setUpRecyclerView()
     {
         mContentListView.setHasFixedSize(true);
-        mContentListView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
+        //mContentListView.setLayoutManager(new NpaLinearLayoutManager(getActivity()));
+        mContentListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mContentListAdapter = new CourseContentListAdapter(getActivity(),mItems, mToken, mCourseid, mCourseName, this);
         mContentListView.setAdapter(mContentListAdapter);
     }
@@ -307,6 +311,7 @@ public class CourseContentFragment extends Fragment
 
     private class LoadContentTask extends AsyncTask<Void,Void, Boolean> {
         Context context;
+        String text="";
 
         public LoadContentTask(Context context) {
             this.context = context;
@@ -349,6 +354,8 @@ public class CourseContentFragment extends Fragment
             if (result) {
                 getContentFromDatabase();
                 mContentListAdapter.updateContentList(mItems);
+            }else{
+
             }
             if (mItems.size() == 0) {
                 mImgPlaceHolder.setVisibility(View.VISIBLE);
@@ -358,7 +365,9 @@ public class CourseContentFragment extends Fragment
     }
 
     @Override
-    public void onRefresh() {
+    public void onRefresh()
+    {
+
         new LoadContentTask(getActivity()).execute(); // refresh content
     }
 

@@ -176,19 +176,19 @@ public class Event extends Model{
         return subscriptionid;
     }
 
-    public static Event findOrCreateFromJson(Event new_event) {
+    public static int findOrCreateFromJson(Event new_event) {
         int eventid = new_event.getEventid();
         Event existingEvent =
                 new Select().from(Event.class).where("eventid = ?", eventid).executeSingle();
         if (existingEvent != null) {
             // found and return existing
            // UpdateEvent(existingEvent,new_event);
-            return existingEvent;
+            return 0;
         } else {
             // create and return new user
             Event event = new_event;
             event.save();
-            return event;
+            return 1;
         }
     }
 

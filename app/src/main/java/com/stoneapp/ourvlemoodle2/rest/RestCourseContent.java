@@ -19,6 +19,9 @@
 
 package com.stoneapp.ourvlemoodle2.rest;
 
+import android.util.Log;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -73,12 +76,28 @@ public class RestCourseContent {
                 writer.close();
 
                 Reader reader = new InputStreamReader(con.getInputStream());
+
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+//
+//                StringBuilder sb = new StringBuilder();
+//                String line;
+//                while((line = reader.readLine())!=null)
+//                {
+//                    sb.append(line + "\n");
+//                }
+
+                //Log.d("json",sb.toString().substring(7000,sb.toString().length()));
+
+
+
                 GsonExclude exclude = new GsonExclude();
 
                 Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(exclude)
                         .addSerializationExclusionStrategy(exclude).create();
 
                 sections = gson.fromJson(reader, new TypeToken<List<Section>>(){}.getType());
+
+                //Log.d("Section",sections.get(sections.size()-1).getModules().get(1).getName());
                 reader.close();
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block

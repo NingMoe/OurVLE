@@ -52,6 +52,7 @@ import android.support.v7.widget.Toolbar;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class CourseViewActivity extends AppCompatActivity
@@ -125,6 +126,8 @@ public class CourseViewActivity extends AppCompatActivity
         token = sites.get(0).getToken();
         name = sites.get(0).getFullname();
         userid = sites.get(0).getUserid();
+
+
     }
 
     @Override
@@ -175,22 +178,22 @@ public class CourseViewActivity extends AppCompatActivity
             switch (index) {
                 case 0:
                     CourseContentFragment cfragment = new CourseContentFragment();
-                    cfragment.setArguments(extras);
+                    cfragment.setArguments(getIntent().getExtras());
                     return cfragment;
 
                 case 1:
                     ForumFragment frag = new ForumFragment();
-                    frag.setArguments(extras);
+                    frag.setArguments(getIntent().getExtras());
                     return frag;
 
                 case 2:
                     EventFragment evfrag = new EventFragment();
-                    evfrag.setArguments(extras);
+                    evfrag.setArguments(getIntent().getExtras());
                     return evfrag;
 
                 case 3:
                     MembersFragment memFrag = new MembersFragment();
-                    memFrag.setArguments(extras);
+                    memFrag.setArguments(getIntent().getExtras());
                     return memFrag;
 
                 default:

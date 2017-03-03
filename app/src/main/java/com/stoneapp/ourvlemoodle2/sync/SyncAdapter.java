@@ -92,7 +92,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         updateLatestEvents();
         updateLatestForumPosts();
         updateLatestDiscussionPots();
-        updateLatestCourseContent();
+       // updateLatestCourseContent();
         updateMembers();
     }
 

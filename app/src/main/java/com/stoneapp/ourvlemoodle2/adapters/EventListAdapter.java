@@ -19,8 +19,10 @@
 
 package com.stoneapp.ourvlemoodle2.adapters;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
@@ -78,7 +80,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Add to calendar
+                //logToast.makeText(mContext,"Hello",Toast.LENGTH_SHORT).show();
 
             }
         });
