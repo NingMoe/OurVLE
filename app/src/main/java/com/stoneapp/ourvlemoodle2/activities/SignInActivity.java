@@ -211,8 +211,6 @@ public class SignInActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) { return; } })
                 .create();
         dialog.show();
     }
