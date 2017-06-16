@@ -317,14 +317,6 @@ public class SignInActivity extends AppCompatActivity {
                 return false;
             }
 
-
-            if (courses.size() == 0)
-            {
-                error = "No courses registered";
-                return false;
-            }
-
-
             Course course;
             for (int i = 0; i < courses.size(); i++) {
                 course = courses.get(i);
