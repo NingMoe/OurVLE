@@ -205,7 +205,7 @@ public class SignInActivity extends AppCompatActivity {
                 " email the helpdesk or visit the UWI Mona Live Support page (link below) to" +
                 " request a password reset";
 
-        AlertDialog dialog = new AlertDialog.Builder(context)
+        AlertDialog dialog = new AlertDialog.Builder(context, R.style.LoginHelpDialogStyle)
                 .setTitle("Login Help").setMessage(message)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
