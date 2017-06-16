@@ -53,7 +53,7 @@ public class LogoutTask {
     }
 
     public void LogOut() {
-        AlertDialog dialog = new AlertDialog.Builder(context)
+        AlertDialog dialog = new AlertDialog.Builder(context, R.style.AlertDialogStyle)
                 .setTitle(R.string.action_logout).setMessage(R.string.dialog_logout_message)
                 .setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
