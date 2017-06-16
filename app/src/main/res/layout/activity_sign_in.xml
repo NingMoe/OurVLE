@@ -49,14 +49,14 @@
             android:id="@+id/idnum_float_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="34dp" >
+            android:layout_marginBottom="34dp"
+            app:hintTextAppearance="@style/TextAppearance.FloatLabelHint" >
 
             <EditText
                 android:id="@+id/editTextUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/id_number"
-                android:textColor="@android:color/white"
                 android:inputType="number" />
 
         </android.support.design.widget.TextInputLayout>
@@ -65,14 +65,14 @@
             android:id="@+id/password_float_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:passwordToggleEnabled="true" >
+            app:passwordToggleEnabled="true"
+            app:hintTextAppearance="@style/TextAppearance.FloatLabelHint">
 
             <EditText
                 android:id="@+id/editPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/password"
-                android:textColor="@android:color/white"
                 android:inputType="textPassword" />
 
         </android.support.design.widget.TextInputLayout>

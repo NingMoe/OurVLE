@@ -53,6 +53,7 @@
         </provider>
         <activity
             android:name=".activities.SignInActivity"
+            android:theme="@style/SignInActivityTheme"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateVisible|adjustResize" />
