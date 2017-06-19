@@ -156,7 +156,7 @@ public class SignInActivity extends AppCompatActivity {
         mUserPass = (EditText) findViewById(R.id.editPassword);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBarSignIn);
         mTvLoginHelp = (TextView) findViewById(R.id.login_help);
-        mTvUserLabel = (TextInputLayout) findViewById(R.id.idnum_float_label);
+        mTvUserLabel = (TextInputLayout) findViewById(R.id.username_float_label);
         mTvUserPassLabel = (TextInputLayout) findViewById(R.id.password_float_label);
         mImageIcon = (ImageView) findViewById(R.id.imgView);
         mProgressBar.setIndeterminate(true);

@@ -27,26 +27,27 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".activities.SignInActivity"
-    android:background="#f04837">
+    tools:context=".activities.SignInActivity" >
 
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <ImageView
             android:id="@+id/imgView"
-            android:paddingTop="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/splashourvle"
+            android:src="@mipmap/ic_launcher"
             android:layout_gravity="center_horizontal" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/idnum_float_label"
+            android:id="@+id/username_float_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="34dp"
@@ -56,7 +57,7 @@
                 android:id="@+id/editTextUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/id_number"
+                android:hint="@string/username"
                 android:inputType="number" />
 
         </android.support.design.widget.TextInputLayout>
@@ -77,23 +78,25 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/button"
             android:layout_marginTop="17dp"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:onClick="signin"
-            android:text="@string/sign_in" />
+            android:text="@string/sign_in"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Colored"
+            app:backgroundTint="@color/colorPrimary" />
 
-        <TextView
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/login_help"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:text="@string/forgot_password"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+            android:textColor="@color/colorPrimary"
+            style="?android:attr/borderlessButtonStyle"/>
 
     </LinearLayout>
 
