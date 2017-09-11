@@ -26,6 +26,7 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.activeandroid.util.Log;
 import com.google.gson.annotations.SerializedName;
 import com.orm.dsl.Ignore;
 
@@ -199,8 +200,10 @@ public class Section extends Model{
         if (existingSection != null) {
             // found and return existing
            // UpdateSection(existingSection,new_section);
+            Log.d(sectionid+"",existingSection.getName());
             return existingSection;
         } else {
+            Log.d(sectionid+"",new_section.getName());
             // create and return new user
             Section section = new_section;
             section.save();

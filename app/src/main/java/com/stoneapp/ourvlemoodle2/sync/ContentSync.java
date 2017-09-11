@@ -68,10 +68,30 @@ public class ContentSync {
         if (mSections.size() == 0)
             return false;
 
-        List<Section> oldSections = new Select().all().from(Section.class).execute();
+
+
+       /* List<Section> oldSections = new Select().all().from(Section.class).execute();
+
+        if(oldSections!=null) {
+            for (Section section : oldSections) {
+                Section.delete(Section.class, section.getId());
+            }
+        }*/
+
+       Log.d(courseid+"",mSections.size()+"");
+
+        for (int i = 0; i < mSections.size(); i++) {
+            final Section section = mSections.get(i);
+            section.setCourseid(courseid);
+            section.setParentid(coursepid);
+
+            Section db_section = Section.findOrCreateFromJson(section); // saves contact to database
+            syncModules(db_section.getModules(),db_section.getSectionid(),db_section.getId());
+        }
+
 
         //clear old data only if new data is present
-        ActiveAndroid.beginTransaction();
+        /*ActiveAndroid.beginTransaction();
         try{
             if(oldSections!=null)
             {
@@ -137,7 +157,7 @@ public class ContentSync {
             ActiveAndroid.setTransactionSuccessful();
         }finally {
             ActiveAndroid.endTransaction();
-        }
+        }*/
         return true;
     }
 
