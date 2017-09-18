@@ -144,7 +144,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 discussionids.add(discussions.get(i).getDiscussionid() + ""); // adds a discussion id to list
 
             for(int i = 0; i < discussionids.size(); i++)
-                new PostSync(token).syncPosts(discussionids.get(i)); // syncs posts
+                new PostSync(super.getContext(),token).syncPosts(discussionids.get(i)); // syncs posts
         }
     }
 

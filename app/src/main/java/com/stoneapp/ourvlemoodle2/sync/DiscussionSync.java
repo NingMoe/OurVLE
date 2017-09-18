@@ -22,11 +22,21 @@ package com.stoneapp.ourvlemoodle2.sync;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.ContextCompat;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
+import com.stoneapp.ourvlemoodle2.BuildConfig;
+import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.activities.MainActivity;
 import com.stoneapp.ourvlemoodle2.models.Discussion;
+import com.stoneapp.ourvlemoodle2.models.Event;
 import com.stoneapp.ourvlemoodle2.rest.RestDiscussion;
 
 public class DiscussionSync {
@@ -45,6 +55,7 @@ public class DiscussionSync {
         RestDiscussion mrdiscuss = new RestDiscussion(token);
         discussions = mrdiscuss.getDiscussions(forumids); // get discussions from api call
 
+        List<Discussion> notifDiscussions = new ArrayList<>();
         // check if there are no discussions
         if (discussions == null)
             return false;
@@ -58,14 +69,60 @@ public class DiscussionSync {
             for (int i = 0; i < discussions.size(); i++) {
                 final Discussion discussion = discussions.get(i);
 
-                Discussion.findOrCreateFromJson(discussion); // saves contact to database
+                if(Discussion.findOrCreateFromJson(discussion)==0)
+                {
+                    notifDiscussions.add(discussion);
+                } // saves contact to database
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
             ActiveAndroid.endTransaction();
         }
 
+        if(notifDiscussions.size() >0)
+        {
+            notifyDiscussions(notifDiscussions);
+        }
+
         return true;
+    }
+
+    void notifyDiscussions(List<Discussion> notifDiscussions)
+    {
+        TaskStackBuilder stackBuilder =  TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(MainActivity.class);
+
+        Intent resultIntent = new Intent(context, MainActivity.class);
+        resultIntent.setAction(BuildConfig.APPLICATION_ID + ".ACTION_OPEN_NEWS");
+
+        stackBuilder.addNextIntent(resultIntent);
+
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.ic_people_white_24dp)
+                        .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                        .setContentTitle(notifDiscussions.size() + " New Discussions")
+                        .setContentIntent(resultPendingIntent)
+                        .setAutoCancel(true)
+                        .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND);
+
+
+        NotificationCompat.InboxStyle inboxStyle =
+                new NotificationCompat.InboxStyle();
+        String endTitle = notifDiscussions.size()>1? " New Discussions":" New Discussion";
+        inboxStyle.setBigContentTitle(notifDiscussions.size() + endTitle);
+        for (int i=0; i < notifDiscussions.size(); i++) {
+
+            inboxStyle.addLine(notifDiscussions.get(i).getName());
+        }
+        mBuilder.setStyle(inboxStyle);
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+// mId allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
     }
 
     private void deleteStaleData()
@@ -83,7 +140,14 @@ public class DiscussionSync {
 
     private boolean doesDiscussionExistInJson(Discussion discussion)
     {
-        return discussions.contains(discussion);
+
+        for (Discussion discuss : discussions){
+            if(discussion.getDiscussionid() == discuss.getDiscussionid())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

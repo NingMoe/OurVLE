@@ -220,19 +220,19 @@ public class Discussion extends Model{
     }
 
 
-    public static Discussion findOrCreateFromJson(Discussion new_discussion) {
+    public static int findOrCreateFromJson(Discussion new_discussion) {
         int discussionid = new_discussion.getDiscussionid();
         Discussion existingDiscussion =
                 new Select().from(Discussion.class).where("discussionid = ?", discussionid).executeSingle();
         if (existingDiscussion != null) {
             // found and return existing
             //UpdateDiscussion(existingDiscussion,new_discussion);
-            return existingDiscussion;
+            return 1;
         } else {
             // create and return new user
             Discussion discussion = new_discussion;
             discussion.save();
-            return discussion;
+            return 0;
         }
     }
 

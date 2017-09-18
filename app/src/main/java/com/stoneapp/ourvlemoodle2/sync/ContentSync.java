@@ -78,7 +78,7 @@ public class ContentSync {
             }
         }*/
 
-       Log.d(courseid+"",mSections.size()+"");
+        Log.d(courseid+"",mSections.size()+"");
 
         for (int i = 0; i < mSections.size(); i++) {
             final Section section = mSections.get(i);
@@ -90,62 +90,11 @@ public class ContentSync {
         }
 
 
-        //clear old data only if new data is present
-        /*ActiveAndroid.beginTransaction();
-        try{
-            if(oldSections!=null)
-            {
-                for(int i=0;i<oldSections.size();i++)
-                {
-                    Section section = oldSections.get(i);
-
-                    if(section!=null)
-                    {
-                        Section.delete(Section.class,section.getId());
-
-                        List<Module> modules = section.getModules();
-                        if(modules!=null)
-                        {
-                            for(int j=0;j<modules.size();j++)
-                            {
-                                Module module = modules.get(j);
-                                if(module!=null)
-                                {
-                                    Module.delete(Module.class,module.getId());
-                                    List<ModuleContent> contents = module.getContents();
-                                    if(contents!=null)
-                                    {
-                                        for(int k=0;k<contents.size();k++)
-                                        {
-                                            ModuleContent moduleContent = contents.get(k);
-                                            if(moduleContent!=null)
-                                            {
-                                                ModuleContent.delete(ModuleContent.class,moduleContent.getId());
-                                            }
-
-                                        }
-                                    }
-
-                                }
-
-                            }
-                        }
-                    }
 
 
-
-
-                }
-            }
-
-            ActiveAndroid.setTransactionSuccessful();
-        }finally {
-            ActiveAndroid.endTransaction();
-        }
-
-        ActiveAndroid.beginTransaction();
+       /* ActiveAndroid.beginTransaction();
         try {
-            //deleteStaleSections();
+            deleteStaleSections();
             for (int i = 0; i < mSections.size(); i++) {
                 final Section section = mSections.get(i);
                 section.setCourseid(courseid);
@@ -169,7 +118,7 @@ public class ContentSync {
         if (modules == null) // checks if there are no modules
             return;
 
-      //  deleteStaleModules(modules);
+        //deleteStaleModules(modules);
         for(int i = 0; i < modules.size(); i++) {
             final Module module = modules.get(i);
             module.setCourseid(courseid); // set course id of module
@@ -187,7 +136,7 @@ public class ContentSync {
         if (contents == null) // checks if there are no contents
             return;
 
-      //  deleteStaleContent(contents);
+        //deleteStaleContent(contents);
 
         for (int i = 0; i < contents.size(); i++) {
             final ModuleContent content = contents.get(i);
@@ -252,7 +201,14 @@ public class ContentSync {
 
     private boolean doesSectionExistInJson(Section section)
     {
-        return mSections.contains(section);
+        for(Section sec : mSections)
+        {
+            if(sec.getSectionid() == section.getSectionid())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void deleteStaleModules(List<Module> modules)
@@ -270,7 +226,14 @@ public class ContentSync {
 
     private boolean doesModuleExistInJson(List<Module> modules, Module module)
     {
-        return modules.contains(module);
+        for (Module mod : modules)
+        {
+            if(mod.getModuleid() == module.getModuleid())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void deleteStaleContent(List<ModuleContent> contents)
@@ -288,7 +251,14 @@ public class ContentSync {
 
     private boolean doesContentExistInJson(List<ModuleContent> contents, ModuleContent content)
     {
-        return contents.contains(content);
+        for(ModuleContent cont: contents)
+        {
+            if(cont.getModuleid() == content.getModuleid())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 

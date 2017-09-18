@@ -229,19 +229,19 @@ public class Post extends Model {
         this.userfullname = userfullname;
     }
 
-    public static Post findOrCreateFromJson(Post new_post) {
+    public static int findOrCreateFromJson(Post new_post) {
         int postid = new_post.getPostid();
         Post existingPost =
                 new Select().from(Post.class).where("postid = ?", postid).executeSingle();
         if (existingPost != null) {
             // found and return existing
             //UpdatePost(existingPost,new_post);
-            return existingPost;
+            return 0;
         } else {
             // create and return new user
             Post post = new_post;
             post.save();
-            return post;
+            return 1;
         }
     }
 

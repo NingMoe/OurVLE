@@ -28,11 +28,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.CalendarContract;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -91,7 +93,16 @@ public class EventSync {
                 {
                     //new event so add event to list of notifications
                     notifEvents.add(event);
+
                     //Toast.makeText(mContext,"New Event",Toast.LENGTH_SHORT).show();
+                }
+                if(!isEventInCal(mContext,event.getEventid()+""))
+                {
+                    try {
+                        addCalendarEvent(event);
+                    }catch(Exception e){
+                        Log.d("Calendar error",e.getMessage());
+                    }
                 }
             }
             ActiveAndroid.setTransactionSuccessful();
@@ -99,8 +110,8 @@ public class EventSync {
             ActiveAndroid.endTransaction();
         }
 
-       // if(notifEvents.size()>0)
-           // notifyEvents(notifEvents);
+        if(notifEvents.size()>0)
+            notifyEvents(notifEvents);
 
         return true;
     }
@@ -136,7 +147,7 @@ public class EventSync {
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_event_available_24dp)
                         .setColor(ContextCompat.getColor(mContext, R.color.colorPrimary))
-                        .setContentTitle(notifEvents.size() + "New Events")
+                        .setContentTitle(notifEvents.size() + " New Events")
                         .setContentIntent(resultPendingIntent)
                         .setAutoCancel(true)
                         .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND);
@@ -173,7 +184,14 @@ public class EventSync {
 
     private boolean doesEventExistInJson(Event event)
     {
-        return mevents.contains(event);
+        for(Event mevent : mevents)
+        {
+            if(mevent.getEventid() == event.getEventid())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isEventInCal(Context context, String cal_meeting_id) {
@@ -196,7 +214,7 @@ public class EventSync {
         // event insert
         ContentValues values = new ContentValues();
         values.put("calendar_id", 1);
-        values.put("_id",event.getEventid());
+        //values.put("_id",event.getEventid());
         values.put("title", event.getName());
         values.put("allDay", 0);
         values.put("dtstart", (long)event.getTimestart() * 1000);
@@ -204,6 +222,22 @@ public class EventSync {
         values.put("description", Html.fromHtml(event.getDescription()).toString().trim());
         values.put("hasAlarm", 1);
         values.put("eventTimezone", "UTC/GMT -5:00");
+
+        long begin = (long)event.getTimestart() * 1000;// starting time in milliseconds
+        long end = (long)event.getTimestart() * 1000 + ((long)event.getTimeduration() * 1000);// ending time in milliseconds
+                String[] proj =
+                new String[]{
+                        CalendarContract.Instances._ID,
+                        CalendarContract.Instances.BEGIN,
+                        CalendarContract.Instances.END,
+                        CalendarContract.Instances.EVENT_ID};
+        Cursor cursor =
+                CalendarContract.Instances.query(cr, proj, begin, end, "\"" + event.getName() + "\"");
+        if (cursor.getCount() > 0) {
+            return;
+            // deal with conflict
+        }
+
         Uri calevent = cr.insert(EVENTS_URI, values);
 
         // reminder insert
@@ -224,9 +258,13 @@ public class EventSync {
         values3.put("method", 1);
         values3.put("minutes", 60 * 24);
 
-        cr.insert(REMINDERS_URI, values);
-        cr.insert(REMINDERS_URI, values2);
-        cr.insert(REMINDERS_URI, values3);
+        try {
+            cr.insert(REMINDERS_URI, values);
+            cr.insert(REMINDERS_URI, values2);
+            cr.insert(REMINDERS_URI, values3);
+        }catch(Exception e){
+            Log.d("Insert Error",e.getMessage());
+        }
     }
 
     private String getCalendarUriBase(Context context) {

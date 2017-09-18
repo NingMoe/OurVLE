@@ -71,8 +71,18 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         String action = getIntent().getAction();
-        if (action != null && action.equals(BuildConfig.APPLICATION_ID + ".ACTION_OPEN_EVENTS"))
-            viewPager.setCurrentItem(1);
+        if (action != null){
+            if(action.equals(BuildConfig.APPLICATION_ID + ".ACTION_OPEN_EVENTS"))
+            {
+                viewPager.setCurrentItem(1);
+            }
+
+            if(action.equals(BuildConfig.APPLICATION_ID + ".ACTION_OPEN_NEWS"))
+            {
+                viewPager.setCurrentItem(2);
+            }
+        }
+
 
         // Create account, if needed
         CreateSyncAccount(this);

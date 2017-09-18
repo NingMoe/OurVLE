@@ -223,7 +223,7 @@ public class PostActivity  extends AppCompatActivity
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            final PostSync psync = new PostSync(token);
+            final PostSync psync = new PostSync(context,token);
 
             if (!isConnected()) {  // if there is no internet connection
                 return false;
