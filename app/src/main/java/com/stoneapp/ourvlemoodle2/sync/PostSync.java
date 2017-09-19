@@ -93,7 +93,7 @@ public class PostSync {
 
         if(notifPosts.size() > 0)
         {
-            notifyPosts(notifPosts);
+            //notifyPosts(notifPosts);
         }
 
         return true;

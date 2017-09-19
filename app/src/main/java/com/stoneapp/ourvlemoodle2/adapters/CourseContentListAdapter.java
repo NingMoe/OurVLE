@@ -264,7 +264,8 @@ public class CourseContentListAdapter
             } else {
 
                 Toast.makeText(mContext, "Downloading file", Toast.LENGTH_SHORT).show();
-                FileUtils.downloadFile(mContext, file_url, file_path, content.getFilename());
+                String fixed_url = file_url.replaceAll("https","http");
+                FileUtils.downloadFile(mContext, fixed_url, file_path, content.getFilename());
             }
         } else {
             mFile = new FileObject(file_path,file_url,content.getFilename());

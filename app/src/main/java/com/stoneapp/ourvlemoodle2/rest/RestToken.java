@@ -74,8 +74,10 @@ public class RestToken {
             token = gson.fromJson(reader, Token.class);
             reader.close();
         }catch (MalformedURLException m){
+            Log.d("Error",m.getMessage());
             return null;
         }catch (IOException io){
+            Log.d("IOError",io.getMessage());
             return null;
         }
 

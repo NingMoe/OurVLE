@@ -425,9 +425,12 @@ public class CourseContentFragment extends Fragment
                         File file = new File(Environment.getExternalStoragePublicDirectory("/OURVLE")
                                 + mFile.getPath() + mFile.getFilename());
                         mFile.setFile(file);
-                        Toast.makeText(getActivity(), "Downloading file", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getActivity(), "Downloading file", Toast.LENGTH_SHORT).show();
+                        String download_url = mFile.getDownloadUrl();
+                        String fixed_url = download_url.replaceAll("https","http");
+                        //Toast.makeText(getActivity(),download_url,Toast.LENGTH_SHORT).show();
                         FileUtils.downloadFile(getActivity(),
-                                mFile.getDownloadUrl(), mFile.getPath(),mFile.getFilename());
+                                fixed_url, mFile.getPath(),mFile.getFilename());
                     }
 
 
