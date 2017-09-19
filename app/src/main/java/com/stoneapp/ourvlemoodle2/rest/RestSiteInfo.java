@@ -78,6 +78,8 @@ public class RestSiteInfo {
             return null;
         } catch (IOException e) {
             return null;
+        } catch (Exception e){
+            return null;
         }
 
         return siteInfo;
