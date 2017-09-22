@@ -23,13 +23,16 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +70,8 @@ public class CourseContentListAdapter
     private CourseContentFragment mCFrag;
     private String filter = "";
     private final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0x1;
+    private static final String PACKAGE_NAME = "com.android.chrome";
+    private static final String EXTRA_CUSTOM_TABS_TOOLBAR_COLOR = "android.support.customtabs.extra.TOOLBAR_COLOR";
 
     public static class CourseContentViewHolder extends RecyclerView.ViewHolder {
 
@@ -225,11 +230,40 @@ public class CourseContentListAdapter
             }
         }
         else {
-            intent = new Intent(mContext, BrowserActivity.class);
-            intent.putExtra("url", url);
+            //intent = new Intent(mContext, BrowserActivity.class);
+            //intent.putExtra("url", url);
+            launchUrl(url);
+            return;
         }
 
         mContext.startActivity(intent);
+    }
+
+    private void launchUrl(String url) {
+        Uri uri = Uri.parse(url);
+        if (uri == null) {
+            return;
+        }
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        CustomTabsIntent customTabsIntent = builder.build();
+
+        TypedValue typedValue = new TypedValue();
+        mContext.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        int color = typedValue.data;
+
+        builder.setToolbarColor(color);
+
+
+        PackageManager packageManager = mContext.getPackageManager();
+        List<ResolveInfo> resolveInfoList = packageManager.queryIntentActivities(customTabsIntent.intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        for (ResolveInfo resolveInfo : resolveInfoList) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            if (TextUtils.equals(packageName, PACKAGE_NAME))
+                customTabsIntent.intent.setPackage(PACKAGE_NAME);
+        }
+
+        customTabsIntent.launchUrl(mContext, uri);
     }
 
     private void downloadResource(Module module) {

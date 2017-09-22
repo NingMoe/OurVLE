@@ -50,6 +50,7 @@ import com.stoneapp.ourvlemoodle2.models.Event;
 import com.stoneapp.ourvlemoodle2.models.Events;
 import com.stoneapp.ourvlemoodle2.rest.RestEvent;
 import com.stoneapp.ourvlemoodle2.R;
+import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 public class EventSync {
     String token;
@@ -96,22 +97,25 @@ public class EventSync {
 
                     //Toast.makeText(mContext,"New Event",Toast.LENGTH_SHORT).show();
                 }
-                if(!isEventInCal(mContext,event.getEventid()+""))
+                try
                 {
-                    try {
+                    if(!isEventInCal(mContext,event.getEventid()+""))
+                    {
+
                         addCalendarEvent(event);
-                    }catch(Exception e){
-                        Log.d("Calendar error",e.getMessage());
                     }
+                } catch(Exception e){
+                    Log.d("Calendar error",e.getMessage());
                 }
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
             ActiveAndroid.endTransaction();
         }
-
-        if(notifEvents.size()>0)
-            notifyEvents(notifEvents);
+        if(SettingsUtils.shouldShowNotifications(mContext)) {
+            if (notifEvents.size() > 0)
+                notifyEvents(notifEvents);
+        }
 
         return true;
     }

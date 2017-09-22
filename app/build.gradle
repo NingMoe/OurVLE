@@ -51,6 +51,7 @@ android {
 
 dependencies {
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile "com.android.support:customtabs:${supportLibVersion}"
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:cardview-v7:${supportLibVersion}"

@@ -53,7 +53,9 @@
             android:defaultValue="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Notifcation types">
+    <PreferenceCategory
+        android:dependency="pref_show_notifications"
+        android:title="Notifcation types">
         <CheckBoxPreference
             android:key="pref_notif_events"
             android:title="Events"
@@ -61,6 +63,7 @@
         <CheckBoxPreference
             android:key="pref_notif_content"
             android:title="Course content"
+            android:enabled="false"
             android:defaultValue="true" />
         <CheckBoxPreference
             android:key="pref_notif_discussions"
@@ -69,6 +72,7 @@
         <CheckBoxPreference
             android:key="pref_notif_messages"
             android:title="Private messages"
+            android:enabled="false"
             android:defaultValue="true" />
     </PreferenceCategory>
 </PreferenceScreen>

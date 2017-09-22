@@ -49,7 +49,7 @@ public class SettingsUtils {
 
     public static boolean shouldShowNotifications(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getBoolean(PREF_SHOW_NOTIFICATIONS, false);
+        return sp.getBoolean(PREF_SHOW_NOTIFICATIONS, true);
     }
 
     public static boolean shouldPlayNotificationSound(final Context context) {

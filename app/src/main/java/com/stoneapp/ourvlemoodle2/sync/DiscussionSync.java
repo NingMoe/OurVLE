@@ -38,6 +38,7 @@ import com.stoneapp.ourvlemoodle2.activities.MainActivity;
 import com.stoneapp.ourvlemoodle2.models.Discussion;
 import com.stoneapp.ourvlemoodle2.models.Event;
 import com.stoneapp.ourvlemoodle2.rest.RestDiscussion;
+import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 public class DiscussionSync {
     String token;
@@ -79,9 +80,10 @@ public class DiscussionSync {
             ActiveAndroid.endTransaction();
         }
 
-        if(notifDiscussions.size() >0)
-        {
-            notifyDiscussions(notifDiscussions);
+        if(SettingsUtils.shouldShowNotifications(context)) {
+            if (notifDiscussions.size() > 0) {
+                notifyDiscussions(notifDiscussions);
+            }
         }
 
         return true;

@@ -21,8 +21,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.stoneapp.ourvlemoodle2"
-    android:versionCode="21"
-    android:versionName="2.1.1">
+    android:versionCode="23"
+    android:versionName="2.1.3">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />

@@ -32,9 +32,12 @@ import com.stoneapp.ourvlemoodle2.util.SettingsUtils;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.support.customtabs.CustomTabsClient;
+import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -49,10 +52,18 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.List;
 
+import static android.provider.ContactsContract.Directory.PACKAGE_NAME;
+
+
+
 public class MainActivity extends AppCompatActivity {
+
+    private CustomTabsClient mClient;
+    private static final String PACKAGE_NAME = "com.android.chrome";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,9 +94,29 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        Toast.makeText(this,SettingsUtils.shouldShowNotifications(this)+"",Toast.LENGTH_SHORT).show();
 
         // Create account, if needed
         CreateSyncAccount(this);
+
+        warmUpChrome();
+    }
+
+    private void warmUpChrome() {
+        CustomTabsServiceConnection service = new CustomTabsServiceConnection() {
+            @Override
+            public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
+                mClient = client;
+                mClient.warmup(0);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                mClient = null;
+            }
+        };
+
+        CustomTabsClient.bindCustomTabsService(getApplicationContext(),PACKAGE_NAME, service);
     }
 
     @Override
